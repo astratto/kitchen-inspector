@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = KitchenInspector::Inspector::VERSION
   spec.authors       = ["Stefano Tortarolo"]
   spec.email         = ["stefano.tortarolo@gmail.com"]
-  spec.description   = %q{This gem verifies that dependencies are updated in regard with a Chef Server and Gitlab}
+  spec.description   = %q{This gem verifies that dependencies are updated checking both a Chef Server and a Gitlab instance}
   spec.summary       = %q{Chef server and Gitlab dependency checker}
   spec.homepage      = "https://github.com/astratto/kitchen-inspector"
   spec.license       = "MIT"
