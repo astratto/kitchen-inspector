@@ -76,5 +76,12 @@ Two display formats are supported: table and json
     +-----------+-------------+-------+--------+--------+-------------+-------------+--------+--------------------+
     Status: error (✖)
 
-## Credits
+## LICENSE
+
+Author:: Stefano Tortarolo <stefano.tortarolo@gmail.com>
+
+Copyright:: Copyright (c) 2013
+License:: MIT License
+
+## CREDITS
 This code was heavily inspired by Kannan Manickam's [chef-taste](https://github.com/arangamani/chef-taste)
