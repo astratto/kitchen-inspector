@@ -36,6 +36,7 @@ module KitchenInspector
 
       desc 'investigate (COOKBOOK_PATH)', 'Check Gitlab/Chef status of dependent cookbooks'
 
+      map 'inspect'   => :investigate
       def investigate(path=Dir.pwd)
         dependencies = DependencyInspector.investigate path
         if dependencies.empty?
