@@ -49,6 +49,7 @@ module KitchenInspector
 
       def self.investigate(path)
         raise NotACookbookError, 'Path is not a cookbook' unless File.exists?(File.join(path, 'metadata.rb'))
+
         ridley = Ridley::Chef::Cookbook::Metadata.from_file(File.join(path, 'metadata.rb'))
         dependencies =
           ridley.dependencies.map do |name, version|
@@ -63,7 +64,7 @@ module KitchenInspector
         dependencies.each do |dependency|
           # Skip cookbooks that are not available on Gitlab.
           project = projects.select do |pr|
-            pr.instance_variable_get("@data")["path"] == "#{dependency.name}"
+            pr.path == "#{dependency.name}"
           end
 
           next unless project
@@ -134,7 +135,7 @@ module KitchenInspector
 
       def self.find_gitlab_versions(project)
         Gitlab.tags(project.id).collect do |t|
-          fix_version_name(t.instance_variable_get("@data")["name"])
+          fix_version_name(t.name)
         end
       end
 
