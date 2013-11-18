@@ -34,11 +34,16 @@ module KitchenInspector
                              default: 'table',
                              aliases: '-t'
 
+      method_option :recursive, type: :boolean,
+                             desc: 'Specify whether recursive dependencies must be analyzed',
+                             default: true,
+                             aliases: '-r'
+
       desc 'investigate (COOKBOOK_PATH)', 'Check Gitlab/Chef status of dependent cookbooks'
 
       map 'inspect'   => :investigate
       def investigate(path=Dir.pwd)
-        dependencies = DependencyInspector.investigate path
+        dependencies = DependencyInspector.investigate(path, options[:recursive])
         if dependencies.empty?
           puts 'No dependent cookbooks'.yellow
         else

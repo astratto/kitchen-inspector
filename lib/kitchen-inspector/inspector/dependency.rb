@@ -60,8 +60,8 @@ module KitchenInspector
       # The source URL for a cookbook
       attr_accessor :source_url
 
-      # The changelog link for the dependency if available
-      attr_accessor :changelog
+      # The dependencies of a cookbook
+      attr_accessor :dependencies
 
       # Remarks field
       attr_accessor :remarks
@@ -79,10 +79,12 @@ module KitchenInspector
         @chef_status = nil
         @source_url = nil
         @remarks = []
+        @dependencies = []
       end
 
       def to_hash
         {}.tap do |hash|
+          hash[:name] = name
           hash[:requirement] = requirement
           hash[:used] = version_used
           hash[:chef_versions] = chef_versions
@@ -94,6 +96,7 @@ module KitchenInspector
           hash[:chef_status] = chef_status
           hash[:source_url] = source_url
           hash[:remarks] = remarks
+          hash[:dependencies] = dependencies
         end
       end
     end

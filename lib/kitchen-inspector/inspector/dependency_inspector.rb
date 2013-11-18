@@ -47,7 +47,7 @@ module KitchenInspector
         config.user_agent = 'Kitchen Inspector'
       end
 
-      def self.investigate(path)
+      def self.investigate(path, recursive=true)
         raise NotACookbookError, 'Path is not a cookbook' unless File.exists?(File.join(path, 'metadata.rb'))
 
         ridley = Ridley::Chef::Cookbook::Metadata.from_file(File.join(path, 'metadata.rb'))
@@ -55,10 +55,10 @@ module KitchenInspector
           ridley.dependencies.map do |name, version|
             Dependency.new(name, version)
           end
-        populate_fields(dependencies)
+        populate_fields(dependencies, recursive)
       end
 
-      def self.populate_fields(dependencies)
+      def self.populate_fields(dependencies, recursive)
         projects = Gitlab.projects(:per_page => REPO_PER_PAGE)
 
         dependencies.each do |dependency|
@@ -72,10 +72,21 @@ module KitchenInspector
           raise DuplicateCookbookError, "Found two versions for #{dependency.name} on Gitlab." if project.size > 1
           project = project.first
 
-          dependency.gitlab_versions = find_gitlab_versions(project)
+          gitlab_versions = find_gitlab_versions(project)
+          dependency.gitlab_versions = gitlab_versions.keys
           dependency.chef_versions = find_chef_server_versions(project.path)
           dependency.version_used = satisfy(dependency.requirement, dependency.chef_versions)
           dependency.source_url = "#{GITLAB_BASE_URL}/#{project.path_with_namespace}"
+
+          # Analyze its dependencies
+          if recursive && gitlab_versions.include?(dependency.version_used)
+            dependency.dependencies = retrieve_dependencies(project, gitlab_versions[dependency.version_used])
+
+            # Add dependencies not already tracked
+            dependency.dependencies.each do |dep|
+              dependencies << dep unless dependencies.collect(&:name).include?(dep.name)
+            end
+          end
 
           update_status(dependency)
         end
@@ -85,6 +96,21 @@ module KitchenInspector
         Solve::Solver.satisfy_best(constraint, versions).to_s
       rescue Solve::Errors::NoSolutionError
         nil
+      end
+
+      def self.retrieve_dependencies(project, tagId)
+        return nil unless project && tagId
+
+        response = HTTParty.get("#{Gitlab.endpoint}/projects/#{project.id}/repository/blobs/#{tagId}?filepath=metadata.rb",
+                                headers: {"PRIVATE-TOKEN" => Gitlab.private_token})
+
+        if response.code == 200
+          metadata = Ridley::Chef::Cookbook::Metadata.new
+          metadata.instance_eval response.body
+          metadata.dependencies.collect{|dep, constraint| Dependency.new(dep, constraint)}
+        else
+          nil
+        end
       end
 
       # Updates the status of the dependency based on the version used and the latest version available on Gitlab
@@ -134,9 +160,11 @@ module KitchenInspector
       end
 
       def self.find_gitlab_versions(project)
-        Gitlab.tags(project.id).collect do |t|
-          fix_version_name(t.name)
+        versions = {}
+        Gitlab.tags(project.id).collect do |tag|
+          versions[fix_version_name(tag.name)] = tag.commit.id
         end
+        versions
       end
 
       def self.fix_version_name(version)
