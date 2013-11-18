@@ -29,8 +29,8 @@ module KitchenInspector
     TICK_MARK = "\u2714"
     # The ASCII code for X mark symbol
     X_MARK = "\u2716"
-    # The ! symbol
     ESCLAMATION_MARK = "!"
+    INFO_MARK = "i"
 
     class Report
       class << self
@@ -91,12 +91,12 @@ module KitchenInspector
           # Show Status
           if dependencies.any? { |dep| dep.status == 'error' }
             status = "Status: error (#{X_MARK})".red
+          elsif dependencies.any? { |dep| dep.gitlab_status == 'warning-gitlab' }
+            status = "Status: warning-gitlab (#{ESCLAMATION_MARK})".light_red
           elsif dependencies.any? { |dep| dep.status == 'warning-req' }
             status = "Status: warning-req (#{ESCLAMATION_MARK})".yellow
-          elsif dependencies.any? { |dep| dep.status == 'warning-gitlab' }
-            status = "Status: warning-gitlab (#{ESCLAMATION_MARK})".yellow
-          elsif dependencies.any? { |dep| dep.status == 'warning-chef' }
-            status = "Status: warning-chef (#{ESCLAMATION_MARK})".yellow
+          elsif dependencies.any? { |dep| dep.chef_status == 'warning-chef' }
+            status = "Status: warning-chef (#{INFO_MARK})".blue
           else
             status = "Status: up-to-date (#{TICK_MARK})".green
           end
@@ -114,7 +114,7 @@ module KitchenInspector
           when /warning-req/
             return ESCLAMATION_MARK.bold.yellow
           when /warning-chef/
-            return "i".bold.blue
+            return INFO_MARK.bold.blue
           when /warning-gitlab/
             return (ESCLAMATION_MARK * 2).bold.light_red
           else

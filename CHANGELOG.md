@@ -3,6 +3,9 @@ Changes
 xx Nov 2013 (1.x.y)
 --
 
+FIXES:
+* Fix warnings retrieval and priorities
+
 CHANGES:
 * Add alias 'inspect'
 
