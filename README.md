@@ -10,6 +10,8 @@ It assumes that your kitchen is composed by:
 This tool checks whether the dependencies specified are up to date or not.
 It also shows whether one of the servers must be aligned.
 
+By default, dependencies are recursively analyzed.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -75,6 +77,11 @@ Two display formats are supported: table and json
     | zookeeper | = 1.0.0     |       |        | 1.0.0  |      ✖      |      !      |   ✔    | No versions found  |
     +-----------+-------------+-------+--------+--------+-------------+-------------+--------+--------------------+
     Status: error (✖)
+
+### Recursive dependencies
+
+There's an option _--recursive boolean_ that turns off recursive analysis.
+
 
 ## LICENSE
 
