@@ -1,6 +1,6 @@
 Changes
 ==
-xx Nov 2013 (1.x.y)
+18 Nov 2013 (1.0.1)
 --
 
 FIXES:
