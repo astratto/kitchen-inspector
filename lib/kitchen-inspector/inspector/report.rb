@@ -109,7 +109,7 @@ module KitchenInspector
           case status
           when 'up-to-date'
             return TICK_MARK.green
-          when 'error'
+          when /error.*/
             return X_MARK.red
           when /warning-req/
             return ESCLAMATION_MARK.bold.yellow

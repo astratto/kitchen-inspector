@@ -67,24 +67,24 @@ module KitchenInspector
             pr.path == "#{dependency.name}"
           end
 
-          next unless project
+          unless project.empty?
+            raise DuplicateCookbookError, "Found two versions for #{dependency.name} on Gitlab." if project.size > 1
+            project = project.first
 
-          raise DuplicateCookbookError, "Found two versions for #{dependency.name} on Gitlab." if project.size > 1
-          project = project.first
+            gitlab_versions = find_gitlab_versions(project)
+            dependency.gitlab_versions = gitlab_versions.keys
+            dependency.chef_versions = find_chef_server_versions(project.path)
+            dependency.version_used = satisfy(dependency.requirement, dependency.chef_versions)
+            dependency.source_url = "#{GITLAB_BASE_URL}/#{project.path_with_namespace}"
 
-          gitlab_versions = find_gitlab_versions(project)
-          dependency.gitlab_versions = gitlab_versions.keys
-          dependency.chef_versions = find_chef_server_versions(project.path)
-          dependency.version_used = satisfy(dependency.requirement, dependency.chef_versions)
-          dependency.source_url = "#{GITLAB_BASE_URL}/#{project.path_with_namespace}"
+            # Analyze its dependencies
+            if recursive && gitlab_versions.include?(dependency.version_used)
+              dependency.dependencies = retrieve_dependencies(project, gitlab_versions[dependency.version_used])
 
-          # Analyze its dependencies
-          if recursive && gitlab_versions.include?(dependency.version_used)
-            dependency.dependencies = retrieve_dependencies(project, gitlab_versions[dependency.version_used])
-
-            # Add dependencies not already tracked
-            dependency.dependencies.each do |dep|
-              dependencies << dep unless dependencies.collect(&:name).include?(dep.name)
+              # Add dependencies not already tracked
+              dependency.dependencies.each do |dep|
+                dependencies << dep unless dependencies.collect(&:name).include?(dep.name)
+              end
             end
           end
 
@@ -144,8 +144,8 @@ module KitchenInspector
             dependency.remarks << "A new version might appear on Chef server"
           end
         else
-          dependency.gitlab_status = 'warning-gitlab' unless dependency.latest_gitlab
-          dependency.chef_status = 'warning-chef' unless dependency.latest_chef
+          dependency.gitlab_status = 'error-gitlab' unless dependency.latest_gitlab
+          dependency.chef_status = 'error-chef' unless dependency.latest_chef
         end
       end
 
