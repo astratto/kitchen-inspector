@@ -27,27 +27,40 @@ module KitchenInspector
   module Inspector
     class DependencyInspector
       REPO_PER_PAGE = 1000
-      GITLAB_BASE_URL = ENV['GITLAB_URL']
-      GITLAB_API_URL = "#{GITLAB_BASE_URL}/api/v3"
-      CHEF_SERVER_URL = ENV['CHEF_SERVER_URL']
-      CHEF_USERNAME = ENV['CHEF_USERNAME']
-      CHEF_CLIENT_PEM = ENV['CHEF_CLIENT_PEM']
-      GITLAB_TOKEN = ENV['GITLAB_TOKEN']
 
-      raise GitlabAccessNotConfiguredError, "Gitlab URL not configured. Please set it in ENV['GITLAB_URL']" unless GITLAB_BASE_URL
-      raise GitlabAccessNotConfiguredError, "Private Token not configured. Please set it in ENV['GITLAB_TOKEN']" unless GITLAB_TOKEN
+      def initialize(config)
+        read_config(config)
 
-      raise ChefAccessNotConfiguredError, "Please set ENV['CHEF_SERVER_URL']" unless CHEF_SERVER_URL
-      raise ChefAccessNotConfiguredError, "Please set ENV['CHEF_USERNAME']" unless CHEF_USERNAME
-      raise ChefAccessNotConfiguredError, "Please set ENV['CHEF_CLIENT_PEM']" unless CHEF_CLIENT_PEM
+        @gitlab_api_url = "#{@gitlab_base_url}/api/v3"
 
-      Gitlab.configure do |config|
-        config.endpoint = GITLAB_API_URL
-        config.private_token = GITLAB_TOKEN
-        config.user_agent = 'Kitchen Inspector'
+        Gitlab.configure do |gitlab|
+          gitlab.endpoint = @gitlab_api_url
+          gitlab.private_token = @gitlab_token
+          gitlab.user_agent = 'Kitchen Inspector'
+        end
       end
 
-      def self.investigate(path, recursive=true)
+      # Import a configuration from a file or StringIO
+      def read_config(config)
+        if config.is_a?(StringIO)
+          configuration = config.string
+        elsif File.exists?(config) && File.readable?(config)
+          configuration = IO.read(config)
+        else
+          raise IOError, "Could not open or read: '#{config}'"
+        end
+
+        self.instance_eval configuration
+
+        raise GitlabAccessNotConfiguredError, config_msg("Gitlab base url", "gitlab_base_url") unless @gitlab_base_url
+        raise GitlabAccessNotConfiguredError, config_msg("Gitlab Private Token", "gitlab_token") unless @gitlab_token
+
+        raise ChefAccessNotConfiguredError, config_msg("Chef server url", "chef_server_url") unless @chef_server_url
+        raise ChefAccessNotConfiguredError, config_msg("Chef username", "chef_username") unless @chef_username
+        raise ChefAccessNotConfiguredError, config_msg("Chef client PEM", "chef_client_pem") unless @chef_client_pem
+      end
+
+      def investigate(path, recursive=true)
         raise NotACookbookError, 'Path is not a cookbook' unless File.exists?(File.join(path, 'metadata.rb'))
 
         ridley = Ridley::Chef::Cookbook::Metadata.from_file(File.join(path, 'metadata.rb'))
@@ -58,7 +71,7 @@ module KitchenInspector
         populate_fields(dependencies, recursive)
       end
 
-      def self.populate_fields(dependencies, recursive)
+      def populate_fields(dependencies, recursive)
         projects = Gitlab.projects(:per_page => REPO_PER_PAGE)
 
         dependencies.each do |dependency|
@@ -75,7 +88,7 @@ module KitchenInspector
             dependency.gitlab_versions = gitlab_versions.keys
             dependency.chef_versions = find_chef_server_versions(project.path)
             dependency.version_used = satisfy(dependency.requirement, dependency.chef_versions)
-            dependency.source_url = "#{GITLAB_BASE_URL}/#{project.path_with_namespace}"
+            dependency.source_url = "#{@gitlab_base_url}/#{project.path_with_namespace}"
 
             # Analyze its dependencies
             if recursive && gitlab_versions.include?(dependency.version_used)
@@ -92,16 +105,18 @@ module KitchenInspector
         end
       end
 
-      def self.satisfy(constraint, versions)
+      # Return from versions the best match that satisfies the given constraint
+      def satisfy(constraint, versions)
         Solve::Solver.satisfy_best(constraint, versions).to_s
       rescue Solve::Errors::NoSolutionError
         nil
       end
 
-      def self.retrieve_dependencies(project, tagId)
-        return nil unless project && tagId
+      # Given a project and a revision retrieve its dependencies
+      def retrieve_dependencies(project, revId)
+        return nil unless project && revId
 
-        response = HTTParty.get("#{Gitlab.endpoint}/projects/#{project.id}/repository/blobs/#{tagId}?filepath=metadata.rb",
+        response = HTTParty.get("#{Gitlab.endpoint}/projects/#{project.id}/repository/blobs/#{revId}?filepath=metadata.rb",
                                 headers: {"PRIVATE-TOKEN" => Gitlab.private_token})
 
         if response.code == 200
@@ -114,7 +129,7 @@ module KitchenInspector
       end
 
       # Updates the status of the dependency based on the version used and the latest version available on Gitlab
-      def self.update_status(dependency)
+      def update_status(dependency)
         dependency.latest_chef = get_latest_version(dependency.chef_versions)
         dependency.latest_gitlab = get_latest_version(dependency.gitlab_versions)
 
@@ -149,8 +164,9 @@ module KitchenInspector
         end
       end
 
-      def self.find_chef_server_versions(project)
-        rest = Chef::REST.new(CHEF_SERVER_URL, CHEF_USERNAME, CHEF_CLIENT_PEM)
+      # Given a project return the versions on the Chef Server
+      def find_chef_server_versions(project)
+        rest = Chef::REST.new(@chef_server_url, @chef_username, @chef_client_pem)
         cookbook = rest.get("cookbooks/#{project}")
         versions = []
         versions = cookbook[project]["versions"].collect{|c| fix_version_name(c["version"])} if cookbook
@@ -159,7 +175,8 @@ module KitchenInspector
         []
       end
 
-      def self.find_gitlab_versions(project)
+      # Given a project return the versions on Gitlab
+      def find_gitlab_versions(project)
         versions = {}
         Gitlab.tags(project.id).collect do |tag|
           versions[fix_version_name(tag.name)] = tag.commit.id
@@ -167,13 +184,46 @@ module KitchenInspector
         versions
       end
 
-      def self.fix_version_name(version)
-        version.gsub(/[v][\.]*/i, "")
+      def inspect
+        "Gitlab base url: #{@gitlab_base_url}\n" \
+        "Gitlab token: #{@gitlab_token}\n" \
+        "Chef server url: #{@chef_server_url}\n" \
+        "Chef username: #{@chef_username}\n" \
+        "Chef client pem: #{@chef_client_pem}"
       end
 
-      def self.get_latest_version(versions)
-        versions.collect{|v| Solve::Version.new(v)}.max
-      end
+      private
+        def fix_version_name(version)
+          version.gsub(/[v][\.]*/i, "")
+        end
+
+        def get_latest_version(versions)
+          versions.collect{|v| Solve::Version.new(v)}.max
+        end
+
+        def gitlab_base_url(url)
+          @gitlab_base_url = url
+        end
+
+        def gitlab_token(token)
+          @gitlab_token = token
+        end
+
+        def chef_server_url(url)
+          @chef_server_url = url
+        end
+
+        def chef_username(username)
+          @chef_username = username
+        end
+
+        def chef_client_pem(filename)
+          @chef_client_pem = filename
+        end
+
+        def config_msg(human_name, field)
+          "#{human_name} not configured. Please set #{field} in your config file."
+        end
     end
   end
 end

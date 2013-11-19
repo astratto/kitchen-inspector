@@ -39,11 +39,18 @@ module KitchenInspector
                              default: true,
                              aliases: '-r'
 
+      method_option :config, type: :string,
+                             desc: 'The configuration to use',
+                             default: File.join("#{Dir.home}", ".chef", "kitchen_inspector.rb"),
+                             aliases: '-c'
+
       desc 'investigate (COOKBOOK_PATH)', 'Check Gitlab/Chef status of dependent cookbooks'
 
       map 'inspect'   => :investigate
       def investigate(path=Dir.pwd)
-        dependencies = DependencyInspector.investigate(path, options[:recursive])
+        inspector = DependencyInspector.new options[:config]
+        dependencies = inspector.investigate(path, options[:recursive])
+
         if dependencies.empty?
           puts 'No dependent cookbooks'.yellow
         else
