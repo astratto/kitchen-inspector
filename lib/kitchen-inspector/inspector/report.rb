@@ -39,10 +39,10 @@ module KitchenInspector
         # @param dependencies [Array<Dependency>] list of cookbook dependency objects
         # @param format [String] the format used for Report
         #
-        def generate(dependencies, format)
+        def generate(dependencies, format, opts={})
           case format
           when 'table'
-            TableReport.generate(dependencies)
+            TableReport.generate(dependencies, opts)
           when'json'
             JSONReport.generate(dependencies)
           else
@@ -60,10 +60,17 @@ module KitchenInspector
         #
         # @param dependencies [Array<Dependency>] list of cookbook dependency objects
         #
-        def generate(dependencies)
+        def generate(dependencies, opts)
           rows = []
           headings = ["Name", "Requirement", "Used", "Latest\nChef", "Latest\nGitlab", "Requirement\nStatus",
-                      "Chef Server\nStatus", "Gitlab\nStatus", "Remarks"]
+                      "Chef Server\nStatus", "Gitlab\nStatus"]
+
+          if opts[:remarks]
+            headings << "Remarks"
+            remarks_counter = 0
+            remarks = []
+          end
+
           dependencies.each do |dependency|
             status = status_to_mark(dependency.status)
             chef_status = status_to_mark(dependency.chef_status)
@@ -72,7 +79,7 @@ module KitchenInspector
             name = dependency.name.dup
             name = name.red if dependency.status == 'error'
 
-            rows << [
+            row = [
               name,
               dependency.requirement,
               dependency.version_used,
@@ -80,9 +87,16 @@ module KitchenInspector
               dependency.latest_gitlab,
               { value: status, alignment: :center },
               { value: chef_status, alignment: :center },
-              { value: gitlab_status, alignment: :center },
-              dependency.remarks.join(', ')
+              { value: gitlab_status, alignment: :center }
             ]
+
+            if opts[:remarks]
+              remarks_idx, remarks_counter = remarks_indices(dependency.remarks, remarks_counter)
+              remarks.push(*dependency.remarks)
+              row << remarks_idx
+            end
+
+            rows << row
           end
 
           # Show Table
@@ -101,7 +115,20 @@ module KitchenInspector
             status = "Status: up-to-date (#{TICK_MARK})".green
           end
 
-          "#{table}\n#{status}"
+          if opts[:remarks]
+            remarks_result = remarks.each_with_index.collect{|remark, idx| "[#{idx + 1}]: #{remark}"}.join("\n")
+            "#{table}\n#{status}\n\nRemarks:\n#{remarks_result}"
+          else
+            "#{table}\n#{status}"
+          end
+        end
+
+        # Return the indices of the remarks
+        def remarks_indices(remarks, remarks_counter)
+          end_counter = remarks_counter + remarks.count
+
+          return [((remarks_counter + 1)..end_counter).to_a.join(', '), end_counter] unless remarks.empty?
+          return ['', end_counter]
         end
 
         # Given a status return a mark

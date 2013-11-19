@@ -44,17 +44,23 @@ module KitchenInspector
                              default: File.join("#{Dir.home}", ".chef", "kitchen_inspector.rb"),
                              aliases: '-c'
 
+      method_option :remarks, type: :boolean,
+                             desc: 'Show remarks (useful to provide more descriptive information)',
+                             default: false,
+                             aliases: '--remarks'
+
       desc 'investigate (COOKBOOK_PATH)', 'Check Gitlab/Chef status of dependent cookbooks'
 
       map 'inspect'   => :investigate
       def investigate(path=Dir.pwd)
         inspector = DependencyInspector.new options[:config]
+
         dependencies = inspector.investigate(path, options[:recursive])
 
         if dependencies.empty?
           puts 'No dependent cookbooks'.yellow
         else
-          puts Report.generate(dependencies, options[:format])
+          puts Report.generate(dependencies, options[:format], options)
         end
       rescue ConfigurationError => e
         puts e.message.red

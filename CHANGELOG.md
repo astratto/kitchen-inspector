@@ -7,6 +7,7 @@ FEATURES:
 
 * Add option to recursively analyze cookbook's dependencies (defaults to true)
 * Use a file to store configuration info (defaults to *${HOME}/.chef/kitchen_inspector.rb*)
+* Add option to show remarks (*--remarks*), that now are hidden by default
 
 FIXES:
 
