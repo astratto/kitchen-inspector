@@ -75,7 +75,10 @@ module KitchenInspector
         projects = Gitlab.projects(:per_page => REPO_PER_PAGE)
 
         dependencies.each do |dependency|
-          # Skip cookbooks that are not available on Gitlab.
+          dependency.chef_versions = find_chef_server_versions(dependency.name)
+          dependency.version_used = satisfy(dependency.requirement, dependency.chef_versions)
+
+          # Grab information from Gitlab
           project = projects.select do |pr|
             pr.path == "#{dependency.name}"
           end
@@ -86,8 +89,6 @@ module KitchenInspector
 
             gitlab_versions = find_gitlab_versions(project)
             dependency.gitlab_versions = gitlab_versions.keys
-            dependency.chef_versions = find_chef_server_versions(project.path)
-            dependency.version_used = satisfy(dependency.requirement, dependency.chef_versions)
             dependency.source_url = "#{@gitlab_base_url}/#{project.path_with_namespace}"
 
             # Analyze its dependencies
@@ -159,8 +160,15 @@ module KitchenInspector
             dependency.remarks << "A new version might appear on Chef server"
           end
         else
-          dependency.gitlab_status = 'error-gitlab' unless dependency.latest_gitlab
-          dependency.chef_status = 'error-chef' unless dependency.latest_chef
+          unless dependency.latest_gitlab
+            dependency.gitlab_status = 'error-gitlab'
+            dependency.remarks << "Gitlab doesn't contain any versions."
+          end
+
+          unless dependency.latest_chef
+            dependency.chef_status = 'error-chef'
+            dependency.remarks << "Chef Server doesn't contain any versions."
+          end
         end
       end
 
