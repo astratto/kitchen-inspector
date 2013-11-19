@@ -29,7 +29,7 @@ Or install it with:
 ## Usage
 
 A valid configuration must be provided in order to configure the Chef and Gitlab servers.  
-By default _${HOME}/.chef/kitchen_inspector.rb_ is picked, but _--config_ can be used to override that setting.
+By default *${HOME}/.chef/kitchen_inspector.rb* is picked, but _--config_ can be used to override that setting.
 
 Example:
 
