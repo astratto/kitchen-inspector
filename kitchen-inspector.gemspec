@@ -29,4 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "colorize", "~> 0.6.0"
   spec.add_dependency "gitlab"
   spec.add_dependency "chef", ">= 11.0.0"
+
+  spec.add_development_dependency 'chef-zero'
+  spec.add_development_dependency 'rspec'
 end
