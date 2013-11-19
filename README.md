@@ -1,4 +1,5 @@
 # Kitchen Inspector
+[![Build Status](https://secure.travis-ci.org/astratto/kitchen-inspector.png?branch=master)](http://travis-ci.org/astratto/kitchen-inspector)
 
 Kitchen Ispector is a CLI utility inspired by chef-taste to check a cookbook's dependency status against a Chef server and a Gitlab instance.
 
