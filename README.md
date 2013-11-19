@@ -28,19 +28,23 @@ Or install it with:
 
 ## Usage
 
-The following variables must be exported in order to configure the Chef and Gitlab servers:
+A valid configuration must be provided in order to configure the Chef and Gitlab servers.  
+By default _${HOME}/.chef/kitchen_inspector.rb_ is picked, but _--config_ can be used to override that setting.
 
-* GITLAB_URL: Url of the Gitlab server
-* GITLAB_TOKEN: Gitlab private token (Profile > Account)
-* CHEF_SERVER_URL: Url of the Chef server
-* CHEF_USERNAME: Client username
-* CHEF_CLIENT_PEM: Location of the client pem
+Example:
+
+    gitlab_base_url "http://gitlab.example.org"
+    gitlab_token "gitlab_token" # (Gitlab > Profile > Account)
+
+    chef_server_url "https://chefsrv.example.org"
+    chef_username "chef_usename"
+    chef_client_pem "/path/to/chef_client_pem"
 
 From inside the cookbook's directory, type `kitchen-inspector` to inspect your kitchen.
 It's also possible to specify a target directory with `kitchen-inspector investigate PATH`.
 
-The `metadata.rb` of the cookbook is parsed to obtain the dependencies, then the configured Chef server and Gitlab server are queried to define which versions are available.
-The Chef server's version is the one that will define the used version.
+The `metadata.rb` of the cookbook is parsed to obtain the dependencies, then the configured Chef server and Gitlab server are queried to define which versions are available.  
+**Note:** The Chef server's version is the one that defines the used version.
 
 It will display a table that contains the following rows:
 
@@ -49,9 +53,19 @@ It will display a table that contains the following rows:
 * `Used` - The final version used based on the requirement constraint
 * `Latest Chef` - The latest version available on the Chef server
 * `Latest Gitlab` - The latest version available on the Gitlab server
-* `Requirement Status` - The status of the cookbook: up-to-date (a green tick mark), warning-req (a yellow esclamation point) or out-of-date (a red x mark)
-* `Chef Server Status` - The status of the chef server: up-to-date (a green tick mark), warning-req (a yellow esclamation point) or out-of-date (a red x mark)
-* `Gitlab Status` - The status of the Gitlab server: up-to-date (a green tick mark), warning-req (a yellow esclamation point) or out-of-date (a red x mark)
+* `Requirement Status` - The status of the cookbook:
+    * up-to-date (a green tick mark): the right version is picked
+    * warning-req (a yellow esclamation point): a newer version could be used
+    * error (a red x mark): no versions could be found
+* `Chef Server Status` - The status of the chef server:
+    * up-to-date (a green tick mark): the server is up to date
+    * warning-chef (a blue 'i'): on Gitlab there's a newer version
+    * error (a red x mark): no versions could be found
+* `Gitlab Status` - The status of the Gitlab server:
+    * up-to-date (a green tick mark): the server is up to date
+    * warning-gitlab (two yellow esclamation points): on Chef there's a newer version
+    * error (a red x mark): no versions could be found
+* `Remarks` - human readable descriptions of warnings/errors
 
 The overall status will also be displayed in the bottom of the table.
 
