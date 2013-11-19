@@ -56,6 +56,8 @@ module KitchenInspector
         else
           puts Report.generate(dependencies, options[:format])
         end
+      rescue ConfigurationError => e
+        puts e.message.red
       rescue NotACookbookError
         puts 'The path is not a cookbook path'.red
       rescue UnsupportedReportFormatError

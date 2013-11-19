@@ -25,6 +25,7 @@
 
 module KitchenInspector
   module Inspector
+    class ConfigurationError < StandardError; end
     class GitlabAccessNotConfiguredError < StandardError; end
     class ChefAccessNotConfiguredError < StandardError; end
     class NotACookbookError < StandardError; end

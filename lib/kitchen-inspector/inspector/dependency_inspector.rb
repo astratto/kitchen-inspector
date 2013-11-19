@@ -47,7 +47,7 @@ module KitchenInspector
         elsif File.exists?(config) && File.readable?(config)
           configuration = IO.read(config)
         else
-          raise IOError, "Could not open or read: '#{config}'"
+          raise ConfigurationError, "Unable to load the configuration: '#{config}'.\nPlease refer to README.md and check that a valid configuration was provided."
         end
 
         self.instance_eval configuration
