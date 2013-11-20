@@ -1,30 +1,24 @@
 # Kitchen Inspector
 [![Build Status](https://travis-ci.org/astratto/kitchen-inspector.png?branch=master)](https://travis-ci.org/astratto/kitchen-inspector)
 
-Kitchen Ispector is a CLI utility inspired by chef-taste to check a cookbook's dependency status against a Chef server and a Repository Manager instance.
+Kitchen Ispector is a CLI utility to check a cookbook's dependency status against a Chef server and a Repository Manager instance.
+
+In particular, this tool checks whether the dependencies specified in a cookbook's metadata are up to date or not.
+It also shows whether one of the servers must be aligned.
+
+By default, dependencies are recursively analyzed.
 
 It assumes that your kitchen is composed by:
 
 * a Chef server containing the cookbooks to be used
 * a Repository Manager instance hosting cookbook's development
-    * at this stage only Gitlab is supported
 
-This tool checks whether the dependencies specified are up to date or not.
-It also shows whether one of the servers must be aligned.
+**Note:** at this stage only Gitlab is supported.
 
-By default, dependencies are recursively analyzed.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'kitchen-inspector'
-
-And then execute:
-
-    $ bundle
-
-Or install it with:
+Install it with:
 
     $ gem install kitchen-inspector
 
@@ -35,16 +29,18 @@ By default *${HOME}/.chef/kitchen_inspector.rb* is picked, but _--config_ can be
 
 Example:
 
+    # Repository Manager configuration
     repository_manager :type => "Gitlab",
                        :base_url => "http://gitlab.example.org",
                        :token => "gitlab_token" # (Gitlab > Profile > Account)
 
+    # Chef Server configuration
     chef_server_url "https://chefsrv.example.org"
     chef_username "chef_usename"
     chef_client_pem "/path/to/chef_client_pem"
 
 From inside the cookbook's directory, type `kitchen-inspector` to inspect your kitchen.
-It's also possible to specify a target directory with `kitchen-inspector investigate PATH`.
+It's also possible to specify a target directory with `kitchen-inspector inspect PATH`.
 
 The `metadata.rb` of the cookbook is parsed to obtain the dependencies, then the configured Chef server and Repository Manager are queried to define which versions are available.  
 **Note:** The Chef server's version is the one that defines the used version.
@@ -101,7 +97,7 @@ Two display formats are supported: table and json
 
 ### Recursive dependencies
 
-There's an option _--recursive boolean_ that turns off recursive analysis.
+There's also an option _--recursive boolean_ that turns off recursive analysis.
 
 
 ## LICENSE
