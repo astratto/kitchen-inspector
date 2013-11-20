@@ -95,6 +95,25 @@ Two display formats are supported: table and json
 
 **Note:** The option *--remarks* provides more verbose descriptions for errors/warnings
 
+    $ kitchen-inspector  --remarks
+    +------------------+-------------+--------+--------+------------+-------------+-------------+------------+---------+
+    | Name             | Requirement | Used   | Latest | Latest     | Requirement | Chef Server | Repository | Remarks |
+    |                  |             |        | Chef   | Repository | Status      | Status      | Status     |         |
+    +------------------+-------------+--------+--------+------------+-------------+-------------+------------+---------+
+    | apache2          | = 1.8.2     | 1.8.2  | 1.8.2  | 1.8.2      |      ✔      |      ✔      |     !      | 1       |
+    | mysql            | = 1.1.3     | 1.1.3  | 1.1.3  | 1.1.4      |      ✔      |      i      |     ✔      | 2       |
+    | postgresql       | = 3.0.5     | 3.0.5  | 3.0.5  | 3.0.5      |      ✔      |      ✔      |     !      | 3       |
+    | build-essential  | ~> 1.4.2    | 1.4.2  | 1.4.2  | 1.4.2      |      ✔      |      ✔      |     ✔      |         |
+    | database         | >= 0.0.0    | 1.5.3  | 1.5.3  | 1.5.2      |      ✔      |      ✔      |     !!     | 4       |
+    +------------------+-------------+--------+--------+------------+-------------+-------------+------------+---------+
+    Status: warning-outofdate-repomanager (!!)
+
+    Remarks:
+    [1]: Gitlab's last tag is 1.8.4 but found 1.8.2 in metadata.rb
+    [2]: A new version might appear on Chef server
+    [3]: Gitlab's last tag is 3.1.0 but found 3.0.5 in metadata.rb
+    [4]: Gitlab out-of-date!
+
 ### Recursive dependencies
 
 There's also an option _--recursive boolean_ that turns off recursive analysis.

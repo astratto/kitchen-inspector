@@ -84,7 +84,7 @@ module KitchenInspector
               dependency.requirement,
               dependency.version_used,
               dependency.latest_chef,
-              dependency.latest_repomanager,
+              dependency.latest_metadata_repomanager,
               { value: status, alignment: :center },
               { value: chef_status, alignment: :center },
               { value: repomanager_status, alignment: :center }
@@ -105,10 +105,12 @@ module KitchenInspector
           # Show Status
           if dependencies.any? { |dep| dep.status == 'error' }
             status = "Status: error (#{X_MARK})".red
-          elsif dependencies.any? { |dep| dep.repomanager_status == 'warning-repomanager' }
-            status = "Status: warning-repomanager (#{ESCLAMATION_MARK})".light_red
+          elsif dependencies.any? { |dep| dep.repomanager_status == 'warning-outofdate-repomanager' }
+            status = "Status: warning-outofdate-repomanager (#{ESCLAMATION_MARK * 2})".light_red
           elsif dependencies.any? { |dep| dep.status == 'warning-req' }
             status = "Status: warning-req (#{ESCLAMATION_MARK})".yellow
+          elsif dependencies.any? { |dep| dep.repomanager_status == 'warning-mismatch-repomanager' }
+            status = "Status: warning-mismatch-repomanager (#{ESCLAMATION_MARK})".light_red
           elsif dependencies.any? { |dep| dep.chef_status == 'warning-chef' }
             status = "Status: warning-chef (#{INFO_MARK})".blue
           else
@@ -142,7 +144,9 @@ module KitchenInspector
             return ESCLAMATION_MARK.bold.yellow
           when /warning-chef/
             return INFO_MARK.bold.blue
-          when /warning-repomanager/
+          when /warning-mismatch-repomanager/
+            return ESCLAMATION_MARK.bold.light_red
+          when /warning-outofdate-repomanager/
             return (ESCLAMATION_MARK * 2).bold.light_red
           else
             return ''.white

@@ -74,6 +74,7 @@ module KitchenInspector
         dependencies.each do |dependency|
           dependency.chef_versions = find_chef_server_versions(dependency.name)
           dependency.version_used = satisfy(dependency.requirement, dependency.chef_versions)
+          dependency.latest_chef = get_latest_version(dependency.chef_versions)
 
           # Grab information from the Repository Manager
           project = @repomanager.project_by_name(dependency.name)
@@ -82,13 +83,19 @@ module KitchenInspector
             raise DuplicateCookbookError, "Found two versions for #{dependency.name} on #{@repomanager.type}." if project.size > 1
             project = project.first
 
-            repomanager_versions = @repomanager.versions(project)
-            dependency.repomanager_versions = repomanager_versions.keys
+            repomanager_tags = @repomanager.tags(project)
+            repomanager_latest_tag = get_latest_version(repomanager_tags.keys)
+
+            dependency.repomanager_tags = repomanager_tags.keys
+            dependency.latest_tag_repomanager = repomanager_latest_tag
             dependency.source_url = @repomanager.source_url(project)
 
+            latest_version_repo = @repomanager.project_metadata_version(project, repomanager_tags[repomanager_latest_tag.to_s])
+            dependency.latest_metadata_repomanager = Solve::Version.new(latest_version_repo) if latest_version_repo
+
             # Analyze its dependencies
-            if recursive && repomanager_versions.include?(dependency.version_used)
-              dependency.dependencies = @repomanager.retrieve_dependencies(project, repomanager_versions[dependency.version_used])
+            if recursive && repomanager_tags.include?(dependency.version_used)
+              dependency.dependencies = @repomanager.project_dependencies(project, repomanager_tags[dependency.version_used])
 
               # Add dependencies not already tracked
               dependency.dependencies.each do |dep|
@@ -111,9 +118,6 @@ module KitchenInspector
       # Updates the status of the dependency based on the version used and the
       # latest version available on the Repository Manager
       def update_status(dependency)
-        dependency.latest_chef = get_latest_version(dependency.chef_versions)
-        dependency.latest_repomanager = get_latest_version(dependency.repomanager_versions)
-
         dependency.status = 'up-to-date'
         dependency.chef_status = 'up-to-date'
         dependency.repomanager_status = 'up-to-date'
@@ -129,18 +133,19 @@ module KitchenInspector
           end
         end
 
-        if dependency.latest_chef && dependency.latest_repomanager
-          if dependency.latest_chef > dependency.latest_repomanager
+        # Compare Chef and Repository Manager versions
+        if dependency.latest_chef && dependency.latest_metadata_repomanager
+          if dependency.latest_chef > dependency.latest_metadata_repomanager
             dependency.chef_status = 'up-to-date'
-            dependency.repomanager_status = 'warning-repomanager'
+            dependency.repomanager_status = 'warning-outofdate-repomanager'
             dependency.remarks << "#{@repomanager.type} out-of-date!"
-          elsif dependency.latest_chef < dependency.latest_repomanager
+          elsif dependency.latest_chef < dependency.latest_metadata_repomanager
             dependency.chef_status = 'warning-chef'
             dependency.repomanager_status = 'up-to-date'
             dependency.remarks << "A new version might appear on Chef server"
           end
         else
-          unless dependency.latest_repomanager
+          unless dependency.latest_metadata_repomanager
             dependency.repomanager_status = 'error-repomanager'
             dependency.remarks << "#{@repomanager.type} doesn't contain any versions."
           end
@@ -149,6 +154,16 @@ module KitchenInspector
             dependency.chef_status = 'error-chef'
             dependency.remarks << "Chef Server doesn't contain any versions."
           end
+        end
+
+        # Check whether last tag and metadata version in Repository Manager are
+        # consistent
+        if (dependency.latest_tag_repomanager &&
+            dependency.latest_metadata_repomanager &&
+            dependency.latest_tag_repomanager != dependency.latest_metadata_repomanager)
+          dependency.repomanager_status = 'warning-mismatch-repomanager'
+          dependency.remarks << "#{@repomanager.type}'s last tag is #{dependency.latest_tag_repomanager} " \
+                                  "but found #{dependency.latest_metadata_repomanager} in metadata.rb"
         end
       end
 

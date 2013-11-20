@@ -41,6 +41,8 @@ module KitchenInspector
         @gitlab_base_url = config[:base_url]
         @gitlab_api_url = "#{@gitlab_base_url}/api/v3"
 
+        @metadata_cache = {}
+
         Gitlab.configure do |gitlab|
           gitlab.endpoint = @gitlab_api_url
           gitlab.private_token = @gitlab_token
@@ -49,19 +51,41 @@ module KitchenInspector
       end
 
       # Given a project and a revision retrieve its dependencies from metadata.rb
-      def retrieve_dependencies(project, revId)
+      def project_dependencies(project, revId)
         return nil unless project && revId
 
-        response = HTTParty.get("#{Gitlab.endpoint}/projects/#{project.id}/repository/blobs/#{revId}?filepath=metadata.rb",
-                                headers: {"PRIVATE-TOKEN" => Gitlab.private_token})
+        metadata = project_metadata(project, revId)
 
-        if response.code == 200
-          metadata = Ridley::Chef::Cookbook::Metadata.new
-          metadata.instance_eval response.body
+        if metadata
           metadata.dependencies.collect{|dep, constraint| Dependency.new(dep, constraint)}
-        else
-          nil
         end
+      end
+
+      def project_metadata_version(project, revId)
+        return nil unless project && revId
+
+        metadata = project_metadata(project, revId)
+
+        if metadata
+          fix_version_name(metadata.version)
+        end
+      end
+
+      def project_metadata(project, revId)
+        cache_key = "#{project.id}-#{revId}"
+        @metadata_cache[cache_key] ||=
+          begin
+            response = HTTParty.get("#{Gitlab.endpoint}/projects/#{project.id}/repository/blobs/#{revId}?filepath=metadata.rb",
+                                    headers: {"PRIVATE-TOKEN" => Gitlab.private_token})
+
+            if response.code == 200
+              metadata = Ridley::Chef::Cookbook::Metadata.new
+              metadata.instance_eval response.body
+              metadata
+            else
+              nil
+            end
+          end
       end
 
       def source_url(project)
@@ -72,13 +96,13 @@ module KitchenInspector
         projects.select{|prj| prj.path == name }
       end
 
-      # Given a project return the versions on Gitlab
-      def versions(project)
-        versions = {}
+      # Given a project return the tags on Gitlab
+      def tags(project)
+        tags = {}
         Gitlab.tags(project.id).collect do |tag|
-          versions[fix_version_name(tag.name)] = tag.commit.id
+          tags[fix_version_name(tag.name)] = tag.commit.id
         end
-        versions
+        tags
       end
 
       def to_s

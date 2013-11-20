@@ -42,11 +42,14 @@ module KitchenInspector
       # The latest version available on Chef Server
       attr_accessor :latest_chef
 
-      # The versions available on the Repository Manager
-      attr_accessor :repomanager_versions
+      # The tags available on the Repository Manager
+      attr_accessor :repomanager_tags
 
-      # The latest version available on the Repository Manager
-      attr_accessor :latest_repomanager
+      # The latest tag available on the Repository Manager
+      attr_accessor :latest_tag_repomanager
+
+      # The latest metadata version available on the Repository Manager
+      attr_accessor :latest_metadata_repomanager
 
       # The status of the dependency
       attr_accessor :status
@@ -73,7 +76,9 @@ module KitchenInspector
         @chef_versions = []
         @latest_chef = nil
         @repomanager_versions = []
-        @latest_repomanager = nil
+        @repomanager_tags = []
+        @latest_tag_repomanager = nil
+        @latest_metadata_repomanager = nil
         @status = nil
         @repomanager_status = nil
         @chef_status = nil
@@ -88,9 +93,11 @@ module KitchenInspector
           hash[:requirement] = requirement
           hash[:used] = version_used
           hash[:chef_versions] = chef_versions
+          hash[:chef_tags] = chef_tags
           hash[:latest_chef] = latest_chef
           hash[:repomanager_versions] = repomanager_versions
-          hash[:latest_repomanager] = latest_repomanager
+          hash[:latest_tag_repomanager] = latest_tag_repomanager
+          hash[:latest_metadata_repomanager] = latest_metadata_repomanager
           hash[:status] = status
           hash[:repomanager_status] = repomanager_status
           hash[:chef_status] = chef_status

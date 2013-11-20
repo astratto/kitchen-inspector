@@ -93,7 +93,10 @@ describe Inspector::DependencyInspector do
     before(:each) do
       @dependency = Inspector::Dependency.new("test", ">= 0")
       @dependency.chef_versions = ["1.0.0", "1.0.1"]
-      @dependency.repomanager_versions = ["1.0.0", "1.0.1"]
+      @dependency.repomanager_tags = ["1.0.0", "1.0.1"]
+      @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.1")
+      @dependency.latest_tag_repomanager = Solve::Version.new("1.0.1")
+      @dependency.latest_chef = Solve::Version.new("1.0.1")
       @dependency.version_used = "1.0.1"
     end
 
@@ -106,38 +109,57 @@ describe Inspector::DependencyInspector do
 
     it "returns an error when a valid version cannot be found" do
       @dependency.version_used = nil
+
       dependency_inspector.update_status(@dependency)
       @dependency.status.should == "error"
     end
 
     it "returns a warning when a newer version could be used" do
       @dependency.version_used = "1.0.0"
+
       dependency_inspector.update_status(@dependency)
       @dependency.status.should == "warning-req"
     end
 
     it "returns an error for missing version on Chef Server" do
       @dependency.chef_versions = []
+      @dependency.latest_chef = nil
+
       dependency_inspector.update_status(@dependency)
       @dependency.chef_status.should == "error-chef"
     end
 
     it "returns a warning when a newer version exists on the Repository Manager" do
       @dependency.chef_versions = ["1.0.0"]
+      @dependency.latest_chef = Solve::Version.new("1.0.0")
+
       dependency_inspector.update_status(@dependency)
       @dependency.chef_status.should == "warning-chef"
     end
 
     it "returns an error for missing version on the Repository Manager" do
-      @dependency.repomanager_versions = []
+      @dependency.repomanager_tags = []
+      @dependency.latest_metadata_repomanager = nil
+
       dependency_inspector.update_status(@dependency)
       @dependency.repomanager_status.should == "error-repomanager"
     end
 
     it "returns a warning when a newer version exists on Chef Server" do
-      @dependency.repomanager_versions = ["1.0.0"]
+      @dependency.repomanager_tags = ["1.0.0"]
+      @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.0")
+      @dependency.latest_tag_repomanager = Solve::Version.new("1.0.0")
+
       dependency_inspector.update_status(@dependency)
-      @dependency.repomanager_status.should == "warning-repomanager"
+      @dependency.repomanager_status.should == "warning-outofdate-repomanager"
+    end
+
+    it "returns a warning when last tag on Repository Manager doesn't match last metadata's version" do
+      @dependency.repomanager_tags = ["1.0.0", "1.0.1"]
+      @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.0")
+
+      dependency_inspector.update_status(@dependency)
+      @dependency.repomanager_status.should == "warning-mismatch-repomanager"
     end
   end
 
