@@ -62,8 +62,8 @@ module KitchenInspector
         #
         def generate(dependencies, opts)
           rows = []
-          headings = ["Name", "Requirement", "Used", "Latest\nChef", "Latest\nGitlab", "Requirement\nStatus",
-                      "Chef Server\nStatus", "Gitlab\nStatus"]
+          headings = ["Name", "Requirement", "Used", "Latest\nChef", "Latest\nRepository", "Requirement\nStatus",
+                      "Chef Server\nStatus", "Repository\nStatus"]
 
           if opts[:remarks]
             headings << "Remarks"
@@ -74,7 +74,7 @@ module KitchenInspector
           dependencies.each do |dependency|
             status = status_to_mark(dependency.status)
             chef_status = status_to_mark(dependency.chef_status)
-            gitlab_status = status_to_mark(dependency.gitlab_status)
+            repomanager_status = status_to_mark(dependency.repomanager_status)
 
             name = dependency.name.dup
             name = name.red if dependency.status == 'error'
@@ -84,10 +84,10 @@ module KitchenInspector
               dependency.requirement,
               dependency.version_used,
               dependency.latest_chef,
-              dependency.latest_gitlab,
+              dependency.latest_repomanager,
               { value: status, alignment: :center },
               { value: chef_status, alignment: :center },
-              { value: gitlab_status, alignment: :center }
+              { value: repomanager_status, alignment: :center }
             ]
 
             if opts[:remarks]
@@ -105,8 +105,8 @@ module KitchenInspector
           # Show Status
           if dependencies.any? { |dep| dep.status == 'error' }
             status = "Status: error (#{X_MARK})".red
-          elsif dependencies.any? { |dep| dep.gitlab_status == 'warning-gitlab' }
-            status = "Status: warning-gitlab (#{ESCLAMATION_MARK})".light_red
+          elsif dependencies.any? { |dep| dep.repomanager_status == 'warning-repomanager' }
+            status = "Status: warning-repomanager (#{ESCLAMATION_MARK})".light_red
           elsif dependencies.any? { |dep| dep.status == 'warning-req' }
             status = "Status: warning-req (#{ESCLAMATION_MARK})".yellow
           elsif dependencies.any? { |dep| dep.chef_status == 'warning-chef' }
@@ -142,7 +142,7 @@ module KitchenInspector
             return ESCLAMATION_MARK.bold.yellow
           when /warning-chef/
             return INFO_MARK.bold.blue
-          when /warning-gitlab/
+          when /warning-repomanager/
             return (ESCLAMATION_MARK * 2).bold.light_red
           else
             return ''.white

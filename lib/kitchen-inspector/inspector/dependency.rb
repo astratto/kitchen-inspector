@@ -42,17 +42,17 @@ module KitchenInspector
       # The latest version available on Chef Server
       attr_accessor :latest_chef
 
-      # The versions available on Gitlab
-      attr_accessor :gitlab_versions
+      # The versions available on the Repository Manager
+      attr_accessor :repomanager_versions
 
-      # The latest version available on Gitlab
-      attr_accessor :latest_gitlab
+      # The latest version available on the Repository Manager
+      attr_accessor :latest_repomanager
 
       # The status of the dependency
       attr_accessor :status
 
-      # The status of Gitlab
-      attr_accessor :gitlab_status
+      # The status of the Repository Manager
+      attr_accessor :repomanager_status
 
       # The status of Chef Server
       attr_accessor :chef_status
@@ -72,10 +72,10 @@ module KitchenInspector
         @version_used = nil
         @chef_versions = []
         @latest_chef = nil
-        @gitlab_versions = []
-        @latest_gitlab = nil
+        @repomanager_versions = []
+        @latest_repomanager = nil
         @status = nil
-        @gitlab_status = nil
+        @repomanager_status = nil
         @chef_status = nil
         @source_url = nil
         @remarks = []
@@ -89,10 +89,10 @@ module KitchenInspector
           hash[:used] = version_used
           hash[:chef_versions] = chef_versions
           hash[:latest_chef] = latest_chef
-          hash[:gitlab_versions] = gitlab_versions
-          hash[:latest_gitlab] = latest_gitlab
+          hash[:repomanager_versions] = repomanager_versions
+          hash[:latest_repomanager] = latest_repomanager
           hash[:status] = status
-          hash[:gitlab_status] = gitlab_status
+          hash[:repomanager_status] = repomanager_status
           hash[:chef_status] = chef_status
           hash[:source_url] = source_url
           hash[:remarks] = remarks

@@ -4,75 +4,87 @@ describe Inspector::DependencyInspector do
   let(:dependency_inspector) { generate_dependency_inspector }
 
   describe "#initialize" do
-    it "creates a valid Inspector with a full configuration" do
-      config = StringIO.new
-      config.puts "gitlab_base_url 'http://localhost:8080'"
-      config.puts "gitlab_token 'test_token'"
-      config.puts "chef_server_url 'http://localhost:4000'"
-      config.puts "chef_client_pem 'testclient.pem'"
-      config.puts "chef_username 'test_user'"
+    describe "Repository Manager" do
+      it "raises an error if an unsupported Repository Manager is specified" do
+          config = StringIO.new
+          config.puts "repository_manager :type => 'Unknown', :base_url => 'http://localhost:8080', :token =>'test_token'"
+          config.puts "chef_server_url 'http://localhost:4000'"
+          config.puts "chef_client_pem 'testclient.pem'"
+          config.puts "chef_username 'test_user'"
 
-      inspector = Inspector::DependencyInspector.new config
-      inspector
-    end
+          expect do
+            Inspector::DependencyInspector.new config
+          end.to raise_error(Inspector::RepositoryManagerError)
+      end
 
-    it "raises an error when Gitlab Token is not configured" do
-      config = StringIO.new
-      config.puts "gitlab_base_url 'http://localhost:8080'"
-      config.puts "chef_server_url 'http://localhost:4000'"
-      config.puts "chef_client_pem 'testclient.pem'"
-      config.puts "chef_username 'test_user'"
+      describe "Gitlab" do
+        it "creates a valid Inspector with a full configuration" do
+          config = StringIO.new
+          config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
+          config.puts "chef_server_url 'http://localhost:4000'"
+          config.puts "chef_client_pem 'testclient.pem'"
+          config.puts "chef_username 'test_user'"
 
-      expect do
-        inspector = Inspector::DependencyInspector.new config
-      end.to raise_error(Inspector::GitlabAccessNotConfiguredError)
-    end
+          inspector = Inspector::DependencyInspector.new config
+          inspector
+        end
 
-    it "raises an error when Gitlab Base Url is not configured" do
-      config = StringIO.new
-      config.puts "gitlab_token 'test_token'"
-      config.puts "chef_server_url 'http://localhost:4000'"
-      config.puts "chef_client_pem 'testclient.pem'"
-      config.puts "chef_username 'test_user'"
+        it "raises an error when Gitlab Token is not configured" do
+          config = StringIO.new
+          config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080'"
+          config.puts "chef_server_url 'http://localhost:4000'"
+          config.puts "chef_client_pem 'testclient.pem'"
+          config.puts "chef_username 'test_user'"
 
-      expect do
-        inspector = Inspector::DependencyInspector.new config
-      end.to raise_error(Inspector::GitlabAccessNotConfiguredError)
+          expect do
+            Inspector::DependencyInspector.new config
+          end.to raise_error(Inspector::GitlabAccessNotConfiguredError)
+        end
+
+        it "raises an error when Gitlab Base Url is not configured" do
+          config = StringIO.new
+          config.puts "repository_manager :type => 'Gitlab', :token =>'test_token'"
+          config.puts "chef_server_url 'http://localhost:4000'"
+          config.puts "chef_client_pem 'testclient.pem'"
+          config.puts "chef_username 'test_user'"
+
+          expect do
+            Inspector::DependencyInspector.new config
+          end.to raise_error(Inspector::GitlabAccessNotConfiguredError)
+        end
+      end
     end
 
     it "raises an error when Chef Server Url is not configured" do
       config = StringIO.new
-      config.puts "gitlab_token 'test_token'"
-      config.puts "gitlab_base_url 'http://localhost:8080'"
+      config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
       config.puts "chef_client_pem 'testclient.pem'"
       config.puts "chef_username 'test_user'"
 
       expect do
-        inspector = Inspector::DependencyInspector.new config
+        Inspector::DependencyInspector.new config
       end.to raise_error(Inspector::ChefAccessNotConfiguredError)
     end
 
     it "raises an error when Chef Client PEM is not configured" do
       config = StringIO.new
-      config.puts "gitlab_token 'test_token'"
-      config.puts "gitlab_base_url 'http://localhost:8080'"
+      config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
       config.puts "chef_server_url 'http://localhost:4000'"
       config.puts "chef_username 'test_user'"
 
       expect do
-        inspector = Inspector::DependencyInspector.new config
+        Inspector::DependencyInspector.new config
       end.to raise_error(Inspector::ChefAccessNotConfiguredError)
     end
 
     it "raises an error when Chef Username is not configured" do
       config = StringIO.new
-      config.puts "gitlab_token 'test_token'"
-      config.puts "gitlab_base_url 'http://localhost:8080'"
+      config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
       config.puts "chef_server_url 'http://localhost:4000'"
       config.puts "chef_client_pem 'testclient.pem'"
 
       expect do
-        inspector = Inspector::DependencyInspector.new config
+        Inspector::DependencyInspector.new config
       end.to raise_error(Inspector::ChefAccessNotConfiguredError)
     end
   end
@@ -81,13 +93,13 @@ describe Inspector::DependencyInspector do
     before(:each) do
       @dependency = Inspector::Dependency.new("test", ">= 0")
       @dependency.chef_versions = ["1.0.0", "1.0.1"]
-      @dependency.gitlab_versions = ["1.0.0", "1.0.1"]
+      @dependency.repomanager_versions = ["1.0.0", "1.0.1"]
       @dependency.version_used = "1.0.1"
     end
 
     it "sets correct statuses for correct versions on both servers" do
       dependency_inspector.update_status(@dependency)
-      @dependency.gitlab_status.should == "up-to-date"
+      @dependency.repomanager_status.should == "up-to-date"
       @dependency.chef_status.should == "up-to-date"
       @dependency.status.should == "up-to-date"
     end
@@ -110,22 +122,22 @@ describe Inspector::DependencyInspector do
       @dependency.chef_status.should == "error-chef"
     end
 
-    it "returns a warning when a newer version exists on Gitlab" do
+    it "returns a warning when a newer version exists on the Repository Manager" do
       @dependency.chef_versions = ["1.0.0"]
       dependency_inspector.update_status(@dependency)
       @dependency.chef_status.should == "warning-chef"
     end
 
-    it "returns an error for missing version on Gitlab" do
-      @dependency.gitlab_versions = []
+    it "returns an error for missing version on the Repository Manager" do
+      @dependency.repomanager_versions = []
       dependency_inspector.update_status(@dependency)
-      @dependency.gitlab_status.should == "error-gitlab"
+      @dependency.repomanager_status.should == "error-repomanager"
     end
 
     it "returns a warning when a newer version exists on Chef Server" do
-      @dependency.gitlab_versions = ["1.0.0"]
+      @dependency.repomanager_versions = ["1.0.0"]
       dependency_inspector.update_status(@dependency)
-      @dependency.gitlab_status.should == "warning-gitlab"
+      @dependency.repomanager_status.should == "warning-repomanager"
     end
   end
 
@@ -143,13 +155,5 @@ describe Inspector::DependencyInspector do
 
   describe "#find_chef_server_versions" do
     it "retrieves versions using a valid project"
-  end
-
-  describe "#find_gitlab_versions" do
-    it "retrieves versions using a valid project"
-  end
-
-  describe "#retrieve_dependencies" do
-    it "retrieves the nested dependencies"
   end
 end

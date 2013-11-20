@@ -49,7 +49,7 @@ module KitchenInspector
                              default: false,
                              aliases: '--remarks'
 
-      desc 'investigate (COOKBOOK_PATH)', 'Check Gitlab/Chef status of dependent cookbooks'
+      desc 'investigate (COOKBOOK_PATH)', 'Check Repository Manager/Chef Server status of dependent cookbooks'
 
       map 'inspect'   => :investigate
       def investigate(path=Dir.pwd)

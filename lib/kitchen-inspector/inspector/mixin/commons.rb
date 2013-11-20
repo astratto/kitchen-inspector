@@ -25,13 +25,26 @@
 
 module KitchenInspector
   module Inspector
-    class ConfigurationError < StandardError; end
-    class RepositoryManagerError < ConfigurationError; end
+    module Commons
+      def config_msg(human_name, field)
+        "#{human_name} not configured. Please set #{field} in your config file."
+      end
 
-    class GitlabAccessNotConfiguredError < StandardError; end
-    class ChefAccessNotConfiguredError < StandardError; end
-    class NotACookbookError < StandardError; end
-    class DuplicateCookbookError < StandardError; end
-    class UnsupportedReportFormatError < ArgumentError; end
+      # Import a configuration from a file or StringIO
+      def read_config(config)
+        if config.is_a?(StringIO)
+          config.string
+        elsif File.exists?(config) && File.readable?(config)
+          IO.read(config)
+        else
+          raise ConfigurationError, "Unable to load the configuration: '#{config}'.\nPlease refer to README.md and check that a valid configuration was provided."
+        end
+      end
+
+      # Normalize version names to x.y.z...
+      def fix_version_name(version)
+        version.gsub(/[v][\.]*/i, "")
+      end
+    end
   end
 end

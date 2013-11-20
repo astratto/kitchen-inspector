@@ -16,8 +16,7 @@ end
 
 def generate_dependency_inspector
   config = StringIO.new
-  config.puts "gitlab_base_url 'http://localhost:8080'"
-  config.puts "gitlab_token 'test_token'"
+  config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
   config.puts "chef_server_url 'http://localhost:4000'"
   config.puts "chef_client_pem 'testclient.pem'"
   config.puts "chef_username 'test_user'"
