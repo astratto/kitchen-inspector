@@ -26,7 +26,7 @@
 module KitchenInspector
   module Inspector
     class GitlabManager
-      include Commons
+      include Utils
 
       REPO_PER_PAGE = 1000
 

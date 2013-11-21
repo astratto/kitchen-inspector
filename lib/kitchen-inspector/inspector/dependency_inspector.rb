@@ -26,7 +26,8 @@
 module KitchenInspector
   module Inspector
     class DependencyInspector
-      include Commons
+      include Utils
+
       def initialize(config)
         configure(config)
       end

@@ -25,7 +25,7 @@
 
 module KitchenInspector
   module Inspector
-    module Commons
+    module Utils
       def config_msg(human_name, field)
         "#{human_name} not configured. Please set #{field} in your config file."
       end
