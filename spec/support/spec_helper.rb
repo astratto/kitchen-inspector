@@ -27,3 +27,46 @@ def generate_dependency_inspector
   inspector = DependencyInspector.new config
   inspector
 end
+
+RSpec::Matchers.define :exit_with_code do |exp_code|
+  actual = nil
+  match do |block|
+    begin
+      block.call
+    rescue SystemExit => e
+      actual = e.status
+    end
+    actual and actual == exp_code
+  end
+  failure_message_for_should do |block|
+    "expected block to call exit(#{exp_code}) but exit" +
+      (actual.nil? ? " not called" : "(#{actual}) was called")
+  end
+  failure_message_for_should_not do |block|
+    "expected block not to call exit(#{exp_code})"
+  end
+  description do
+    "expect block to call exit(#{exp_code})"
+  end
+end
+
+## Define File::NULL for ruby < 1.9.3
+#
+# Shamelessly stolen from backports
+# https://github.com/marcandre/backports/blob/master/lib/backports/1.9.3/file/null.rb
+unless File.const_defined? :NULL
+  module File::Constants
+    platform = RUBY_PLATFORM
+    platform = RbConfig::CONFIG['host_os'] if platform == 'java'
+    NULL =  case platform
+            when /mswin|mingw/i
+              'NUL'
+            when /amiga/i
+              'NIL:'
+            when /openvms/i
+              'NL:'
+            else
+              '/dev/null'
+            end
+  end
+end
