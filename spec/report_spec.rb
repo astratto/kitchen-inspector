@@ -23,7 +23,7 @@ describe Inspector::Report do
         output, code = Inspector::Report.generate(@dependencies, 'table', {})
         output.split("\n").grep(/Test|Status:/).join("\n").should == \
         "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{Inspector::TICK_MARK.green}      |      #{Inspector::TICK_MARK.green}      |     #{Inspector::TICK_MARK.green}      |\n" \
-        "#{'Status: up-to-date (✔)'.green}"
+        "#{'Status: up-to-date (%s)'.green}" % Inspector::TICK_MARK
         code.should == :'up-to-date'
       end
 
@@ -37,7 +37,7 @@ describe Inspector::Report do
         output, code = Inspector::Report.generate(@dependencies, 'table', {})
         output.split("\n").grep(/Test|Status:/).join("\n").should == \
         "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  |            |      #{Inspector::TICK_MARK.green}      |      #{Inspector::TICK_MARK.green}      |     #{Inspector::X_MARK.red}      |\n" \
-        "#{'Status: error-repomanager (✖)'.yellow}"
+        "#{'Status: error-repomanager (%s)'.yellow}" % Inspector::X_MARK
         code.should == :'error-repomanager'
       end
 
@@ -113,7 +113,7 @@ describe Inspector::Report do
         output, code = Inspector::Report.generate([dep1], 'table', {})
         output.split("\n").grep(/Test|Status:/).join("\n").should == \
         "| #{'Test'.red} | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      #{Inspector::X_MARK.red}      |      #{Inspector::TICK_MARK.green}      |     #{Inspector::TICK_MARK.green}      |\n" \
-        "#{'Status: error (✖)'.red}"
+        "#{'Status: error (%s)'.red}" % Inspector::X_MARK
         code.should == :'error'
       end
 
@@ -127,7 +127,7 @@ describe Inspector::Report do
         output, code = Inspector::Report.generate([dep1], 'table', {})
         output.split("\n").grep(/Test|Status:/).join("\n").should == \
         "| #{'Test'.red} | ~> 1.0.0    |      |        | 1.0.1      |      #{Inspector::X_MARK.red}      |      #{Inspector::X_MARK.red}      |     #{Inspector::TICK_MARK.green}      |\n" \
-        "#{'Status: error (✖)'.red}"
+        "#{'Status: error (%s)'.red}" % Inspector::X_MARK
         code.should == :'error'
       end
     end
