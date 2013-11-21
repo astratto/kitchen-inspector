@@ -3,6 +3,7 @@
 [![Dependency Status](https://gemnasium.com/astratto/kitchen-inspector.png)](https://gemnasium.com/astratto/kitchen-inspector)
 [![Gem Version](https://badge.fury.io/rb/kitchen-inspector.png)](http://badge.fury.io/rb/kitchen-inspector)
 [![Code Climate](https://codeclimate.com/github/astratto/kitchen-inspector.png)](https://codeclimate.com/github/astratto/kitchen-inspector)
+[![Coverage Status](https://coveralls.io/repos/astratto/kitchen-inspector/badge.png)](https://coveralls.io/r/astratto/kitchen-inspector)
 
 Kitchen Ispector is a CLI utility to check a cookbook's dependency status against a Chef server and a Repository Manager instance.
 
