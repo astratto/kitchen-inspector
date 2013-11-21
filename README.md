@@ -1,5 +1,6 @@
 # Kitchen Inspector
 [![Build Status](https://travis-ci.org/astratto/kitchen-inspector.png?branch=master)](https://travis-ci.org/astratto/kitchen-inspector)
+[![Dependency Status](https://gemnasium.com/astratto/kitchen-inspector.png)](https://gemnasium.com/astratto/kitchen-inspector)
 
 Kitchen Ispector is a CLI utility to check a cookbook's dependency status against a Chef server and a Repository Manager instance.
 
