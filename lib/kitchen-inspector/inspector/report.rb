@@ -77,7 +77,7 @@ module KitchenInspector
             repomanager_status = status_to_mark(dependency.repomanager_status)
 
             name = dependency.name.dup
-            name = name.red if dependency.status == 'error'
+            name = name.red if dependency.status == :'error'
 
             row = [
               name,
@@ -103,15 +103,15 @@ module KitchenInspector
           table = Terminal::Table.new headings: headings, rows: rows
 
           # Show Status
-          if dependencies.any? { |dep| dep.status == 'error' }
+          if dependencies.any? { |dep| dep.status == :'error' }
             status = "Status: error (#{X_MARK})".red
-          elsif dependencies.any? { |dep| dep.repomanager_status == 'warning-outofdate-repomanager' }
+          elsif dependencies.any? { |dep| dep.repomanager_status == :'warning-outofdate-repomanager' }
             status = "Status: warning-outofdate-repomanager (#{ESCLAMATION_MARK * 2})".light_red
-          elsif dependencies.any? { |dep| dep.status == 'warning-req' }
+          elsif dependencies.any? { |dep| dep.status == :'warning-req' }
             status = "Status: warning-req (#{ESCLAMATION_MARK})".yellow
-          elsif dependencies.any? { |dep| dep.repomanager_status == 'warning-mismatch-repomanager' }
+          elsif dependencies.any? { |dep| dep.repomanager_status == :'warning-mismatch-repomanager' }
             status = "Status: warning-mismatch-repomanager (#{ESCLAMATION_MARK})".light_red
-          elsif dependencies.any? { |dep| dep.chef_status == 'warning-chef' }
+          elsif dependencies.any? { |dep| dep.chef_status == :'warning-chef' }
             status = "Status: warning-chef (#{INFO_MARK})".blue
           else
             status = "Status: up-to-date (#{TICK_MARK})".green
@@ -136,7 +136,7 @@ module KitchenInspector
         # Given a status return a mark
         def status_to_mark(status)
           case status
-          when 'up-to-date'
+          when :'up-to-date'
             return TICK_MARK.green
           when /error.*/
             return X_MARK.red

@@ -102,23 +102,23 @@ describe Inspector::DependencyInspector do
 
     it "sets correct statuses for correct versions on both servers" do
       dependency_inspector.update_status(@dependency)
-      @dependency.repomanager_status.should == "up-to-date"
-      @dependency.chef_status.should == "up-to-date"
-      @dependency.status.should == "up-to-date"
+      @dependency.repomanager_status.should == :'up-to-date'
+      @dependency.chef_status.should == :'up-to-date'
+      @dependency.status.should == :'up-to-date'
     end
 
     it "returns an error when a valid version cannot be found" do
       @dependency.version_used = nil
 
       dependency_inspector.update_status(@dependency)
-      @dependency.status.should == "error"
+      @dependency.status.should == :error
     end
 
     it "returns a warning when a newer version could be used" do
       @dependency.version_used = "1.0.0"
 
       dependency_inspector.update_status(@dependency)
-      @dependency.status.should == "warning-req"
+      @dependency.status.should == :'warning-req'
     end
 
     it "returns an error for missing version on Chef Server" do
@@ -126,7 +126,7 @@ describe Inspector::DependencyInspector do
       @dependency.latest_chef = nil
 
       dependency_inspector.update_status(@dependency)
-      @dependency.chef_status.should == "error-chef"
+      @dependency.chef_status.should == :'error-chef'
     end
 
     it "returns a warning when a newer version exists on the Repository Manager" do
@@ -134,7 +134,7 @@ describe Inspector::DependencyInspector do
       @dependency.latest_chef = Solve::Version.new("1.0.0")
 
       dependency_inspector.update_status(@dependency)
-      @dependency.chef_status.should == "warning-chef"
+      @dependency.chef_status.should == :'warning-chef'
     end
 
     it "returns an error for missing version on the Repository Manager" do
@@ -142,7 +142,7 @@ describe Inspector::DependencyInspector do
       @dependency.latest_metadata_repomanager = nil
 
       dependency_inspector.update_status(@dependency)
-      @dependency.repomanager_status.should == "error-repomanager"
+      @dependency.repomanager_status.should == :'error-repomanager'
     end
 
     it "returns a warning when a newer version exists on Chef Server" do
@@ -151,7 +151,7 @@ describe Inspector::DependencyInspector do
       @dependency.latest_tag_repomanager = Solve::Version.new("1.0.0")
 
       dependency_inspector.update_status(@dependency)
-      @dependency.repomanager_status.should == "warning-outofdate-repomanager"
+      @dependency.repomanager_status.should == :'warning-outofdate-repomanager'
     end
 
     it "returns a warning when last tag on Repository Manager doesn't match last metadata's version" do
@@ -159,7 +159,7 @@ describe Inspector::DependencyInspector do
       @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.0")
 
       dependency_inspector.update_status(@dependency)
-      @dependency.repomanager_status.should == "warning-mismatch-repomanager"
+      @dependency.repomanager_status.should == :'warning-mismatch-repomanager'
     end
   end
 

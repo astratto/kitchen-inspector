@@ -61,6 +61,7 @@ module KitchenInspector
         end
       end
 
+      # Given a project and a revision retrieve its metadata's version
       def project_metadata_version(project, revId)
         return nil unless project && revId
 
@@ -71,6 +72,7 @@ module KitchenInspector
         end
       end
 
+      # Given a project and a revision retrieve its metadata
       def project_metadata(project, revId)
         cache_key = "#{project.id}-#{revId}"
         @metadata_cache[cache_key] ||=
@@ -88,10 +90,12 @@ module KitchenInspector
           end
       end
 
+      # Return the full URL for a given project
       def source_url(project)
         "#{@gitlab_base_url}/#{project.path_with_namespace}"
       end
 
+      # Retrieve a project by name
       def project_by_name(name)
         projects.select{|prj| prj.path == name }
       end

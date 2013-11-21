@@ -118,17 +118,17 @@ module KitchenInspector
       # Updates the status of the dependency based on the version used and the
       # latest version available on the Repository Manager
       def update_status(dependency)
-        dependency.status = 'up-to-date'
-        dependency.chef_status = 'up-to-date'
-        dependency.repomanager_status = 'up-to-date'
+        dependency.status = :'up-to-date'
+        dependency.chef_status = :'up-to-date'
+        dependency.repomanager_status = :'up-to-date'
 
         if !dependency.version_used
-          dependency.status = 'error'
+          dependency.status = :error
           dependency.remarks << 'No versions found'
         else
           relaxed_version = satisfy("~> #{dependency.version_used}", dependency.chef_versions)
           if relaxed_version != dependency.version_used
-            dependency.status = 'warning-req'
+            dependency.status = :'warning-req'
             dependency.remarks << "#{relaxed_version} is available"
           end
         end
@@ -136,22 +136,22 @@ module KitchenInspector
         # Compare Chef and Repository Manager versions
         if dependency.latest_chef && dependency.latest_metadata_repomanager
           if dependency.latest_chef > dependency.latest_metadata_repomanager
-            dependency.chef_status = 'up-to-date'
-            dependency.repomanager_status = 'warning-outofdate-repomanager'
+            dependency.chef_status = :'up-to-date'
+            dependency.repomanager_status = :'warning-outofdate-repomanager'
             dependency.remarks << "#{@repomanager.type} out-of-date!"
           elsif dependency.latest_chef < dependency.latest_metadata_repomanager
-            dependency.chef_status = 'warning-chef'
-            dependency.repomanager_status = 'up-to-date'
+            dependency.chef_status = :'warning-chef'
+            dependency.repomanager_status = :'up-to-date'
             dependency.remarks << "A new version might appear on Chef server"
           end
         else
           unless dependency.latest_metadata_repomanager
-            dependency.repomanager_status = 'error-repomanager'
+            dependency.repomanager_status = :'error-repomanager'
             dependency.remarks << "#{@repomanager.type} doesn't contain any versions."
           end
 
           unless dependency.latest_chef
-            dependency.chef_status = 'error-chef'
+            dependency.chef_status = :'error-chef'
             dependency.remarks << "Chef Server doesn't contain any versions."
           end
         end
@@ -161,7 +161,7 @@ module KitchenInspector
         if (dependency.latest_tag_repomanager &&
             dependency.latest_metadata_repomanager &&
             dependency.latest_tag_repomanager != dependency.latest_metadata_repomanager)
-          dependency.repomanager_status = 'warning-mismatch-repomanager'
+          dependency.repomanager_status = :'warning-mismatch-repomanager'
           dependency.remarks << "#{@repomanager.type}'s last tag is #{dependency.latest_tag_repomanager} " \
                                   "but found #{dependency.latest_metadata_repomanager} in metadata.rb"
         end
