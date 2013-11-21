@@ -1,3 +1,6 @@
+require 'coveralls'
+Coveralls.wear!
+
 require 'kitchen-inspector/inspector'
 require 'chef_zero/server'
 
