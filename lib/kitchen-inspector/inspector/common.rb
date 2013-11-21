@@ -38,10 +38,14 @@ module KitchenInspector
         :'up-to-date' => 0,
         :'error' => 100,
         :'error-repomanager' => 101,
+        :'error-config' => 110,
+        :'error-notacookbook' => 111,
+        :'error-reportformat' => 112,
         :'warning-req' => 200,
         :'warning-mismatch-repomanager' => 201,
         :'warning-outofdate-repomanager' => 202,
-        :'warning-chef' => 203
+        :'warning-chef' => 203,
+        :'warning-nodependencies' => 204
     }
     STATUS_TO_RETURN_CODES.default = 1
   end
