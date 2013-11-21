@@ -90,19 +90,21 @@ In this section are listed the checks applied.
 
 ### Chef Server doesn't contain any versions
 
-+------+-------------+------+--------+------------+-------------+-------------+------------+
-| Name | Requirement | Used | Latest | Latest     | Requirement | Chef Server | Repository |
-|      |             |      | Chef   | Repository | Status      | Status      | Status     |
-+------+-------------+------+--------+------------+-------------+-------------+------------+
-| Test | ~> 1.0.0    |      |        | 1.0.1      |      ✖      |      ✖      |     ✔      |
-+------+-------------+------+--------+------------+-------------+-------------+------------+
-Status: error (✖)
+    +------+-------------+------+--------+------------+-------------+-------------+------------+
+    | Name | Requirement | Used | Latest | Latest     | Requirement | Chef Server | Repository |
+    |      |             |      | Chef   | Repository | Status      | Status      | Status     |
+    +------+-------------+------+--------+------------+-------------+-------------+------------+
+    | Test | ~> 1.0.0    |      |        | 1.0.1      |      ✖      |      ✖      |     ✔      |
+    +------+-------------+------+--------+------------+-------------+-------------+------------+
+    Status: error (✖)
 
 ## Installation
 
 Install it with:
 
-    $ gem install kitchen-inspector
+```bash
+$ gem install kitchen-inspector
+```
 
 ## Usage
 
@@ -111,15 +113,17 @@ By default *${HOME}/.chef/kitchen_inspector.rb* is picked, but _--config_ can be
 
 Example:
 
-    # Repository Manager configuration
-    repository_manager :type => "Gitlab",
-                       :base_url => "http://gitlab.example.org",
-                       :token => "gitlab_token" # (Gitlab > Profile > Account)
+```ruby
+# Repository Manager configuration
+repository_manager :type => "Gitlab",
+                   :base_url => "http://gitlab.example.org",
+                   :token => "gitlab_token" # (Gitlab > Profile > Account)
 
-    # Chef Server configuration
-    chef_server_url "https://chefsrv.example.org"
-    chef_username "chef_usename"
-    chef_client_pem "/path/to/chef_client_pem"
+# Chef Server configuration
+chef_server_url "https://chefsrv.example.org"
+chef_username "chef_usename"
+chef_client_pem "/path/to/chef_client_pem"
+```
 
 From inside the cookbook's directory, type `kitchen-inspector` to inspect your kitchen.
 It's also possible to specify a target directory with `kitchen-inspector inspect PATH`.
