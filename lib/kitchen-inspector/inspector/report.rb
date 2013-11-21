@@ -103,28 +103,45 @@ module KitchenInspector
           table = Terminal::Table.new headings: headings, rows: rows
 
           # Show Status
-          if dependencies.any? { |dep| dep.status == :'error' }
-            status = "Status: error (#{X_MARK})".red
-          elsif dependencies.any? { |dep| dep.repomanager_status == :'error-repomanager' }
-            status = "Status: error-repomanager (#{X_MARK})".yellow
-          elsif dependencies.any? { |dep| dep.repomanager_status == :'warning-outofdate-repomanager' }
-            status = "Status: warning-outofdate-repomanager (#{ESCLAMATION_MARK * 2})".light_red
-          elsif dependencies.any? { |dep| dep.status == :'warning-req' }
-            status = "Status: warning-req (#{ESCLAMATION_MARK})".yellow
-          elsif dependencies.any? { |dep| dep.repomanager_status == :'warning-mismatch-repomanager' }
-            status = "Status: warning-mismatch-repomanager (#{ESCLAMATION_MARK})".light_red
-          elsif dependencies.any? { |dep| dep.chef_status == :'warning-chef' }
-            status = "Status: warning-chef (#{INFO_MARK})".blue
-          else
-            status = "Status: up-to-date (#{TICK_MARK})".green
-          end
+          g_status, g_status_code = global_status(dependencies)
+
 
           if opts[:remarks]
             remarks_result = remarks.each_with_index.collect{|remark, idx| "[#{idx + 1}]: #{remark}"}.join("\n")
-            "#{table}\n#{status}\n\nRemarks:\n#{remarks_result}"
+            output = "#{table}\n#{g_status}\n\nRemarks:\n#{remarks_result}"
           else
-            "#{table}\n#{status}"
+            output = "#{table}\n#{g_status}"
           end
+          [output, g_status_code]
+        end
+
+        def global_status(dependencies)
+          code = :'up-to-date'
+          status = "Status: up-to-date (#{TICK_MARK})".green
+
+          # Note that global :error-chef is not possible since there would be at least
+          # one :error
+          if dependencies.any? { |dep| dep.status == :'error' }
+            status = "Status: error (#{X_MARK})".red
+            code = :error
+          elsif dependencies.any? { |dep| dep.repomanager_status == :'error-repomanager' }
+            status = "Status: error-repomanager (#{X_MARK})".yellow
+            code = :'error-repomanager'
+          elsif dependencies.any? { |dep| dep.repomanager_status == :'warning-outofdate-repomanager' }
+            status = "Status: warning-outofdate-repomanager (#{ESCLAMATION_MARK * 2})".light_red
+            code = :'warning-outofdate-repomanager'
+          elsif dependencies.any? { |dep| dep.status == :'warning-req' }
+            status = "Status: warning-req (#{ESCLAMATION_MARK})".yellow
+            code = :'warning-req'
+          elsif dependencies.any? { |dep| dep.repomanager_status == :'warning-mismatch-repomanager' }
+            status = "Status: warning-mismatch-repomanager (#{ESCLAMATION_MARK})".light_red
+            code = :'warning-mismatch-repomanager'
+          elsif dependencies.any? { |dep| dep.chef_status == :'warning-chef' }
+            status = "Status: warning-chef (#{INFO_MARK})".blue
+            code = :'warning-chef'
+          end
+
+          [status, code]
         end
 
         # Return the indices of the remarks

@@ -60,7 +60,9 @@ module KitchenInspector
         if dependencies.empty?
           puts 'No dependent cookbooks'.yellow
         else
-          puts Report.generate(dependencies, options[:format], options)
+          output, status_code = Report.generate(dependencies, options[:format], options)
+          puts output
+          exit STATUS_TO_RETURN_CODES[status_code]
         end
       rescue ConfigurationError => e
         puts e.message.red

@@ -33,5 +33,16 @@ module KitchenInspector
     class NotACookbookError < StandardError; end
     class DuplicateCookbookError < StandardError; end
     class UnsupportedReportFormatError < ArgumentError; end
+
+    STATUS_TO_RETURN_CODES = {
+        :'up-to-date' => 0,
+        :'error' => 100,
+        :'error-repomanager' => 101,
+        :'warning-req' => 200,
+        :'warning-mismatch-repomanager' => 201,
+        :'warning-outofdate-repomanager' => 202,
+        :'warning-chef' => 203
+    }
+    STATUS_TO_RETURN_CODES.default = 1
   end
 end

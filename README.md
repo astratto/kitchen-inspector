@@ -15,6 +15,88 @@ It assumes that your kitchen is composed by:
 
 **Note:** at this stage only Gitlab is supported.
 
+## Checks
+
+In this section are listed the checks applied.
+
+### Everything is up to date
+
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    | Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
+    |      |             |       | Chef   | Repository | Status      | Status      | Status     |
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    | Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      ✔      |      ✔      |     ✔      |
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    Status: up-to-date (✔)
+
+### Repository Manager doesn't contain any versions
+
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    | Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
+    |      |             |       | Chef   | Repository | Status      | Status      | Status     |
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    | Test | ~> 1.0.0    | 1.0.1 | 1.0.1  |            |      ✔      |      ✔      |     ✖      |
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    Status: error-repomanager (✖)
+
+### Repository Manager contains a mismatched tag/metadata's version
+
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    | Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
+    |      |             |       | Chef   | Repository | Status      | Status      | Status     |
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    | Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.0      |      ✔      |      ✔      |     !      |
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    Status: warning-mismatch-repomanager (!)
+
+### Repository Manager doesn't contain the last version
+
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    | Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
+    |      |             |       | Chef   | Repository | Status      | Status      | Status     |
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    | Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.0      |      ✔      |      ✔      |     !!     |
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    Status: warning-outofdate-repomanager (!!)
+
+### Chef Server doesn't contain the last version
+
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    | Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
+    |      |             |       | Chef   | Repository | Status      | Status      | Status     |
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    | Test | ~> 1.0.0    | 1.0.0 | 1.0.0  | 1.0.1      |      ✔      |      i      |     ✔      |
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    Status: warning-chef (i)
+
+### Metadata doesn't use the last version
+
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    | Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
+    |      |             |       | Chef   | Repository | Status      | Status      | Status     |
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    | Test | = 1.0.0     | 1.0.0 | 1.0.1  | 1.0.1      |      !      |      ✔      |     ✔      |
+    +------+-------------+-------+--------+------------+-------------+-------------+------------+
+    Status: warning-req (!)
+
+### Metadata refers to a version not existing on Chef Server
+    +------+-------------+------+--------+------------+-------------+-------------+------------+
+    | Name | Requirement | Used | Latest | Latest     | Requirement | Chef Server | Repository |
+    |      |             |      | Chef   | Repository | Status      | Status      | Status     |
+    +------+-------------+------+--------+------------+-------------+-------------+------------+
+    | Test | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      ✖      |      ✔      |     ✔      |
+    +------+-------------+------+--------+------------+-------------+-------------+------------+
+    Status: error (✖)
+
+### Chef Server doesn't contain any versions
+
++------+-------------+------+--------+------------+-------------+-------------+------------+
+| Name | Requirement | Used | Latest | Latest     | Requirement | Chef Server | Repository |
+|      |             |      | Chef   | Repository | Status      | Status      | Status     |
++------+-------------+------+--------+------------+-------------+-------------+------------+
+| Test | ~> 1.0.0    |      |        | 1.0.1      |      ✖      |      ✖      |     ✔      |
++------+-------------+------+--------+------------+-------------+-------------+------------+
+Status: error (✖)
 
 ## Installation
 
