@@ -12,3 +12,4 @@ pkg
 rdoc
 tmp
 examples
+coverage/
