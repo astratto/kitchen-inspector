@@ -105,6 +105,8 @@ module KitchenInspector
           # Show Status
           if dependencies.any? { |dep| dep.status == :'error' }
             status = "Status: error (#{X_MARK})".red
+          elsif dependencies.any? { |dep| dep.repomanager_status == :'error-repomanager' }
+            status = "Status: error-repomanager (#{X_MARK})".yellow
           elsif dependencies.any? { |dep| dep.repomanager_status == :'warning-outofdate-repomanager' }
             status = "Status: warning-outofdate-repomanager (#{ESCLAMATION_MARK * 2})".light_red
           elsif dependencies.any? { |dep| dep.status == :'warning-req' }
