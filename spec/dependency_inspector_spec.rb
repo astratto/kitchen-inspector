@@ -1,6 +1,6 @@
 require_relative 'support/spec_helper'
 
-describe Inspector::DependencyInspector do
+describe DependencyInspector do
   let(:dependency_inspector) { generate_dependency_inspector }
 
   describe "#initialize" do
@@ -13,8 +13,8 @@ describe Inspector::DependencyInspector do
           config.puts "chef_username 'test_user'"
 
           expect do
-            Inspector::DependencyInspector.new config
-          end.to raise_error(Inspector::RepositoryManagerError)
+            DependencyInspector.new config
+          end.to raise_error(RepositoryManagerError)
       end
 
       describe "Gitlab" do
@@ -25,7 +25,7 @@ describe Inspector::DependencyInspector do
           config.puts "chef_client_pem 'testclient.pem'"
           config.puts "chef_username 'test_user'"
 
-          inspector = Inspector::DependencyInspector.new config
+          inspector = DependencyInspector.new config
           inspector
         end
 
@@ -37,8 +37,8 @@ describe Inspector::DependencyInspector do
           config.puts "chef_username 'test_user'"
 
           expect do
-            Inspector::DependencyInspector.new config
-          end.to raise_error(Inspector::GitlabAccessNotConfiguredError)
+            DependencyInspector.new config
+          end.to raise_error(GitlabAccessNotConfiguredError)
         end
 
         it "raises an error when Gitlab Base Url is not configured" do
@@ -49,8 +49,8 @@ describe Inspector::DependencyInspector do
           config.puts "chef_username 'test_user'"
 
           expect do
-            Inspector::DependencyInspector.new config
-          end.to raise_error(Inspector::GitlabAccessNotConfiguredError)
+            DependencyInspector.new config
+          end.to raise_error(GitlabAccessNotConfiguredError)
         end
       end
     end
@@ -62,8 +62,8 @@ describe Inspector::DependencyInspector do
       config.puts "chef_username 'test_user'"
 
       expect do
-        Inspector::DependencyInspector.new config
-      end.to raise_error(Inspector::ChefAccessNotConfiguredError)
+        DependencyInspector.new config
+      end.to raise_error(ChefAccessNotConfiguredError)
     end
 
     it "raises an error when Chef Client PEM is not configured" do
@@ -73,8 +73,8 @@ describe Inspector::DependencyInspector do
       config.puts "chef_username 'test_user'"
 
       expect do
-        Inspector::DependencyInspector.new config
-      end.to raise_error(Inspector::ChefAccessNotConfiguredError)
+        DependencyInspector.new config
+      end.to raise_error(ChefAccessNotConfiguredError)
     end
 
     it "raises an error when Chef Username is not configured" do
@@ -84,14 +84,14 @@ describe Inspector::DependencyInspector do
       config.puts "chef_client_pem 'testclient.pem'"
 
       expect do
-        Inspector::DependencyInspector.new config
-      end.to raise_error(Inspector::ChefAccessNotConfiguredError)
+        DependencyInspector.new config
+      end.to raise_error(ChefAccessNotConfiguredError)
     end
   end
 
   describe "#update_status" do
     before(:each) do
-      @dependency = Inspector::Dependency.new("test", ">= 0")
+      @dependency = Dependency.new("test", ">= 0")
       @dependency.chef_versions = ["1.0.0", "1.0.1"]
       @dependency.repomanager_tags = ["1.0.0", "1.0.1"]
       @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.1")

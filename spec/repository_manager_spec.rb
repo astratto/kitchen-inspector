@@ -1,6 +1,6 @@
 require_relative 'support/spec_helper'
 
-describe Inspector::GitlabManager do
+describe GitlabManager do
   describe "API" do
     let(:manager) do
       config = {:base_url => "Test url",
@@ -8,7 +8,7 @@ describe Inspector::GitlabManager do
           :type => "Gitlab"
         }
 
-      manager = Inspector::GitlabManager.new config
+      manager = GitlabManager.new config
       manager
     end
 
@@ -27,7 +27,7 @@ describe Inspector::GitlabManager do
                 :type => "Gitlab"
               }
 
-      manager = Inspector::GitlabManager.new config
+      manager = GitlabManager.new config
       manager
     end
 
@@ -37,8 +37,8 @@ describe Inspector::GitlabManager do
               }
 
       expect do
-        Inspector::GitlabManager.new config
-      end.to raise_error(Inspector::GitlabAccessNotConfiguredError)
+        GitlabManager.new config
+      end.to raise_error(GitlabAccessNotConfiguredError)
     end
 
     it "raises an error when Gitlab Base Url is not configured" do
@@ -47,8 +47,8 @@ describe Inspector::GitlabManager do
               }
 
       expect do
-        Inspector::GitlabManager.new config
-      end.to raise_error(Inspector::GitlabAccessNotConfiguredError)
+        GitlabManager.new config
+      end.to raise_error(GitlabAccessNotConfiguredError)
     end
   end
 end

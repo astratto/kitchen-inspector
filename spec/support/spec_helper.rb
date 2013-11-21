@@ -4,7 +4,7 @@ Coveralls.wear!
 require 'kitchen-inspector/inspector'
 require 'chef_zero/server'
 
-include KitchenInspector
+include KitchenInspector::Inspector
 
 RSpec.configure do |config|
   config.before(:all) do
@@ -24,6 +24,6 @@ def generate_dependency_inspector
   config.puts "chef_client_pem 'testclient.pem'"
   config.puts "chef_username 'test_user'"
 
-  inspector = Inspector::DependencyInspector.new config
+  inspector = DependencyInspector.new config
   inspector
 end
