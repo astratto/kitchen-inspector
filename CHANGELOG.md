@@ -10,6 +10,7 @@ FEATURES:
 * Add option to show remarks (*--remarks*), that now are hidden by default
 * Add support for different Repository Managers (but only Gitlab is supported at this stage)
 * Verifies that a tag on the Repository Manager matches the corresponding metadata's version
+* Add exit codes to integrate Kitchen Inspector with a CI process
 
 FIXES:
 
