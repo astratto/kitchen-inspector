@@ -24,7 +24,7 @@ describe Cli do
 
       expect do
         cli.investigate("#{File.dirname(__FILE__)}/data/cookbook_no_deps")
-      end.to exit_with_code(204)
+      end.to exit_with_code(STATUS_TO_RETURN_CODES[:'warning-nodependencies'])
     end
 
     it "raises an error for missing configuration" do
@@ -32,7 +32,7 @@ describe Cli do
 
       expect do
         cli.investigate
-      end.to exit_with_code(110)
+      end.to exit_with_code(STATUS_TO_RETURN_CODES[:'error-config'])
     end
 
     it "raises an error for missing cookbook" do
@@ -40,7 +40,7 @@ describe Cli do
 
       expect do
         cli.investigate
-      end.to exit_with_code(111)
+      end.to exit_with_code(STATUS_TO_RETURN_CODES[:'error-notacookbook'])
     end
   end
 end
