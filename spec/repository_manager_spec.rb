@@ -15,7 +15,7 @@ describe GitlabManager do
     [:project_dependencies, :tags, :source_url, :project_by_name,
      :project_metadata, :project_metadata_version].each do |method|
       it "responds to #{method}" do
-        manager.respond_to?(method).should be_true
+        expect(manager.respond_to?(method)).to be_true
       end
     end
   end

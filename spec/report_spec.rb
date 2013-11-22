@@ -21,10 +21,11 @@ describe Report do
 
       it "up-to-date" do
         output, code = Report.generate(@dependencies, 'table', {})
-        output.split("\n").grep(/Test|Status:/).join("\n").should == \
+        expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |\n" \
         "#{'Status: up-to-date (%s)'.green}" % TICK_MARK
-        code.should == :'up-to-date'
+        )
+        expect(code).to eq(:'up-to-date')
       end
 
       it "error-repomanager" do
@@ -35,10 +36,11 @@ describe Report do
         dependency_inspector.update_status(dep1)
 
         output, code = Report.generate(@dependencies, 'table', {})
-        output.split("\n").grep(/Test|Status:/).join("\n").should == \
+        expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  |            |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{X_MARK.red}      |\n" \
         "#{'Status: error-repomanager (%s)'.yellow}" % X_MARK
-        code.should == :'error-repomanager'
+        )
+        expect(code).to eq(:'error-repomanager')
       end
 
       it "warning-mismatch-repomanager" do
@@ -49,10 +51,11 @@ describe Report do
         dependency_inspector.update_status(dep1)
 
         output, code = Report.generate(@dependencies, 'table', {})
-        output.split("\n").grep(/Test|Status:/).join("\n").should == \
+        expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.0      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{ESCLAMATION_MARK.bold.light_red}      |\n" \
         "#{'Status: warning-mismatch-repomanager (!)'.light_red}"
-        code.should == :'warning-mismatch-repomanager'
+        )
+        expect(code).to eq(:'warning-mismatch-repomanager')
       end
 
       it "warning-outofdate-repomanager" do
@@ -63,10 +66,11 @@ describe Report do
         dependency_inspector.update_status(dep1)
 
         output, code = Report.generate(@dependencies, 'table', {})
-        output.split("\n").grep(/Test|Status:/).join("\n").should == \
+        expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.0      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{(ESCLAMATION_MARK * 2).bold.light_red}     |\n" \
         "#{'Status: warning-outofdate-repomanager (!!)'.light_red}"
-        code.should == :'warning-outofdate-repomanager'
+        )
+        expect(code).to eq(:'warning-outofdate-repomanager')
       end
 
       it "warning-chef" do
@@ -77,10 +81,11 @@ describe Report do
         dependency_inspector.update_status(dep1)
 
         output, code = Report.generate(@dependencies, 'table', {})
-        output.split("\n").grep(/Test|Status:/).join("\n").should == \
+        expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| Test | ~> 1.0.0    | 1.0.0 | 1.0.0  | 1.0.1      |      #{TICK_MARK.green}      |      #{INFO_MARK.bold.blue}      |     #{TICK_MARK.green}      |\n" \
         "#{'Status: warning-chef (i)'.blue}"
-        code.should == :'warning-chef'
+        )
+        expect(code).to eq(:'warning-chef')
       end
 
       it "warning-req" do
@@ -94,10 +99,11 @@ describe Report do
         dependency_inspector.update_status(dep1)
 
         output, code = Report.generate([dep1], 'table', {})
-        output.split("\n").grep(/Test|Status:/).join("\n").should == \
+        expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| Test | = 1.0.0     | 1.0.0 | 1.0.1  | 1.0.1      |      #{ESCLAMATION_MARK.bold.yellow}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |\n" \
         "#{'Status: warning-req (!)'.yellow}"
-        code.should == :'warning-req'
+        )
+        expect(code).to eq(:'warning-req')
       end
 
       it "error due to wrong metadata" do
@@ -111,10 +117,11 @@ describe Report do
         dependency_inspector.update_status(dep1)
 
         output, code = Report.generate([dep1], 'table', {})
-        output.split("\n").grep(/Test|Status:/).join("\n").should == \
+        expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| #{'Test'.red} | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      #{X_MARK.red}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |\n" \
         "#{'Status: error (%s)'.red}" % X_MARK
-        code.should == :'error'
+        )
+        expect(code).to eq(:'error')
       end
 
       it "error due to Chef Server" do
@@ -125,10 +132,11 @@ describe Report do
         dependency_inspector.update_status(dep1)
 
         output, code = Report.generate([dep1], 'table', {})
-        output.split("\n").grep(/Test|Status:/).join("\n").should == \
+        expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| #{'Test'.red} | ~> 1.0.0    |      |        | 1.0.1      |      #{X_MARK.red}      |      #{X_MARK.red}      |     #{TICK_MARK.green}      |\n" \
         "#{'Status: error (%s)'.red}" % X_MARK
-        code.should == :'error'
+        )
+        expect(code).to eq(:'error')
       end
     end
   end

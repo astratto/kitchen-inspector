@@ -108,9 +108,9 @@ describe DependencyInspector do
 
     it "returns a success for correct versions on both servers" do
       dependency_inspector.update_status(@dependency)
-      @dependency.repomanager_status.should == :'up-to-date'
-      @dependency.chef_status.should == :'up-to-date'
-      @dependency.status.should == :'up-to-date'
+      expect(@dependency.repomanager_status).to eq(:'up-to-date')
+      expect(@dependency.chef_status).to eq(:'up-to-date')
+      expect(@dependency.status).to eq(:'up-to-date')
     end
 
     context "error statuses" do
@@ -118,7 +118,7 @@ describe DependencyInspector do
         @dependency.version_used = nil
 
         dependency_inspector.update_status(@dependency)
-        @dependency.status.should == :error
+        expect(@dependency.status).to eq(:error)
       end
 
       it "missing version on Chef Server" do
@@ -126,7 +126,7 @@ describe DependencyInspector do
         @dependency.latest_chef = nil
 
         dependency_inspector.update_status(@dependency)
-        @dependency.chef_status.should == :'error-chef'
+        expect(@dependency.chef_status).to eq(:'error-chef')
       end
 
       it "missing version on the Repository Manager" do
@@ -134,7 +134,7 @@ describe DependencyInspector do
         @dependency.latest_metadata_repomanager = nil
 
         dependency_inspector.update_status(@dependency)
-        @dependency.repomanager_status.should == :'error-repomanager'
+        expect(@dependency.repomanager_status).to eq(:'error-repomanager')
       end
     end
 
@@ -143,7 +143,7 @@ describe DependencyInspector do
         @dependency.version_used = "1.0.0"
 
         dependency_inspector.update_status(@dependency)
-        @dependency.status.should == :'warning-req'
+        expect(@dependency.status).to eq(:'warning-req')
       end
 
       it "a newer version exists on the Repository Manager" do
@@ -151,7 +151,7 @@ describe DependencyInspector do
         @dependency.latest_chef = Solve::Version.new("1.0.0")
 
         dependency_inspector.update_status(@dependency)
-        @dependency.chef_status.should == :'warning-chef'
+        expect(@dependency.chef_status).to eq(:'warning-chef')
       end
 
       it "a newer version exists on Chef Server" do
@@ -160,7 +160,7 @@ describe DependencyInspector do
         @dependency.latest_tag_repomanager = Solve::Version.new("1.0.0")
 
         dependency_inspector.update_status(@dependency)
-        @dependency.repomanager_status.should == :'warning-outofdate-repomanager'
+        expect(@dependency.repomanager_status).to eq(:'warning-outofdate-repomanager')
       end
 
       it "last tag on Repository Manager doesn't match last metadata's version" do
@@ -168,7 +168,7 @@ describe DependencyInspector do
         @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.0")
 
         dependency_inspector.update_status(@dependency)
-        @dependency.repomanager_status.should == :'warning-mismatch-repomanager'
+        expect(@dependency.repomanager_status).to eq(:'warning-mismatch-repomanager')
       end
     end
   end
@@ -176,12 +176,12 @@ describe DependencyInspector do
   describe "#satisfy" do
     it "returns the correct version when existing" do
       version = dependency_inspector.satisfy("~> 1.0.1", ["1.0.0", "1.0.1"])
-      version.should == "1.0.1"
+      expect(version).to eq("1.0.1")
     end
 
     it "returns nil when a satisfying version doesn't exist" do
       version = dependency_inspector.satisfy("~> 1.0.1", ["1.0.0"])
-      version.should == nil
+      expect(version).to eq(nil)
     end
   end
 
@@ -195,12 +195,12 @@ describe DependencyInspector do
       @chef_server.load_data data
 
       versions = dependency_inspector.find_chef_server_versions('Test')
-      versions.should == ["1.0.1"]
+      expect(versions).to eq(["1.0.1"])
     end
 
     it "doesn't retrieve any versions using a missing project" do
       versions = dependency_inspector.find_chef_server_versions('Test')
-      versions.should == []
+      expect(versions).to eq([])
     end
   end
 end

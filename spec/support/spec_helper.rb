@@ -19,6 +19,10 @@ RSpec.configure do |config|
   config.after(:all) do
     @chef_server.stop
   end
+
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
+  end
 end
 
 def generate_dependency_inspector
