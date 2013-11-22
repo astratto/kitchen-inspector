@@ -56,12 +56,8 @@ module KitchenInspector
     #
     class TableReport
       class << self
-        # Generates the status of dependent cookbooks as a table
-        #
-        # @param dependencies [Array<Dependency>] list of cookbook dependency objects
-        #
+        # Generate the status of dependent cookbooks as a table
         def generate(dependencies, opts)
-          rows = []
           headings = ["Name", "Requirement", "Used", "Latest\nChef", "Latest\nRepository", "Requirement\nStatus",
                       "Chef Server\nStatus", "Repository\nStatus"]
 
@@ -71,6 +67,26 @@ module KitchenInspector
             remarks = []
           end
 
+          rows = generate_rows(dependencies, opts)
+
+          # Show Table
+          table = Terminal::Table.new headings: headings, rows: rows
+
+          # Show Status
+          g_status, g_status_code = global_status(dependencies)
+
+          if opts[:remarks]
+            remarks_result = remarks.each_with_index.collect{|remark, idx| "[#{idx + 1}]: #{remark}"}.join("\n")
+            output = "#{table}\n#{g_status}\n\nRemarks:\n#{remarks_result}"
+          else
+            output = "#{table}\n#{g_status}"
+          end
+          [output, g_status_code]
+        end
+
+        # Generate a single row
+        def generate_rows(dependencies, opts)
+          rows = []
           dependencies.each do |dependency|
             status = status_to_mark(dependency.status)
             chef_status = status_to_mark(dependency.chef_status)
@@ -98,21 +114,7 @@ module KitchenInspector
 
             rows << row
           end
-
-          # Show Table
-          table = Terminal::Table.new headings: headings, rows: rows
-
-          # Show Status
-          g_status, g_status_code = global_status(dependencies)
-
-
-          if opts[:remarks]
-            remarks_result = remarks.each_with_index.collect{|remark, idx| "[#{idx + 1}]: #{remark}"}.join("\n")
-            output = "#{table}\n#{g_status}\n\nRemarks:\n#{remarks_result}"
-          else
-            output = "#{table}\n#{g_status}"
-          end
-          [output, g_status_code]
+          rows
         end
 
         def global_status(dependencies)
