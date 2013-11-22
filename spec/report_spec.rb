@@ -19,7 +19,7 @@ describe Report do
         @dependencies = [dep1]
       end
 
-      it "yields a global up-to-date" do
+      it "returns a global up-to-date" do
         output, code = Report.generate(@dependencies, 'table', {})
         output.split("\n").grep(/Test|Status:/).join("\n").should == \
         "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |\n" \
@@ -27,7 +27,7 @@ describe Report do
         code.should == :'up-to-date'
       end
 
-      it "yields a global error-repomanager" do
+      it "returns a global error-repomanager" do
         dep1 = @dependencies.first
         dep1.repomanager_tags = []
         dep1.latest_metadata_repomanager = nil
@@ -41,7 +41,7 @@ describe Report do
         code.should == :'error-repomanager'
       end
 
-      it "yields a global warning-mismatch-repomanager" do
+      it "returns a global warning-mismatch-repomanager" do
         dep1 = @dependencies.first
         dep1.repomanager_tags = ["1.0.0"]
         dep1.latest_metadata_repomanager = Solve::Version.new("1.0.0")
@@ -55,7 +55,7 @@ describe Report do
         code.should == :'warning-mismatch-repomanager'
       end
 
-      it "yields a global warning-outofdate-repomanager" do
+      it "returns a global warning-outofdate-repomanager" do
         dep1 = @dependencies.first
         dep1.repomanager_tags = ["1.0.0"]
         dep1.latest_metadata_repomanager = Solve::Version.new("1.0.0")
@@ -69,7 +69,7 @@ describe Report do
         code.should == :'warning-outofdate-repomanager'
       end
 
-      it "yields a global warning-chef" do
+      it "returns a global warning-chef" do
         dep1 = @dependencies.first
         dep1.chef_versions = ["1.0.0"]
         dep1.latest_chef = Solve::Version.new("1.0.0")
@@ -83,7 +83,7 @@ describe Report do
         code.should == :'warning-chef'
       end
 
-      it "yields a global warning-req" do
+      it "returns a global warning-req" do
         dep1 = Dependency.new("Test", "= 1.0.0")
         dep1.chef_versions = ["1.0.0", "1.0.1"]
         dep1.repomanager_tags = ["1.0.0", "1.0.1"]
@@ -100,7 +100,7 @@ describe Report do
         code.should == :'warning-req'
       end
 
-      it "yields a global error due to wrong metadata" do
+      it "returns a global error due to wrong metadata" do
         dep1 = Dependency.new("Test", "~> 1.0.0")
         dep1.chef_versions = ["1.1.0"]
         dep1.repomanager_tags = ["1.1.0"]
@@ -117,7 +117,7 @@ describe Report do
         code.should == :'error'
       end
 
-      it "yields a global error due to Chef Server" do
+      it "returns a global error due to Chef Server" do
         dep1 = @dependencies.first
         dep1.chef_versions = []
         dep1.latest_chef = nil
