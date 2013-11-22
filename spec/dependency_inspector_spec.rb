@@ -176,6 +176,21 @@ describe DependencyInspector do
   end
 
   describe "#find_chef_server_versions" do
-    it "retrieves versions using a valid project"
+    it "retrieves versions using a valid project" do
+      data = {"cookbooks" =>
+        {
+          "Test-1.0.1" => {"metadata.rb" => "depends \"mysql\""}
+        }
+      }
+      @chef_server.load_data data
+
+      versions = dependency_inspector.find_chef_server_versions('Test')
+      versions.should == ["1.0.1"]
+    end
+
+    it "doesn't retrieve any versions using a missing project" do
+      versions = dependency_inspector.find_chef_server_versions('Test')
+      versions.should == []
+    end
   end
 end
