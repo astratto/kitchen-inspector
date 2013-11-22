@@ -16,7 +16,7 @@ describe Cli do
     $stdout = @original_stdout
   end
 
-  describe "investigate" do
+  describe ".investigate" do
     let(:cli) { Cli.new }
 
     it "raises a warning for cookbook without dependencies" do
@@ -42,5 +42,9 @@ describe Cli do
         cli.investigate
       end.to exit_with_code(STATUS_TO_RETURN_CODES[:'error-notacookbook'])
     end
+
+    it "generates a correct table report"
+
+    it "generates a correct json report"
   end
 end

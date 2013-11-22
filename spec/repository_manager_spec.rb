@@ -21,34 +21,38 @@ describe GitlabManager do
   end
 
   describe "#initialize" do
-    it "creates a valid Manager with a full configuration" do
-      config = {:base_url => "Test url",
-                :token => "token",
-                :type => "Gitlab"
-              }
+    context "full configuration" do
+      it "creates a valid Manager" do
+        config = {:base_url => "Test url",
+                  :token => "token",
+                  :type => "Gitlab"
+                }
 
-      manager = GitlabManager.new config
-      manager
+        manager = GitlabManager.new config
+        manager
+      end
     end
 
-    it "raises an error when Gitlab Token is not configured" do
-      config = {:base_url => "Test url",
-                :type => "Gitlab"
-              }
+    context "invalid configuration" do
+      it "raises an error when Gitlab Token is not configured" do
+        config = {:base_url => "Test url",
+                  :type => "Gitlab"
+                }
 
-      expect do
-        GitlabManager.new config
-      end.to raise_error(GitlabAccessNotConfiguredError)
-    end
+        expect do
+          GitlabManager.new config
+        end.to raise_error(GitlabAccessNotConfiguredError)
+      end
 
-    it "raises an error when Gitlab Base Url is not configured" do
-      config = {:token => "token",
-                :type => "Gitlab"
-              }
+      it "raises an error when Gitlab Base Url is not configured" do
+        config = {:token => "token",
+                  :type => "Gitlab"
+                }
 
-      expect do
-        GitlabManager.new config
-      end.to raise_error(GitlabAccessNotConfiguredError)
+        expect do
+          GitlabManager.new config
+        end.to raise_error(GitlabAccessNotConfiguredError)
+      end
     end
   end
 end

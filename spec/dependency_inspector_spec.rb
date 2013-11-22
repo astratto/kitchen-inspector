@@ -4,7 +4,7 @@ describe DependencyInspector do
   let(:dependency_inspector) { generate_dependency_inspector }
 
   describe "#initialize" do
-    describe "Repository Manager" do
+    context "Repository Manager" do
       it "raises an error if an unsupported Repository Manager is specified" do
           config = StringIO.new
           config.puts "repository_manager :type => 'Unknown', :base_url => 'http://localhost:8080', :token =>'test_token'"
@@ -17,75 +17,81 @@ describe DependencyInspector do
           end.to raise_error(RepositoryManagerError)
       end
 
-      describe "Gitlab" do
-        it "creates a valid Inspector with a full configuration" do
-          config = StringIO.new
-          config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-          config.puts "chef_server_url 'http://localhost:4000'"
-          config.puts "chef_client_pem 'testclient.pem'"
-          config.puts "chef_username 'test_user'"
+      context "Gitlab" do
+        context "with a full configuration" do
+          it "creates a valid Inspector" do
+            config = StringIO.new
+            config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
+            config.puts "chef_server_url 'http://localhost:4000'"
+            config.puts "chef_client_pem 'testclient.pem'"
+            config.puts "chef_username 'test_user'"
 
-          inspector = DependencyInspector.new config
-          inspector
+            inspector = DependencyInspector.new config
+            inspector
+          end
         end
 
-        it "raises an error when Gitlab Token is not configured" do
-          config = StringIO.new
-          config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080'"
-          config.puts "chef_server_url 'http://localhost:4000'"
-          config.puts "chef_client_pem 'testclient.pem'"
-          config.puts "chef_username 'test_user'"
+        context "with invalid configuration" do
+          it "raises an error when Gitlab Token is not configured" do
+            config = StringIO.new
+            config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080'"
+            config.puts "chef_server_url 'http://localhost:4000'"
+            config.puts "chef_client_pem 'testclient.pem'"
+            config.puts "chef_username 'test_user'"
 
-          expect do
-            DependencyInspector.new config
-          end.to raise_error(GitlabAccessNotConfiguredError)
-        end
+            expect do
+              DependencyInspector.new config
+            end.to raise_error(GitlabAccessNotConfiguredError)
+          end
 
-        it "raises an error when Gitlab Base Url is not configured" do
-          config = StringIO.new
-          config.puts "repository_manager :type => 'Gitlab', :token =>'test_token'"
-          config.puts "chef_server_url 'http://localhost:4000'"
-          config.puts "chef_client_pem 'testclient.pem'"
-          config.puts "chef_username 'test_user'"
+          it "raises an error when Gitlab Base Url is not configured" do
+            config = StringIO.new
+            config.puts "repository_manager :type => 'Gitlab', :token =>'test_token'"
+            config.puts "chef_server_url 'http://localhost:4000'"
+            config.puts "chef_client_pem 'testclient.pem'"
+            config.puts "chef_username 'test_user'"
 
-          expect do
-            DependencyInspector.new config
-          end.to raise_error(GitlabAccessNotConfiguredError)
+            expect do
+              DependencyInspector.new config
+            end.to raise_error(GitlabAccessNotConfiguredError)
+          end
         end
       end
     end
 
-    it "raises an error when Chef Server Url is not configured" do
-      config = StringIO.new
-      config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-      config.puts "chef_client_pem 'testclient.pem'"
-      config.puts "chef_username 'test_user'"
+    context "Chef Server" do
+      it "raises an error when Server Url is not configured" do
+        config = StringIO.new
+        config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
+        config.puts "chef_client_pem 'testclient.pem'"
+        config.puts "chef_username 'test_user'"
 
-      expect do
-        DependencyInspector.new config
-      end.to raise_error(ChefAccessNotConfiguredError)
-    end
+        expect do
+          DependencyInspector.new config
+        end.to raise_error(ChefAccessNotConfiguredError)
+      end
 
-    it "raises an error when Chef Client PEM is not configured" do
-      config = StringIO.new
-      config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-      config.puts "chef_server_url 'http://localhost:4000'"
-      config.puts "chef_username 'test_user'"
+      it "raises an error when Client PEM is not configured" do
+        config = StringIO.new
+        config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
+        config.puts "chef_server_url 'http://localhost:4000'"
+        config.puts "chef_username 'test_user'"
 
-      expect do
-        DependencyInspector.new config
-      end.to raise_error(ChefAccessNotConfiguredError)
-    end
+        expect do
+          DependencyInspector.new config
+        end.to raise_error(ChefAccessNotConfiguredError)
+      end
 
-    it "raises an error when Chef Username is not configured" do
-      config = StringIO.new
-      config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-      config.puts "chef_server_url 'http://localhost:4000'"
-      config.puts "chef_client_pem 'testclient.pem'"
+      it "raises an error when Username is not configured" do
+        config = StringIO.new
+        config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
+        config.puts "chef_server_url 'http://localhost:4000'"
+        config.puts "chef_client_pem 'testclient.pem'"
 
-      expect do
-        DependencyInspector.new config
-      end.to raise_error(ChefAccessNotConfiguredError)
+        expect do
+          DependencyInspector.new config
+        end.to raise_error(ChefAccessNotConfiguredError)
+      end
     end
   end
 
@@ -100,66 +106,70 @@ describe DependencyInspector do
       @dependency.version_used = "1.0.1"
     end
 
-    it "sets correct statuses for correct versions on both servers" do
+    it "returns a success for correct versions on both servers" do
       dependency_inspector.update_status(@dependency)
       @dependency.repomanager_status.should == :'up-to-date'
       @dependency.chef_status.should == :'up-to-date'
       @dependency.status.should == :'up-to-date'
     end
 
-    it "returns an error when a valid version cannot be found" do
-      @dependency.version_used = nil
+    context "error statuses" do
+      it "when a valid version cannot be found" do
+        @dependency.version_used = nil
 
-      dependency_inspector.update_status(@dependency)
-      @dependency.status.should == :error
+        dependency_inspector.update_status(@dependency)
+        @dependency.status.should == :error
+      end
+
+      it "missing version on Chef Server" do
+        @dependency.chef_versions = []
+        @dependency.latest_chef = nil
+
+        dependency_inspector.update_status(@dependency)
+        @dependency.chef_status.should == :'error-chef'
+      end
+
+      it "missing version on the Repository Manager" do
+        @dependency.repomanager_tags = []
+        @dependency.latest_metadata_repomanager = nil
+
+        dependency_inspector.update_status(@dependency)
+        @dependency.repomanager_status.should == :'error-repomanager'
+      end
     end
 
-    it "returns a warning when a newer version could be used" do
-      @dependency.version_used = "1.0.0"
+    context "warning statuses" do
+      it "a newer version could be used" do
+        @dependency.version_used = "1.0.0"
 
-      dependency_inspector.update_status(@dependency)
-      @dependency.status.should == :'warning-req'
-    end
+        dependency_inspector.update_status(@dependency)
+        @dependency.status.should == :'warning-req'
+      end
 
-    it "returns an error for missing version on Chef Server" do
-      @dependency.chef_versions = []
-      @dependency.latest_chef = nil
+      it "a newer version exists on the Repository Manager" do
+        @dependency.chef_versions = ["1.0.0"]
+        @dependency.latest_chef = Solve::Version.new("1.0.0")
 
-      dependency_inspector.update_status(@dependency)
-      @dependency.chef_status.should == :'error-chef'
-    end
+        dependency_inspector.update_status(@dependency)
+        @dependency.chef_status.should == :'warning-chef'
+      end
 
-    it "returns a warning when a newer version exists on the Repository Manager" do
-      @dependency.chef_versions = ["1.0.0"]
-      @dependency.latest_chef = Solve::Version.new("1.0.0")
+      it "a newer version exists on Chef Server" do
+        @dependency.repomanager_tags = ["1.0.0"]
+        @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.0")
+        @dependency.latest_tag_repomanager = Solve::Version.new("1.0.0")
 
-      dependency_inspector.update_status(@dependency)
-      @dependency.chef_status.should == :'warning-chef'
-    end
+        dependency_inspector.update_status(@dependency)
+        @dependency.repomanager_status.should == :'warning-outofdate-repomanager'
+      end
 
-    it "returns an error for missing version on the Repository Manager" do
-      @dependency.repomanager_tags = []
-      @dependency.latest_metadata_repomanager = nil
+      it "last tag on Repository Manager doesn't match last metadata's version" do
+        @dependency.repomanager_tags = ["1.0.0", "1.0.1"]
+        @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.0")
 
-      dependency_inspector.update_status(@dependency)
-      @dependency.repomanager_status.should == :'error-repomanager'
-    end
-
-    it "returns a warning when a newer version exists on Chef Server" do
-      @dependency.repomanager_tags = ["1.0.0"]
-      @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.0")
-      @dependency.latest_tag_repomanager = Solve::Version.new("1.0.0")
-
-      dependency_inspector.update_status(@dependency)
-      @dependency.repomanager_status.should == :'warning-outofdate-repomanager'
-    end
-
-    it "returns a warning when last tag on Repository Manager doesn't match last metadata's version" do
-      @dependency.repomanager_tags = ["1.0.0", "1.0.1"]
-      @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.0")
-
-      dependency_inspector.update_status(@dependency)
-      @dependency.repomanager_status.should == :'warning-mismatch-repomanager'
+        dependency_inspector.update_status(@dependency)
+        @dependency.repomanager_status.should == :'warning-mismatch-repomanager'
+      end
     end
   end
 
