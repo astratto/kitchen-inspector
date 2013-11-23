@@ -117,33 +117,36 @@ module KitchenInspector
           rows
         end
 
+        # Return a global status
+        #
+        # Note that global :error-chef is not possible since there would
+        # be at least one :error that takes precedence
         def global_status(dependencies)
-          code = :'up-to-date'
-          status = "Status: up-to-date (#{TICK_MARK})".green
+          mark, color, code = dependencies.each do |dep|
+            break [X_MARK, :red, dep.status
+                   ] if dep.status == :error
 
-          # Note that global :error-chef is not possible since there would be at least
-          # one :error
-          if dependencies.any? { |dep| dep.status == :'error' }
-            status = "Status: error (#{X_MARK})".red
-            code = :error
-          elsif dependencies.any? { |dep| dep.repomanager_status == :'error-repomanager' }
-            status = "Status: error-repomanager (#{X_MARK})".yellow
-            code = :'error-repomanager'
-          elsif dependencies.any? { |dep| dep.repomanager_status == :'warning-outofdate-repomanager' }
-            status = "Status: warning-outofdate-repomanager (#{ESCLAMATION_MARK * 2})".light_red
-            code = :'warning-outofdate-repomanager'
-          elsif dependencies.any? { |dep| dep.status == :'warning-req' }
-            status = "Status: warning-req (#{ESCLAMATION_MARK})".yellow
-            code = :'warning-req'
-          elsif dependencies.any? { |dep| dep.repomanager_status == :'warning-mismatch-repomanager' }
-            status = "Status: warning-mismatch-repomanager (#{ESCLAMATION_MARK})".light_red
-            code = :'warning-mismatch-repomanager'
-          elsif dependencies.any? { |dep| dep.chef_status == :'warning-chef' }
-            status = "Status: warning-chef (#{INFO_MARK})".blue
-            code = :'warning-chef'
+            break [X_MARK, :yellow, dep.repomanager_status
+                   ] if dep.repomanager_status == :'error-repomanager'
+
+            break ["#{ESCLAMATION_MARK * 2}", :light_red, dep.repomanager_status
+                   ] if dep.repomanager_status == :'warning-outofdate-repomanager'
+
+            break [ESCLAMATION_MARK, :yellow, dep.status
+                   ] if dep.status == :'warning-req'
+
+            break [ESCLAMATION_MARK, :light_red, dep.repomanager_status
+                   ] if dep.repomanager_status == :'warning-mismatch-repomanager'
+
+            break [INFO_MARK, :blue, dep.chef_status
+                   ] if dep.chef_status == :'warning-chef'
           end
 
-          [status, code]
+          unless code
+            mark, color, code = TICK_MARK, :green, :'up-to-date'
+          end
+
+          ["Status: #{code} (#{mark})".send(color), code]
         end
 
         # Return the indices of the remarks
