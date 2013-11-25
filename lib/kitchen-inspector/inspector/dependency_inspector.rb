@@ -62,10 +62,10 @@ module KitchenInspector
 
       # Initialize the Repository Manager
       def repository_manager(config)
-        case config[:type]
-        when "Gitlab"
-          @repomanager = GitlabManager.new config
-        else
+        begin
+          manager_cls = Object.const_get "KitchenInspector::Inspector::#{config[:type]}Manager"
+          @repomanager = manager_cls.new config
+        rescue NameError
           raise RepositoryManagerError, "Repository Manager '#{config[:type]}' not supported."
         end
       end
