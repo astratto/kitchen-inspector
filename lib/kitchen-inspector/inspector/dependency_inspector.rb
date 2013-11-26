@@ -63,7 +63,7 @@ module KitchenInspector
       # Initialize the Repository Manager
       def repository_manager(config)
         begin
-          manager_cls = Object.const_get "KitchenInspector::Inspector::#{config[:type]}Manager"
+          manager_cls = "KitchenInspector::Inspector::#{config[:type]}Manager".constantize
           @repomanager = manager_cls.new config
         rescue NameError
           raise RepositoryManagerError, "Repository Manager '#{config[:type]}' not supported."
