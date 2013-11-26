@@ -88,6 +88,7 @@ module KitchenInspector
         def generate_rows(dependencies, opts)
           rows = []
           remarks = []
+          remarks_counter = 0
           dependencies.each do |dependency|
             status = status_to_mark(dependency.status)
             chef_status = status_to_mark(dependency.chef_status)
@@ -108,7 +109,7 @@ module KitchenInspector
             ]
 
             if opts[:remarks]
-              remarks_idx, remarks_counter = remarks_indices(dependency.remarks, remarks_counter ||= 0)
+              remarks_idx, remarks_counter = remarks_indices(dependency.remarks, remarks_counter)
               remarks.push(*dependency.remarks)
               row << remarks_idx
             end

@@ -149,17 +149,19 @@ describe Report do
         dep1.version_used = nil
         dependency_inspector.update_status(dep1)
 
-        output, code = Report.generate([dep1], 'table', {:remarks => true})
+        output, code = Report.generate([dep1, dep1], 'table', {:remarks => true})
         expect(output).to eq( \
         "+------+-------------+------+--------+------------+-------------+-------------+------------+---------+\n" \
         "| Name | Requirement | Used | Latest | Latest     | Requirement | Chef Server | Repository | Remarks |\n" \
         "|      |             |      | Chef   | Repository | Status      | Status      | Status     |         |\n" \
         "+------+-------------+------+--------+------------+-------------+-------------+------------+---------+\n" \
         "| #{'Test'.red} | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      #{X_MARK.red}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      | 1       |\n" \
+        "| #{'Test'.red} | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      #{X_MARK.red}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      | 2       |\n" \
         "+------+-------------+------+--------+------------+-------------+-------------+------------+---------+\n" \
         "#{'Status: error (%s)'.red}\n\n" \
         "Remarks:\n" \
-        "[1]: No versions found" % X_MARK)
+        "[1]: No versions found\n" \
+        "[2]: No versions found" % X_MARK)
         expect(code).to eq(:error)
       end
     end
