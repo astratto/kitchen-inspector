@@ -10,7 +10,7 @@ Kitchen Ispector is a CLI utility to check a cookbook's dependency status agains
 In particular, this tool checks whether the dependencies specified in a cookbook's metadata are up to date or not.
 It also shows whether one of the servers must be aligned.
 
-By default, dependencies are recursively analyzed.
+By default, dependencies are recursively analyzed and transitive dependencies are marked with a * (star).
 
 It assumes that your kitchen is composed by:
 

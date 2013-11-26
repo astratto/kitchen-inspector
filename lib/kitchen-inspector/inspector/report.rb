@@ -96,6 +96,7 @@ module KitchenInspector
 
             name = dependency.name.dup
             name = name.red if dependency.status == :'error'
+            name = "#{name} *" if dependency.transitive
 
             row = [
               name,

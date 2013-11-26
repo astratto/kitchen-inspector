@@ -100,7 +100,10 @@ module KitchenInspector
 
               # Add dependencies not already tracked
               dependency.dependencies.each do |dep|
-                dependencies << dep unless dependencies.collect(&:name).include?(dep.name)
+                unless dependencies.collect(&:name).include?(dep.name)
+                  dep.transitive = true
+                  dependencies << dep
+                end
               end
             end
           end
