@@ -29,7 +29,6 @@ require 'colorize'
 require 'ridley'
 require 'terminal-table'
 require 'thor'
-require 'gitlab'
 
 require 'kitchen-inspector/inspector/mixin/utils'
 require 'kitchen-inspector/inspector/cli'

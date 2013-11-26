@@ -17,7 +17,7 @@ It assumes that your kitchen is composed by:
 * a Chef server containing the cookbooks to be used
 * a Repository Manager hosting cookbook's development
 
-**Note:** at this stage only Gitlab is supported.
+**Note:** at this stage Gitlab and GitHub are supported.
 
 ## Installation
 
@@ -137,6 +137,24 @@ Example:
 repository_manager :type => "Gitlab",
                    :base_url => "http://gitlab.example.org",
                    :token => "gitlab_token" # (Gitlab > Profile > Account)
+```
+
+### GitHub
+
+GitHub access can be configured specifying a *token* and a list of *users* that
+host the cookbooks you're interested in.
+
+*PLEASE NOTE* that GitHub has a strict [rate limit](http://developer.github.com/v3/#rate-limiting) on the calls you can make.
+So, even though a *token* is not strictly required, it's better to configure it as well.  
+From [GitHub's Applications page](https://github.com/settings/applications) go to "Personal Access Tokens" and generate a new token.
+
+Example:
+
+```ruby
+# Repository Manager configuration
+repository_manager :type => "Github",
+                   :token => "gitlab_token",
+                   :users => ["opscode-cookbooks"]
 ```
 
 ## Checks

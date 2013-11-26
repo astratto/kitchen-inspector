@@ -1,7 +1,9 @@
 language: ruby
 rvm:
-  - 2.0.0
-  - 1.9.3
-  - 1.9.2
-
+- 2.0.0
+- 1.9.3
+- 1.9.2
 script: bundle exec rspec spec
+env:
+  global:
+    secure: ox+FSwU2Ue7t3Yq/XKiUvvY5kZ6H2BTAza3zQdHgKq3hhqF9xowp1QSB2BybVSreVgy+dMPivsk5ZPX67aZwfH0tYOJRkaZODVYTxbu/gygTAkcpf9qqGTsS9ISXn6EGqXfAWHXAPsuhjDbMgGBbuAxj0k/HagDSrd7mKvqsrgc=

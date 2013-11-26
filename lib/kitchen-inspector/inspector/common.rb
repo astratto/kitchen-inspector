@@ -28,7 +28,6 @@ module KitchenInspector
     class ConfigurationError < StandardError; end
     class RepositoryManagerError < ConfigurationError; end
 
-    class GitlabAccessNotConfiguredError < StandardError; end
     class ChefAccessNotConfiguredError < StandardError; end
     class NotACookbookError < StandardError; end
     class DuplicateCookbookError < StandardError; end
