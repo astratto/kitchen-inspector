@@ -67,7 +67,7 @@ module KitchenInspector
             remarks = []
           end
 
-          rows = generate_rows(dependencies, opts)
+          rows, remarks = generate_rows(dependencies, opts)
 
           # Show Table
           table = Terminal::Table.new headings: headings, rows: rows
@@ -87,6 +87,7 @@ module KitchenInspector
         # Generate a single row
         def generate_rows(dependencies, opts)
           rows = []
+          remarks = []
           dependencies.each do |dependency|
             status = status_to_mark(dependency.status)
             chef_status = status_to_mark(dependency.chef_status)
@@ -107,14 +108,14 @@ module KitchenInspector
             ]
 
             if opts[:remarks]
-              remarks_idx, remarks_counter = remarks_indices(dependency.remarks, remarks_counter)
+              remarks_idx, remarks_counter = remarks_indices(dependency.remarks, remarks_counter ||= 0)
               remarks.push(*dependency.remarks)
               row << remarks_idx
             end
 
             rows << row
           end
-          rows
+          [rows, remarks]
         end
 
         # Return a global status
