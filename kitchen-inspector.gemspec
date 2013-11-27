@@ -5,8 +5,14 @@ require 'kitchen-inspector/inspector/version'
 
 # Generate pre-release versions for non tagged releases
 git_version = begin
-  stripped = `git describe --always`.strip
-  /^([^-]+)-([0-9]+)-[^-]+$/.match(stripped) ? "#{$1}-#{$2}" : stripped
+  describe = `git describe`
+  if $?.success?
+    stripped = describe.strip
+    /^([^-]+)-([0-9]+)-[^-]+$/.match(stripped) ? "#{$1}.#{$2}" : stripped
+  else
+    git_raw = `git log --pretty=format:%h | head -n1`
+    $?.success? ? '0.0.0.%d' % git_raw.strip.to_i(16) : '0.0.0'
+  end
 end
 
 Gem::Specification.new do |spec|
