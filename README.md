@@ -10,7 +10,7 @@ Kitchen Ispector is a CLI utility to check a cookbook's dependency status agains
 In particular, this tool checks whether the dependencies specified in a cookbook's metadata are up to date or not.
 It also shows whether one of the servers must be aligned.
 
-By default, dependencies are recursively analyzed and transitive dependencies are marked with a * (star).
+By default, dependencies are recursively analyzed and transitive dependencies are shown indented.
 
 It assumes that your kitchen is composed by:
 
@@ -174,12 +174,12 @@ Two display formats are supported: table and json
     | apache2    | = 1.8.2     | 1.8.2 | 1.8.2  | 1.8.4      |      ✔      |      i      |   ✔        |
     | mysql      | = 1.1.2     | 1.1.2 | 1.1.3  | 1.1.4      |      !      |      i      |   ✔        |
     | database   | = 1.5.3     | 1.5.3 | 1.5.3  | 1.5.2      |      ✔      |      ✔      |   !!       |
-    | activemq   | = 1.1.0     | 1.1.0 | 1.1.1  | 1.1.1      |      !      |      ✔      |   ✔        |
     | postgresql | = 3.1.0     |       | 3.0.5  | 3.1.0      |      ✖      |      i      |   ✔        |
+    | activemq   | = 1.1.0     | 1.1.0 | 1.1.1  | 1.1.1      |      !      |      ✔      |   ✔        |
     | yum        | = 2.3.4     | 2.3.4 | 2.3.4  | 2.3.4      |      ✔      |      ✔      |   ✔        |
     | ssh-keys   | = 1.0.0     | 1.0.0 | 1.0.0  |            |      ✔      |      ✔      |   ✖        |
     | selinux    | = 0.5.6     | 0.5.6 | 0.5.6  | 0.5.6      |      ✔      |      ✔      |   ✔        |
-    | keytool    | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      ✔      |      ✔      |   ✔        |
+    |  › keytool | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      ✔      |      ✔      |   ✔        |
     +------------+-------------+-------+--------+------------+-------------+-------------+------------+
     Status: error (✖)
 

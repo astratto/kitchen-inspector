@@ -71,8 +71,8 @@ module KitchenInspector
       # Remarks field
       attr_accessor :remarks
 
-      # True if it's a transitive dependency of another one
-      attr_accessor :transitive
+      # Dependency's parents (if transitive)
+      attr_accessor :parents
 
       def initialize(name, requirement)
         @name = name
@@ -90,7 +90,7 @@ module KitchenInspector
         @source_url = nil
         @remarks = []
         @dependencies = []
-        @transitive = false
+        @parents = []
       end
 
       def ==(anOther)
@@ -114,7 +114,7 @@ module KitchenInspector
           hash[:source_url] = source_url
           hash[:remarks] = remarks
           hash[:dependencies] = dependencies
-          hash[:transitive] = transitive
+          hash[:parents] = parents
         end
       end
     end

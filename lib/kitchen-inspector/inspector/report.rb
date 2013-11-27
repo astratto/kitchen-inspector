@@ -31,6 +31,7 @@ module KitchenInspector
     X_MARK = "\u2716"
     ESCLAMATION_MARK = "!"
     INFO_MARK = "i"
+    INDENT_MARK = "\u203A"
 
     class Report
       class << self
@@ -84,40 +85,71 @@ module KitchenInspector
           [output, g_status_code]
         end
 
-        # Generate a single row
+        # Generate table rows
         def generate_rows(dependencies, opts)
           rows = []
           remarks = []
-          remarks_counter = 0
-          dependencies.each do |dependency|
-            status = status_to_mark(dependency.status)
-            chef_status = status_to_mark(dependency.chef_status)
-            repomanager_status = status_to_mark(dependency.repomanager_status)
 
-            name = dependency.name.dup
-            name = name.red if dependency.status == :'error'
-            name = "#{name} *" if dependency.transitive
+          dependencies.select{|d| d.parents.empty?}.each do |dependency|
+            dep_rows, dep_remarks = display_child(dependency, remarks.size, 0, opts)
 
-            row = [
-              name,
-              dependency.requirement,
-              dependency.version_used,
-              dependency.latest_chef,
-              dependency.latest_metadata_repomanager,
-              { value: status, alignment: :center },
-              { value: chef_status, alignment: :center },
-              { value: repomanager_status, alignment: :center }
-            ]
-
-            if opts[:remarks]
-              remarks_idx, remarks_counter = remarks_indices(dependency.remarks, remarks_counter)
-              remarks.push(*dependency.remarks)
-              row << remarks_idx
-            end
-
-            rows << row
+            rows.push(*dep_rows)
+            remarks.push(*dep_remarks)
           end
           [rows, remarks]
+        end
+
+        def display_child(dependency, remarks_counter, level, opts)
+          row, remarks = generate_row(dependency, remarks_counter, level, opts)
+          remarks_counter += remarks.size
+          children_rows = []
+          children_remarks = []
+
+          dependency.dependencies.each do |child|
+            child_row, child_remarks = display_child(child, remarks_counter, level + 1, opts)
+            remarks_counter += child_remarks.size
+
+            children_rows.push(*child_row)
+            children_remarks.push(*child_remarks)
+          end
+
+
+          [[row, *children_rows], [remarks, children_remarks].flatten]
+        end
+
+        def indent_name(name, level)
+          level > 0 ? "#{(' ' * level) + INDENT_MARK} #{name}" : name
+        end
+
+        # Generate a single row and its remarks
+        def generate_row(dependency, remarks_counter, level, opts)
+          row_remarks = []
+
+          status = status_to_mark(dependency.status)
+          chef_status = status_to_mark(dependency.chef_status)
+          repomanager_status = status_to_mark(dependency.repomanager_status)
+
+          name = indent_name(dependency.name.dup, level)
+          name = name.red if dependency.status == :'error'
+
+          row = [
+            name,
+            dependency.requirement,
+            dependency.version_used,
+            dependency.latest_chef,
+            dependency.latest_metadata_repomanager,
+            { value: status, alignment: :center },
+            { value: chef_status, alignment: :center },
+            { value: repomanager_status, alignment: :center }
+          ]
+
+          if opts[:remarks]
+            remarks_idx, remarks_counter = remarks_indices(dependency.remarks, remarks_counter)
+            row_remarks.push(*dependency.remarks)
+            row << remarks_idx
+          end
+
+          [row, row_remarks]
         end
 
         # Return a global status

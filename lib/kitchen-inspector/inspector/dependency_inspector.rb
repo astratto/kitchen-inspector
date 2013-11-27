@@ -99,10 +99,8 @@ module KitchenInspector
               dependency.dependencies = @repomanager.project_dependencies(project, repomanager_tags[dependency.version_used])
 
               dependency.dependencies.each do |dep|
-                unless dependencies.include?(dep)
-                  dep.transitive = true
-                  dependencies << dep
-                end
+                dep.parents << dependency
+                dependencies << dep
               end
             end
           end
