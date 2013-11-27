@@ -41,7 +41,9 @@ module KitchenInspector
         @gitlab_base_url = config[:base_url]
         @gitlab_api_url = "#{@gitlab_base_url}/api/v3"
 
+        # Cache metadata and tags to reduce calls against the Repository Manager
         @metadata_cache = {}
+        @tags_cache = {}
 
         Gitlab.configure do |gitlab|
           gitlab.endpoint = @gitlab_api_url
@@ -102,11 +104,15 @@ module KitchenInspector
 
       # Given a project return the tags on Gitlab
       def tags(project)
-        tags = {}
-        Gitlab.tags(project.id).collect do |tag|
-          tags[fix_version_name(tag.name)] = tag.commit.id
-        end
-        tags
+        cache_key = project.id
+        @tags_cache[cache_key] ||=
+          begin
+            tags = {}
+            Gitlab.tags(project.id).collect do |tag|
+              tags[fix_version_name(tag.name)] = tag.commit.id
+            end
+            tags
+          end
       end
 
       def to_s
