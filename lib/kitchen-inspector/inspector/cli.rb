@@ -64,17 +64,16 @@ module KitchenInspector
           output, status_code = Report.generate(dependencies, options[:format], options)
           puts output
         end
+        exit STATUS_TO_RETURN_CODES[status_code]
       rescue ConfigurationError => e
         puts e.message.red
-        status_code = :'error-config'
+        exit STATUS_TO_RETURN_CODES[:'error-config']
       rescue NotACookbookError
         puts 'The path is not a cookbook path'.red
-        status_code = :'error-notacookbook'
+        exit STATUS_TO_RETURN_CODES[:'error-notacookbook']
       rescue UnsupportedReportFormatError
         puts "The report format #{options[:format]} is not supported".red
-        status_code = :'error-reportformat'
-      ensure
-        exit STATUS_TO_RETURN_CODES[status_code]
+        exit STATUS_TO_RETURN_CODES[:'error-reportformat']
       end
     end
   end
