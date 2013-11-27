@@ -3,9 +3,15 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'kitchen-inspector/inspector/version'
 
+# Generate pre-release versions for non tagged releases
+git_version = begin
+  stripped = `git describe --always`.strip
+  /^([^-]+)-([0-9]+)-[^-]+$/.match(stripped) ? "#{$1}-#{$2}" : stripped
+end
+
 Gem::Specification.new do |spec|
   spec.name          = "kitchen-inspector"
-  spec.version       = KitchenInspector::Inspector::VERSION
+  spec.version       = git_version
   spec.authors       = ["Stefano Tortarolo"]
   spec.email         = ["stefano.tortarolo@gmail.com"]
   spec.description   = %q{Given an Opscode Chef cookbook, verifies its dependencies against a Chef Server and a Repository Manager instance (i.e., Gitlab)}
