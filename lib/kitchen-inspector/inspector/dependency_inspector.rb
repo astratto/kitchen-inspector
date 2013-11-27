@@ -98,9 +98,8 @@ module KitchenInspector
             if recursive && repomanager_tags.include?(dependency.version_used)
               dependency.dependencies = @repomanager.project_dependencies(project, repomanager_tags[dependency.version_used])
 
-              # Add dependencies not already tracked
               dependency.dependencies.each do |dep|
-                unless dependencies.collect(&:name).include?(dep.name)
+                unless dependencies.include?(dep)
                   dep.transitive = true
                   dependencies << dep
                 end

@@ -27,6 +27,8 @@ module KitchenInspector
   module Inspector
     # The class that contains information about a dependent cookbook
     class Dependency
+      include Comparable
+
       # The name of the dependency
       attr_reader :name
 
@@ -89,6 +91,10 @@ module KitchenInspector
         @remarks = []
         @dependencies = []
         @transitive = false
+      end
+
+      def ==(anOther)
+        name == anOther.name && requirement == anOther.requirement
       end
 
       def to_hash
