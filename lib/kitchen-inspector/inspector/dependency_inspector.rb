@@ -64,10 +64,11 @@ module KitchenInspector
       def repository_manager(config)
         begin
           manager_cls = "KitchenInspector::Inspector::#{config[:type]}Manager".constantize
-          @repomanager = manager_cls.new config
-        rescue NameError
-          raise RepositoryManagerError, "Repository Manager '#{config[:type]}' not supported."
+        rescue NameError => e
+          raise RepositoryManagerError, "Repository Manager '#{config[:type]}' not supported"
         end
+
+        @repomanager = manager_cls.new config
       end
 
       # Populate dependencies with information about their status
