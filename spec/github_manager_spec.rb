@@ -9,7 +9,7 @@ describe GithubManager do
   end
 
   context "API" do
-    [:project_dependencies, :tags, :source_url, :project_by_name,
+    [:project_dependencies, :tags, :source_url, :projects_by_name,
      :project_metadata, :project_metadata_version].each do |method|
       it "responds to #{method}" do
         expect(manager.respond_to?(method)).to be_true
@@ -41,15 +41,15 @@ describe GithubManager do
     end
   end
 
-  describe "#project_by_name" do
+  describe "#projects_by_name" do
     it "returns the correct project for astratto/kitchen-inspector", :type => :external do
-      project = manager.project_by_name "kitchen-inspector"
-      expect(project).not_to eq(nil)
+      projects = manager.projects_by_name "kitchen-inspector"
+      expect(projects).not_to eq(nil)
     end
   end
 
   describe "#tags" do
-    let(:project) { manager.project_by_name "kitchen-inspector" }
+    let(:project) { manager.projects_by_name("kitchen-inspector").first }
 
     it "returns the correct tags for astratto/kitchen-inspector", :type => :external do
 
@@ -60,7 +60,7 @@ describe GithubManager do
   end
 
   describe "#project_metadata" do
-    let(:project) { manager.project_by_name "mysql" }
+    let(:project) { manager.projects_by_name("mysql").first }
     it "returns the correct metadata for github.com/astratto/mysql v.4.4.0", :type => :external do
 
       metadata = manager.project_metadata(project, "aa1d3ac6c8266830005331518d77d1cf4a0987bd")

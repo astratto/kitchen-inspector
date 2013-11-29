@@ -79,11 +79,11 @@ module KitchenInspector
           dependency.latest_chef = get_latest_version(dependency.chef_versions)
 
           # Grab information from the Repository Manager
-          project = @repomanager.project_by_name(dependency.name)
+          projects = @repomanager.projects_by_name(dependency.name)
 
-          unless project.empty?
-            raise DuplicateCookbookError, "Found two versions for #{dependency.name} on #{@repomanager.type}." if project.size > 1
-            project = project.first
+          unless projects.empty?
+            raise DuplicateCookbookError, "Found two versions for #{dependency.name} on #{@repomanager.type}." if projects.size > 1
+            project = projects.first
 
             repomanager_tags = @repomanager.tags(project)
             repomanager_latest_tag = get_latest_version(repomanager_tags.keys)

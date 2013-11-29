@@ -12,7 +12,7 @@ describe GitlabManager do
       manager
     end
 
-    [:project_dependencies, :tags, :source_url, :project_by_name,
+    [:project_dependencies, :tags, :source_url, :projects_by_name,
      :project_metadata, :project_metadata_version].each do |method|
       it "responds to #{method}" do
         expect(manager.respond_to?(method)).to be_true

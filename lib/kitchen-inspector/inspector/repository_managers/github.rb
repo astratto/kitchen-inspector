@@ -63,9 +63,9 @@ module KitchenInspector
         # "#{@Github_base_url}/#{project.path_with_namespace}"
       end
 
-      # Retrieve a project by name
-      def project_by_name(name)
-        projects.select{|prj| prj.name == name }.first
+      # Retrieve projects by name
+      def projects_by_name(name)
+        projects.select{|prj| prj.name == name }
       end
 
       # Iterate over @users' profiles to search for projects

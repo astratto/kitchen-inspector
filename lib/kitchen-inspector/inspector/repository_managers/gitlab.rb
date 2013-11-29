@@ -56,8 +56,8 @@ module KitchenInspector
         "#{@gitlab_base_url}/#{project.path_with_namespace}"
       end
 
-      # Retrieve a project by name
-      def project_by_name(name)
+      # Retrieve projects by name
+      def projects_by_name(name)
         projects.select{|prj| prj.path == name }
       end
 
