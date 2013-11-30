@@ -29,6 +29,19 @@ describe DependencyInspector do
           end.to raise_error(RepositoryManagerError)
       end
 
+      it "raises an error if an unsupported field is specified" do
+          config = StringIO.new
+          config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
+          config.puts "chef_server_url 'http://localhost:4000'"
+          config.puts "chef_client_pem 'testclient.pem'"
+          config.puts "chef_username 'test_user'"
+          config.puts "invalid_field 'test'"
+
+          expect do
+            DependencyInspector.new config
+          end.to raise_error(ConfigurationError)
+      end
+
       context "Gitlab" do
         context "with a full configuration" do
           it "creates a valid Inspector" do
