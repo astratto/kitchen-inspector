@@ -52,12 +52,10 @@ module KitchenInspector
       def investigate(path, recursive=true)
         raise NotACookbookError, 'Path is not a cookbook' unless File.exists?(File.join(path, 'metadata.rb'))
 
-        ridley = Ridley::Chef::Cookbook::Metadata.from_file(File.join(path, 'metadata.rb'))
-        dependencies =
-          ridley.dependencies.map do |name, version|
-            Dependency.new(name, version)
-          end
-        populate_fields(dependencies, recursive)
+        metadata = Ridley::Chef::Cookbook::Metadata.from_file(File.join(path, 'metadata.rb'))
+        metadata.dependencies.collect do |name, version|
+          analyze_dependency(Dependency.new(name, version), recursive)
+        end.flatten
       end
 
       # Initialize the Repository Manager
@@ -71,42 +69,42 @@ module KitchenInspector
         @repomanager = manager_cls.new config
       end
 
-      # Populate dependencies with information about their status
-      def populate_fields(dependencies, recursive)
-        dependencies.each do |dependency|
-          dependency.chef_versions = find_chef_server_versions(dependency.name)
-          dependency.version_used = satisfy(dependency.requirement, dependency.chef_versions)
-          dependency.latest_chef = get_latest_version(dependency.chef_versions)
+      # Analyze Chef repo and Repository manager in order to find more information
+      # about a given dependency
+      def analyze_dependency(dependency, recursive)
+        dependency.chef_versions = find_chef_server_versions(dependency.name)
+        dependency.version_used = satisfy(dependency.requirement, dependency.chef_versions)
+        dependency.latest_chef = get_latest_version(dependency.chef_versions)
 
-          # Grab information from the Repository Manager
-          projects = @repomanager.projects_by_name(dependency.name)
+        # Grab information from the Repository Manager
+        projects = @repomanager.projects_by_name(dependency.name)
 
-          unless projects.empty?
-            raise DuplicateCookbookError, "Found two versions for #{dependency.name} on #{@repomanager.type}." if projects.size > 1
-            project = projects.first
+        unless projects.empty?
+          raise DuplicateCookbookError, "Found two versions for #{dependency.name} on #{@repomanager.type}." if projects.size > 1
+          project = projects.first
 
-            repomanager_tags = @repomanager.tags(project)
-            repomanager_latest_tag = get_latest_version(repomanager_tags.keys)
+          repomanager_tags = @repomanager.tags(project)
+          repomanager_latest_tag = get_latest_version(repomanager_tags.keys)
 
-            dependency.repomanager_tags = repomanager_tags.keys
-            dependency.latest_tag_repomanager = repomanager_latest_tag
-            dependency.source_url = @repomanager.source_url(project)
+          dependency.repomanager_tags = repomanager_tags.keys
+          dependency.latest_tag_repomanager = repomanager_latest_tag
+          dependency.source_url = @repomanager.source_url(project)
 
-            latest_version_repo = @repomanager.project_metadata_version(project, repomanager_tags[repomanager_latest_tag.to_s])
-            dependency.latest_metadata_repomanager = Solve::Version.new(latest_version_repo) if latest_version_repo
+          latest_version_repo = @repomanager.project_metadata_version(project, repomanager_tags[repomanager_latest_tag.to_s])
+          dependency.latest_metadata_repomanager = Solve::Version.new(latest_version_repo) if latest_version_repo
+        end
+        update_status(dependency)
 
-            # Analyze its dependencies
-            if recursive && repomanager_tags.include?(dependency.version_used)
-              dependency.dependencies = @repomanager.project_dependencies(project, repomanager_tags[dependency.version_used])
+        # Analyze its dependencies based on Repository Manager
+        if recursive && repomanager_tags && repomanager_tags.include?(dependency.version_used)
+          dependency.dependencies = @repomanager.project_dependencies(project, repomanager_tags[dependency.version_used])
 
-              dependency.dependencies.each do |dep|
-                dep.parents << dependency
-                dependencies << dep
-              end
-            end
-          end
-
-          update_status(dependency)
+          [dependency, dependency.dependencies.collect do |dep|
+              dep.parents << dependency
+              analyze_dependency(dependency, recursive)
+            end]
+        else
+          [dependency]
         end
       end
 
