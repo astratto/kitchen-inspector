@@ -3,6 +3,18 @@ require_relative 'support/spec_helper'
 describe DependencyInspector do
   let(:dependency_inspector) { generate_dependency_inspector }
 
+  let(:repomanager_info) do
+    {:tags =>["1.0.0", "1.0.1"],
+     :latest_metadata => Solve::Version.new("1.0.1"),
+     :latest_tag => Solve::Version.new("1.0.1")}
+  end
+
+  let(:chef_info) do
+    {:latest_version => Solve::Version.new("1.0.1"),
+     :version_used => "1.0.1",
+     :versions => ["1.0.0", "1.0.1"]}
+  end
+
   describe "#initialize" do
     context "Repository Manager" do
       it "raises an error if an unsupported Repository Manager is specified" do
@@ -95,80 +107,76 @@ describe DependencyInspector do
     end
   end
 
-  describe "#update_status" do
+  describe "#update_dependency" do
     before(:each) do
-      @dependency = Dependency.new("test", ">= 0")
-      @dependency.chef_versions = ["1.0.0", "1.0.1"]
-      @dependency.repomanager_tags = ["1.0.0", "1.0.1"]
-      @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.1")
-      @dependency.latest_tag_repomanager = Solve::Version.new("1.0.1")
-      @dependency.latest_chef = Solve::Version.new("1.0.1")
-      @dependency.version_used = "1.0.1"
+      @dep = Dependency.new("test", ">= 0")
     end
 
     it "returns a success for correct versions on both servers" do
-      dependency_inspector.update_status(@dependency)
-      expect(@dependency.repomanager_status).to eq(:'up-to-date')
-      expect(@dependency.chef_status).to eq(:'up-to-date')
-      expect(@dependency.status).to eq(:'up-to-date')
+      dependency_inspector.update_dependency(@dep, chef_info, repomanager_info)
+      expect(@dep.repomanager[:status]).to eq(:'up-to-date')
+      expect(@dep.chef[:status]).to eq(:'up-to-date')
+      expect(@dep.status).to eq(:'up-to-date')
     end
 
     context "error statuses" do
       it "when a valid version cannot be found" do
-        @dependency.version_used = nil
+        chef = {:version_used => nil}
 
-        dependency_inspector.update_status(@dependency)
-        expect(@dependency.status).to eq(:error)
+        dependency_inspector.update_dependency(@dep, chef, repomanager_info)
+        expect(@dep.status).to eq(:error)
       end
 
       it "missing version on Chef Server" do
-        @dependency.chef_versions = []
-        @dependency.latest_chef = nil
+        chef = {:versions => [],
+                :latest_version => nil}
 
-        dependency_inspector.update_status(@dependency)
-        expect(@dependency.chef_status).to eq(:'error-chef')
+        dependency_inspector.update_dependency(@dep, chef, repomanager_info)
+        expect(@dep.chef[:status]).to eq(:'error-chef')
       end
 
       it "missing version on the Repository Manager" do
-        @dependency.repomanager_tags = []
-        @dependency.latest_metadata_repomanager = nil
+        repomanager = {:tags =>[],
+                       :latest_metadata => nil}
 
-        dependency_inspector.update_status(@dependency)
-        expect(@dependency.repomanager_status).to eq(:'error-repomanager')
+
+        dependency_inspector.update_dependency(@dep, chef_info, repomanager)
+        expect(@dep.repomanager[:status]).to eq(:'error-repomanager')
       end
     end
 
     context "warning statuses" do
       it "a newer version could be used" do
-        @dependency.version_used = "1.0.0"
+        chef_info[:version_used] = "1.0.0"
 
-        dependency_inspector.update_status(@dependency)
-        expect(@dependency.status).to eq(:'warning-req')
+        dependency_inspector.update_dependency(@dep, chef_info, repomanager_info)
+        expect(@dep.status).to eq(:'warning-req')
       end
 
       it "a newer version exists on the Repository Manager" do
-        @dependency.chef_versions = ["1.0.0"]
-        @dependency.latest_chef = Solve::Version.new("1.0.0")
+        chef_info = {:versions => ["1.0.0"],
+                     :latest_version => Solve::Version.new("1.0.0")}
 
-        dependency_inspector.update_status(@dependency)
-        expect(@dependency.chef_status).to eq(:'warning-chef')
+        dependency_inspector.update_dependency(@dep, chef_info, repomanager_info)
+        expect(@dep.chef[:status]).to eq(:'warning-chef')
       end
 
       it "a newer version exists on Chef Server" do
-        @dependency.repomanager_tags = ["1.0.0"]
-        @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.0")
-        @dependency.latest_tag_repomanager = Solve::Version.new("1.0.0")
+        repomanager_info = {:tags => ["1.0.0"],
+                            :latest_metadata => Solve::Version.new("1.0.0"),
+                            :latest_tag => Solve::Version.new("1.0.0")}
 
-        dependency_inspector.update_status(@dependency)
-        expect(@dependency.repomanager_status).to eq(:'warning-outofdate-repomanager')
+        dependency_inspector.update_dependency(@dep, chef_info, repomanager_info)
+        expect(@dep.repomanager[:status]).to eq(:'warning-outofdate-repomanager')
       end
 
       it "last tag on Repository Manager doesn't match last metadata's version" do
-        @dependency.repomanager_tags = ["1.0.0", "1.0.1"]
-        @dependency.latest_metadata_repomanager = Solve::Version.new("1.0.0")
+        repomanager = {:tags =>["1.0.0", "1.0.1"],
+                       :latest_metadata => Solve::Version.new("1.0.0"),
+                       :latest_tag => Solve::Version.new("1.0.1")}
 
-        dependency_inspector.update_status(@dependency)
-        expect(@dependency.repomanager_status).to eq(:'warning-mismatch-repomanager')
+        dependency_inspector.update_dependency(@dep, chef_info, repomanager)
+        expect(@dep.repomanager[:status]).to eq(:'warning-mismatch-repomanager')
       end
     end
   end

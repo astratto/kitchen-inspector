@@ -126,8 +126,8 @@ module KitchenInspector
           row_remarks = []
 
           status = status_to_mark(dependency.status)
-          chef_status = status_to_mark(dependency.chef_status)
-          repomanager_status = status_to_mark(dependency.repomanager_status)
+          chef_status = status_to_mark(dependency.chef[:status])
+          repomanager_status = status_to_mark(dependency.repomanager[:status])
 
           name = indent_name(dependency.name.dup, level)
           name = name.red if dependency.status == :'error'
@@ -135,9 +135,9 @@ module KitchenInspector
           row = [
             name,
             dependency.requirement,
-            dependency.version_used,
-            dependency.latest_chef,
-            dependency.latest_metadata_repomanager,
+            dependency.chef[:version_used],
+            dependency.chef[:latest_version],
+            dependency.repomanager[:latest_metadata],
             { value: status, alignment: :center },
             { value: chef_status, alignment: :center },
             { value: repomanager_status, alignment: :center }
@@ -161,20 +161,20 @@ module KitchenInspector
             break [X_MARK, :red, dep.status
                    ] if dep.status == :error
 
-            break [X_MARK, :yellow, dep.repomanager_status
-                   ] if dep.repomanager_status == :'error-repomanager'
+            break [X_MARK, :yellow, dep.repomanager[:status]
+                   ] if dep.repomanager[:status] == :'error-repomanager'
 
-            break ["#{ESCLAMATION_MARK * 2}", :light_red, dep.repomanager_status
-                   ] if dep.repomanager_status == :'warning-outofdate-repomanager'
+            break ["#{ESCLAMATION_MARK * 2}", :light_red, dep.repomanager[:status]
+                   ] if dep.repomanager[:status] == :'warning-outofdate-repomanager'
 
             break [ESCLAMATION_MARK, :yellow, dep.status
                    ] if dep.status == :'warning-req'
 
-            break [ESCLAMATION_MARK, :light_red, dep.repomanager_status
-                   ] if dep.repomanager_status == :'warning-mismatch-repomanager'
+            break [ESCLAMATION_MARK, :light_red, dep.repomanager[:status]
+                   ] if dep.repomanager[:status] == :'warning-mismatch-repomanager'
 
-            break [INFO_MARK, :blue, dep.chef_status
-                   ] if dep.chef_status == :'warning-chef'
+            break [INFO_MARK, :blue, dep.chef[:status]
+                   ] if dep.chef[:status] == :'warning-chef'
           end
 
           unless code

@@ -72,9 +72,12 @@ module KitchenInspector
       # Analyze Chef repo and Repository manager in order to find more information
       # about a given dependency
       def analyze_dependency(dependency, recursive)
-        dependency.chef_versions = find_chef_server_versions(dependency.name)
-        dependency.version_used = satisfy(dependency.requirement, dependency.chef_versions)
-        dependency.latest_chef = get_latest_version(dependency.chef_versions)
+        repo_info = {}
+
+        chef_info = {}
+        chef_info[:versions] = find_chef_server_versions(dependency.name)
+        chef_info[:latest_version] = get_latest_version(chef_info[:versions])
+        chef_info[:version_used] = satisfy(dependency.requirement, chef_info[:versions])
 
         # Grab information from the Repository Manager
         projects = @repomanager.projects_by_name(dependency.name)
@@ -82,22 +85,13 @@ module KitchenInspector
         unless projects.empty?
           raise DuplicateCookbookError, "Found two versions for #{dependency.name} on #{@repomanager.type}." if projects.size > 1
           project = projects.first
-
-          repomanager_tags = @repomanager.tags(project)
-          repomanager_latest_tag = get_latest_version(repomanager_tags.keys)
-
-          dependency.repomanager_tags = repomanager_tags.keys
-          dependency.latest_tag_repomanager = repomanager_latest_tag
-          dependency.source_url = @repomanager.source_url(project)
-
-          latest_version_repo = @repomanager.project_metadata_version(project, repomanager_tags[repomanager_latest_tag.to_s])
-          dependency.latest_metadata_repomanager = Solve::Version.new(latest_version_repo) if latest_version_repo
+          repo_info = analyze_from_repository(project)
         end
-        update_status(dependency)
+        update_dependency(dependency, chef_info, repo_info)
 
         # Analyze its dependencies based on Repository Manager
-        if recursive && repomanager_tags && repomanager_tags.include?(dependency.version_used)
-          dependency.dependencies = @repomanager.project_dependencies(project, repomanager_tags[dependency.version_used])
+        if recursive && repo_info[:tags] && repo_info[:tags].include?(chef_info[:version_used])
+          dependency.dependencies = @repomanager.project_dependencies(project, repo_info[:tags][chef_info[:version_used]])
 
           [dependency, dependency.dependencies.collect do |dep|
               dep.parents << dependency
@@ -115,56 +109,89 @@ module KitchenInspector
         nil
       end
 
-      # Updates the status of the dependency based on the version used and the
-      # latest version available on the Repository Manager
-      def update_status(dependency)
-        dependency.status = :'up-to-date'
-        dependency.chef_status = :'up-to-date'
-        dependency.repomanager_status = :'up-to-date'
+      # Retrieve project info from Repository Manager
+      def analyze_from_repository(project)
+        tags = @repomanager.tags(project)
+        latest_tag = get_latest_version(tags.keys)
 
-        if !dependency.version_used
+        latest_metadata = @repomanager.project_metadata_version(project, tags[latest_tag.to_s])
+        latest_metadata = Solve::Version.new(latest_metadata) if latest_metadata
+
+        {:tags => tags,
+         :latest_tag => latest_tag,
+         :latest_metadata => latest_metadata,
+         :source_url => @repomanager.source_url(project)
+        }
+      end
+
+      # Update the status of the dependency based on the version used and the
+      # latest version available on the Repository Manager
+      def update_dependency(dependency, chef_info, repo_info)
+        dependency.status = :'up-to-date'
+
+        if !chef_info[:version_used]
           dependency.status = :error
           dependency.remarks << 'No versions found'
         else
-          relaxed_version = satisfy("~> #{dependency.version_used}", dependency.chef_versions)
-          if relaxed_version != dependency.version_used
+          relaxed_version = satisfy("~> #{chef_info[:version_used]}", chef_info[:versions])
+          if relaxed_version != chef_info[:version_used]
             dependency.status = :'warning-req'
             dependency.remarks << "#{relaxed_version} is available"
           end
         end
 
         # Compare Chef and Repository Manager versions
-        if dependency.latest_chef && dependency.latest_metadata_repomanager
-          if dependency.latest_chef > dependency.latest_metadata_repomanager
-            dependency.chef_status = :'up-to-date'
-            dependency.repomanager_status = :'warning-outofdate-repomanager'
-            dependency.remarks << "#{@repomanager.type} out-of-date!"
-          elsif dependency.latest_chef < dependency.latest_metadata_repomanager
-            dependency.chef_status = :'warning-chef'
-            dependency.repomanager_status = :'up-to-date'
-            dependency.remarks << "A new version might appear on Chef server"
-          end
-        else
-          unless dependency.latest_metadata_repomanager
-            dependency.repomanager_status = :'error-repomanager'
-            dependency.remarks << "#{@repomanager.type} doesn't contain any versions."
-          end
+        comparison = compare_repo_chef(chef_info, repo_info)
+        chef_info[:status] = comparison[:chef]
+        repo_info[:status] = comparison[:repo]
+        dependency.remarks.push(*comparison[:remarks]) if comparison[:remarks]
 
-          unless dependency.latest_chef
-            dependency.chef_status = :'error-chef'
-            dependency.remarks << "Chef Server doesn't contain any versions."
-          end
-        end
-
-        # Check whether last tag and metadata version in Repository Manager are
+        # Check whether latest tag and metadata version in Repository Manager are
         # consistent
-        if (dependency.latest_tag_repomanager &&
-            dependency.latest_metadata_repomanager &&
-            dependency.latest_tag_repomanager != dependency.latest_metadata_repomanager)
-          dependency.repomanager_status = :'warning-mismatch-repomanager'
-          dependency.remarks << "#{@repomanager.type}'s last tag is #{dependency.latest_tag_repomanager} " \
-                                  "but found #{dependency.latest_metadata_repomanager} in metadata.rb"
+        unless repomanager_consistent?(repo_info)
+          repo_info[:status] = :'warning-mismatch-repomanager'
+          dependency.remarks << "#{@repomanager.type}'s last tag is #{repo_info[:latest_tag]} " \
+                                  "but found #{repo_info[:latest_metadata]} in metadata.rb"
         end
+
+        dependency.repomanager = repo_info
+        dependency.chef = chef_info
+      end
+
+      # Compare Repository Manager and Chef Server
+      def compare_repo_chef(chef_info, repo_info)
+        comparison = {:chef => :'up-to-date', :repo => :'up-to-date',
+                  :remarks => []}
+
+        if chef_info[:latest_version] && repo_info[:latest_metadata]
+          if chef_info[:latest_version] > repo_info[:latest_metadata]
+            comparison[:repo] = :'warning-outofdate-repomanager'
+            comparison[:remarks] << "#{@repomanager.type} out-of-date!"
+            return comparison
+          elsif chef_info[:latest_version] < repo_info[:latest_metadata]
+            comparison[:chef] = :'warning-chef'
+            comparison[:remarks] << "A new version might appear on Chef server"
+            return comparison
+          end
+        end
+
+        unless repo_info[:latest_metadata]
+          comparison[:repo] = :'error-repomanager'
+          comparison[:remarks] << "#{@repomanager.type} doesn't contain any versions."
+        end
+
+        unless chef_info[:latest_version]
+          comparison[:chef] = :'error-chef'
+          comparison[:remarks] << "Chef Server doesn't contain any versions."
+        end
+
+        comparison
+      end
+
+      def repomanager_consistent?(info)
+        !(info[:latest_tag] &&
+          info[:latest_metadata] &&
+            info[:latest_tag] != info[:latest_metadata])
       end
 
       # Given a project return the versions on the Chef Server

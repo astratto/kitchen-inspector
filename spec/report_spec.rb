@@ -7,14 +7,14 @@ describe Report do
     context "global status" do
       before(:each) do
         dep1 = Dependency.new("Test", "~> 1.0.0")
-        dep1.chef_versions = ["1.0.0", "1.0.1"]
-        dep1.repomanager_tags = ["1.0.0", "1.0.1"]
-        dep1.latest_metadata_repomanager = Solve::Version.new("1.0.1")
-        dep1.latest_tag_repomanager = Solve::Version.new("1.0.1")
-        dep1.latest_chef = Solve::Version.new("1.0.1")
-        dep1.version_used = "1.0.1"
+        chef = {:versions => ["1.0.0", "1.0.1"],
+                     :latest_version => Solve::Version.new("1.0.1"),
+                     :version_used => "1.0.1"}
+        repomanager = {:tags => ["1.0.0", "1.0.1"],
+                            :latest_metadata => Solve::Version.new("1.0.1"),
+                            :latest_tag => Solve::Version.new("1.0.1")}
 
-        dependency_inspector.update_status(dep1)
+        dependency_inspector.update_dependency(dep1, chef, repomanager)
 
         @dependencies = [dep1]
       end
@@ -30,10 +30,11 @@ describe Report do
 
       it "error-repomanager" do
         dep1 = @dependencies.first
-        dep1.repomanager_tags = []
-        dep1.latest_metadata_repomanager = nil
-        dep1.latest_tag_repomanager = nil
-        dependency_inspector.update_status(dep1)
+        repomanager = {:tags => [],
+                            :latest_metadata => nil,
+                            :latest_tag => nil}
+
+        dependency_inspector.update_dependency(dep1, dep1.chef, repomanager)
 
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -45,10 +46,10 @@ describe Report do
 
       it "warning-mismatch-repomanager" do
         dep1 = @dependencies.first
-        dep1.repomanager_tags = ["1.0.0"]
-        dep1.latest_metadata_repomanager = Solve::Version.new("1.0.0")
-        dep1.latest_tag_repomanager = Solve::Version.new("1.0.1")
-        dependency_inspector.update_status(dep1)
+        repomanager = {:tags => ["1.0.0"],
+                            :latest_metadata => Solve::Version.new("1.0.0"),
+                            :latest_tag => Solve::Version.new("1.0.1")}
+        dependency_inspector.update_dependency(dep1, dep1.chef, repomanager)
 
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -60,10 +61,10 @@ describe Report do
 
       it "warning-outofdate-repomanager" do
         dep1 = @dependencies.first
-        dep1.repomanager_tags = ["1.0.0"]
-        dep1.latest_metadata_repomanager = Solve::Version.new("1.0.0")
-        dep1.latest_tag_repomanager = Solve::Version.new("1.0.0")
-        dependency_inspector.update_status(dep1)
+        repomanager = {:tags => ["1.0.0"],
+                            :latest_metadata => Solve::Version.new("1.0.0"),
+                            :latest_tag => Solve::Version.new("1.0.0")}
+        dependency_inspector.update_dependency(dep1, dep1.chef, repomanager)
 
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -75,10 +76,10 @@ describe Report do
 
       it "warning-chef" do
         dep1 = @dependencies.first
-        dep1.chef_versions = ["1.0.0"]
-        dep1.latest_chef = Solve::Version.new("1.0.0")
-        dep1.version_used = "1.0.0"
-        dependency_inspector.update_status(dep1)
+        chef = {:versions => ["1.0.0"],
+                     :latest_version => Solve::Version.new("1.0.0"),
+                     :version_used => "1.0.0"}
+        dependency_inspector.update_dependency(dep1, chef, dep1.repomanager)
 
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -90,13 +91,13 @@ describe Report do
 
       it "warning-req" do
         dep1 = Dependency.new("Test", "= 1.0.0")
-        dep1.chef_versions = ["1.0.0", "1.0.1"]
-        dep1.repomanager_tags = ["1.0.0", "1.0.1"]
-        dep1.latest_metadata_repomanager = Solve::Version.new("1.0.1")
-        dep1.latest_tag_repomanager = Solve::Version.new("1.0.1")
-        dep1.latest_chef = Solve::Version.new("1.0.1")
-        dep1.version_used = "1.0.0"
-        dependency_inspector.update_status(dep1)
+        chef = {:versions => ["1.0.0", "1.0.1"],
+                     :latest_version => Solve::Version.new("1.0.1"),
+                     :version_used => "1.0.0"}
+        repomanager = {:tags => ["1.0.0", "1.0.1"],
+                            :latest_metadata => Solve::Version.new("1.0.1"),
+                            :latest_tag => Solve::Version.new("1.0.1")}
+        dependency_inspector.update_dependency(dep1, chef, repomanager)
 
         output, code = Report.generate([dep1], 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -107,14 +108,14 @@ describe Report do
       end
 
       it "error due to wrong metadata" do
-        dep1 = Dependency.new("Test", "~> 1.0.0")
-        dep1.chef_versions = ["1.1.0"]
-        dep1.repomanager_tags = ["1.1.0"]
-        dep1.latest_metadata_repomanager = Solve::Version.new("1.1.0")
-        dep1.latest_tag_repomanager = Solve::Version.new("1.1.0")
-        dep1.latest_chef = Solve::Version.new("1.1.0")
-        dep1.version_used = nil
-        dependency_inspector.update_status(dep1)
+        dep1 = @dependencies.first
+        chef = {:versions => ["1.1.0"],
+                     :latest_version => Solve::Version.new("1.1.0"),
+                     :version_used => nil}
+        repomanager = {:tags => ["1.1.0"],
+                            :latest_metadata => Solve::Version.new("1.1.0"),
+                            :latest_tag => Solve::Version.new("1.1.0")}
+        dependency_inspector.update_dependency(dep1, chef, repomanager)
 
         output, code = Report.generate([dep1], 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -126,10 +127,10 @@ describe Report do
 
       it "error due to Chef Server" do
         dep1 = @dependencies.first
-        dep1.chef_versions = []
-        dep1.latest_chef = nil
-        dep1.version_used = nil
-        dependency_inspector.update_status(dep1)
+        chef = {:versions => [],
+                     :latest_version => nil,
+                     :version_used => nil}
+        dependency_inspector.update_dependency(dep1, chef, dep1.repomanager)
 
         output, code = Report.generate([dep1], 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -140,14 +141,14 @@ describe Report do
       end
 
       it "show remarks" do
-        dep1 = Dependency.new("Test", "~> 1.0.0")
-        dep1.chef_versions = ["1.1.0"]
-        dep1.repomanager_tags = ["1.1.0"]
-        dep1.latest_metadata_repomanager = Solve::Version.new("1.1.0")
-        dep1.latest_tag_repomanager = Solve::Version.new("1.1.0")
-        dep1.latest_chef = Solve::Version.new("1.1.0")
-        dep1.version_used = nil
-        dependency_inspector.update_status(dep1)
+        dep1 = @dependencies.first
+        chef = {:versions => ["1.1.0"],
+                     :latest_version => Solve::Version.new("1.1.0"),
+                     :version_used => nil}
+        repomanager = {:tags => ["1.1.0"],
+                            :latest_metadata => Solve::Version.new("1.1.0"),
+                            :latest_tag => Solve::Version.new("1.1.0")}
+        dependency_inspector.update_dependency(dep1, chef, repomanager)
 
         output, code = Report.generate([dep1, dep1], 'table', {:remarks => true})
         expect(output).to eq( \
