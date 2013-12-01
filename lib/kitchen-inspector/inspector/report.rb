@@ -158,23 +158,8 @@ module KitchenInspector
         # be at least one :error that takes precedence
         def global_status(dependencies)
           mark, color, code = dependencies.each do |dep|
-            break [X_MARK, :red, dep.status
-                   ] if dep.status == :error
-
-            break [X_MARK, :yellow, dep.repomanager[:status]
-                   ] if dep.repomanager[:status] == :'error-repomanager'
-
-            break ["#{ESCLAMATION_MARK * 2}", :light_red, dep.repomanager[:status]
-                   ] if dep.repomanager[:status] == :'warning-outofdate-repomanager'
-
-            break [ESCLAMATION_MARK, :yellow, dep.status
-                   ] if dep.status == :'warning-req'
-
-            break [ESCLAMATION_MARK, :light_red, dep.repomanager[:status]
-                   ] if dep.repomanager[:status] == :'warning-mismatch-repomanager'
-
-            break [INFO_MARK, :blue, dep.chef[:status]
-                   ] if dep.chef[:status] == :'warning-chef'
+            local_status = get_local_status(dep)
+            break local_status if local_status
           end
 
           unless code
@@ -182,6 +167,29 @@ module KitchenInspector
           end
 
           ["Status: #{code} (#{mark})".send(color), code]
+        end
+
+        # Return a dependency local status if different from up-to-date
+        def get_local_status(dep)
+          return [X_MARK, :red, dep.status
+                 ] if dep.status == :error
+
+          return [X_MARK, :yellow, dep.repomanager[:status]
+                 ] if dep.repomanager[:status] == :'error-repomanager'
+
+          return ["#{ESCLAMATION_MARK * 2}", :light_red, dep.repomanager[:status]
+                 ] if dep.repomanager[:status] == :'warning-outofdate-repomanager'
+
+          return [ESCLAMATION_MARK, :yellow, dep.status
+                 ] if dep.status == :'warning-req'
+
+          return [ESCLAMATION_MARK, :light_red, dep.repomanager[:status]
+                 ] if dep.repomanager[:status] == :'warning-mismatch-repomanager'
+
+          return [INFO_MARK, :blue, dep.chef[:status]
+                 ] if dep.chef[:status] == :'warning-chef'
+
+          nil
         end
 
         # Return the indices of the remarks
