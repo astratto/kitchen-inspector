@@ -3,18 +3,23 @@ require_relative 'support/spec_helper'
 describe Report do
   let(:dependency_inspector) { generate_dependency_inspector }
 
+  let(:chef_info) {
+    chef = {:versions => ["1.0.0", "1.0.1"],
+             :latest_version => Solve::Version.new("1.0.1"),
+             :version_used => "1.0.1"}
+  }
+
+  let(:repomanager_info) {
+    repomanager = {:tags => ["1.0.0", "1.0.1"],
+                    :latest_metadata => Solve::Version.new("1.0.1"),
+                    :latest_tag => Solve::Version.new("1.0.1")}
+  }
+
   describe ".generate" do
     context "global status" do
       before(:each) do
         dep1 = Dependency.new("Test", "~> 1.0.0")
-        chef = {:versions => ["1.0.0", "1.0.1"],
-                     :latest_version => Solve::Version.new("1.0.1"),
-                     :version_used => "1.0.1"}
-        repomanager = {:tags => ["1.0.0", "1.0.1"],
-                            :latest_metadata => Solve::Version.new("1.0.1"),
-                            :latest_tag => Solve::Version.new("1.0.1")}
-
-        dependency_inspector.update_dependency(dep1, chef, repomanager)
+        dependency_inspector.update_dependency(dep1, chef_info, repomanager_info)
 
         @dependencies = [dep1]
       end
@@ -140,7 +145,7 @@ describe Report do
         expect(code).to eq(:'error')
       end
 
-      it "show remarks" do
+      it "shows remarks" do
         dep1 = @dependencies.first
         chef = {:versions => ["1.1.0"],
                      :latest_version => Solve::Version.new("1.1.0"),
@@ -164,6 +169,27 @@ describe Report do
         "[1]: No versions found\n" \
         "[2]: No versions found" % X_MARK)
         expect(code).to eq(:error)
+      end
+
+      it "shows nested dependencies" do
+        dep1 = @dependencies.first
+        dep2 = Dependency.new("Nested", "~> 1.0.0")
+        dep2.parents << dep1
+        dep1.dependencies << dep2
+        dependency_inspector.update_dependency(dep2, chef_info, repomanager_info)
+
+        output, code = Report.generate([dep1, dep2], 'table', {:remarks => true})
+        expect(output).to eq( \
+        "+-----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
+        "| Name      | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository | Remarks |\n" \
+        "|           |             |       | Chef   | Repository | Status      | Status      | Status     |         |\n" \
+        "+-----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
+        "| Test      | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |         |\n" \
+        "|  › Nested | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |         |\n" \
+        "+-----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
+        "#{'Status: up-to-date (%s)'.green}\n\n" \
+        "Remarks:\n" % TICK_MARK)
+        expect(code).to eq(:'up-to-date')
       end
     end
   end
