@@ -25,21 +25,9 @@
 
 module KitchenInspector
   module Inspector
-    # The ASCII code for tick mark symbol
-    TICK_MARK = "\u2714"
-    # The ASCII code for X mark symbol
-    X_MARK = "\u2716"
-    ESCLAMATION_MARK = "!"
-    INFO_MARK = "i"
-    INDENT_MARK = "\u203A"
-
     class Report
       class << self
         # Generates the status of dependent cookbooks in specified format
-        #
-        # @param dependencies [Array<Dependency>] list of cookbook dependency objects
-        # @param format [String] the format used for Report
-        #
         def generate(dependencies, format, opts={})
           case format
           when 'table'

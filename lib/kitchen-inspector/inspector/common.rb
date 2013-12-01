@@ -47,5 +47,12 @@ module KitchenInspector
         :'warning-nodependencies' => 204
     }
     STATUS_TO_RETURN_CODES.default = 1
+
+    # Graphical marks
+    TICK_MARK = "\u2714"
+    X_MARK = "\u2716"
+    ESCLAMATION_MARK = "!"
+    INFO_MARK = "i"
+    INDENT_MARK = "\u203A"
   end
 end
