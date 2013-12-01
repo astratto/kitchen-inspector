@@ -1,0 +1,10 @@
+name             'cookbook-deps'
+maintainer       'YOUR_NAME'
+maintainer_email 'YOUR_EMAIL'
+license          'All rights reserved'
+description      'Installs/Configures cookbook-no-deps'
+long_description 'Test cookbook with dependencies'
+version          '0.1.0'
+
+depends 'test', '~> 1.0.0'
+depends 'dep1', '~> 1.0.0'

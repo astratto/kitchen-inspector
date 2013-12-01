@@ -210,18 +210,89 @@ describe DependencyInspector do
     it "retrieves versions using a valid project" do
       data = {"cookbooks" =>
         {
-          "Test-1.0.1" => {"metadata.rb" => "depends \"mysql\""}
+          "test-1.0.1" => {"metadata.rb" => "depends \"mysql\""}
         }
       }
       @chef_server.load_data data
 
-      versions = dependency_inspector.find_chef_server_versions('Test')
+      versions = dependency_inspector.find_chef_server_versions('test')
       expect(versions).to eq(["1.0.1"])
     end
 
     it "doesn't retrieve any versions using a missing project" do
-      versions = dependency_inspector.find_chef_server_versions('Test')
+      versions = dependency_inspector.find_chef_server_versions('test')
       expect(versions).to eq([])
+    end
+  end
+
+  describe "#investigate" do
+    before(:each) do
+      GitlabManager.any_instance.stub(:projects_by_name).and_return([])
+
+      data = {"cookbooks" =>
+        {
+          "test-1.0.1" => {"metadata.rb" => "depends \"dep1 ~> 1.0.0\""},
+          "dep1-1.0.0" => {"metadata.rb" => "depends \"dep2 ~> 1.0.0\""},
+          "dep2-1.0.0" => {"metadata.rb" => ""},
+        }
+      }
+      @chef_server.load_data data
+    end
+
+    context "dependencies on Chef Server but not on Repository Manager" do
+      it "doesn't fail" do
+        dependencies = dependency_inspector.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps")
+        expect(dependencies.count).to eq(2)
+        expect(dependencies.first.repomanager).not_to be_nil
+      end
+
+      it "sets correct remarks" do
+        dependencies = dependency_inspector.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps")
+        expect(dependencies.first.remarks).to eq(["Gitlab doesn't contain any versions."])
+      end
+
+      it "sets correct chef info" do
+        dependencies = dependency_inspector.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps")
+        dep1 = dependencies.first
+
+        expect(dep1.chef).not_to be_empty
+        expect(dep1.chef[:versions]).to eq(["1.0.1"])
+        expect(dep1.chef[:latest_version]).to eq(Solve::Version.new("1.0.1"))
+        expect(dep1.chef[:version_used]).to eq("1.0.1")
+      end
+    end
+
+    context "dependencies on Repository Manager" do
+      before(:each) do
+        project = double()
+
+        allow(project).to receive(:id).and_return(1)
+        allow(project).to receive(:path_with_namespace).and_return("group/project")
+
+        GitlabManager.any_instance.stub(:projects_by_name).and_return([
+          project
+        ])
+
+        GitlabManager.any_instance.stub(:tags).with(project).and_return(
+          { "1.0.1" => "fake_sha1" }
+        )
+
+        GitlabManager.any_instance.stub(:project_metadata_version).with(project, "fake_sha1").and_return(
+          "1.0.1"
+        )
+      end
+
+      it "sets correct repomanager info without recursing" do
+        dependencies = dependency_inspector.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps", recursive=false)
+        dep1 = dependencies.first
+
+        expect(dependencies.count).to eq(2)
+        expect(dep1.repomanager).not_to be_nil
+        expect(dep1.repomanager[:tags]).to eq({"1.0.1"=>"fake_sha1"})
+        expect(dep1.repomanager[:latest_metadata]).to eq(Solve::Version.new("1.0.1"))
+        expect(dep1.repomanager[:latest_tag]).to eq(Solve::Version.new("1.0.1"))
+        expect(dep1.repomanager[:source_url]).to eq("http://localhost:8080/group/project")
+      end
     end
   end
 end
