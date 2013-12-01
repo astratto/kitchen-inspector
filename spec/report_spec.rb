@@ -185,7 +185,7 @@ describe Report do
         "|           |             |       | Chef   | Repository | Status      | Status      | Status     |         |\n" \
         "+-----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
         "| Test      | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |         |\n" \
-        "|  › Nested | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |         |\n" \
+        "|  #{INDENT_MARK} Nested | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |         |\n" \
         "+-----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
         "#{'Status: up-to-date (%s)'.green}\n\n" \
         "Remarks:\n" % TICK_MARK)
