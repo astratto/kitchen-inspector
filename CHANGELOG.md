@@ -1,6 +1,6 @@
 Changes
 ==
-Next Version (1.x.x)
+Next Version (1.1.0)
 --
 
 FEATURES:
@@ -8,7 +8,7 @@ FEATURES:
 * Add option to recursively analyze cookbook's dependencies (defaults to true)
 * Use a file to store configuration info (defaults to *${HOME}/.chef/kitchen_inspector.rb*)
 * Add option to show remarks (*--remarks*), that now are hidden by default
-* Add support for different Repository Managers (but only Gitlab is supported at this stage)
+* Add support for different Repository Managers (Gitlab and GitHub)
 * Verifies that a tag on the Repository Manager matches the corresponding metadata's version
 * Add exit codes to integrate Kitchen Inspector with a CI process
 
