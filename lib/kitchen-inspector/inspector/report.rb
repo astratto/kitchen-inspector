@@ -177,6 +177,9 @@ module KitchenInspector
           return [INFO_MARK, :blue, dep.chef[:status]
                  ] if dep.chef[:status] == :'warning-chef'
 
+          return [QUESTION_MARK, :light_red, dep.repomanager[:status]
+                 ] if dep.repomanager[:status] == :'warning-notunique-repomanager'
+
           nil
         end
 
@@ -203,8 +206,10 @@ module KitchenInspector
             return ESCLAMATION_MARK.bold.light_red
           when /warning-outofdate-repomanager/
             return (ESCLAMATION_MARK * 2).bold.light_red
+          when /warning-notunique-repomanager/
+            return QUESTION_MARK.light_red
           else
-            return ''.white
+            return (status || '').red
           end
         end
       end

@@ -72,34 +72,54 @@ module KitchenInspector
       # Analyze Chef repo and Repository manager in order to find more information
       # about a given dependency
       def analyze_dependency(dependency, recursive)
-        repo_info = {}
-
         chef_info = {}
         chef_info[:versions] = find_chef_server_versions(dependency.name)
         chef_info[:latest_version] = get_latest_version(chef_info[:versions])
         chef_info[:version_used] = satisfy(dependency.requirement, chef_info[:versions])
 
         # Grab information from the Repository Manager
+        info_repo = analyze_from_repository(dependency, chef_info[:version_used], recursive)
+        deps = info_repo.collect do |dep, repo_info|
+          update_dependency(dep, chef_info, repo_info)
+          dep
+        end
+        deps
+      end
+
+      def analyze_from_repository(dependency, version_used, recursive)
+        repo_dependencies = []
         projects = @repomanager.projects_by_name(dependency.name)
 
-        unless projects.empty?
-          raise DuplicateCookbookError, "Found two versions for #{dependency.name} on #{@repomanager.type}." if projects.size > 1
-          project = projects.first
-          repo_info = analyze_from_repository(project)
-        end
-        update_dependency(dependency, chef_info, repo_info)
-
-        # Analyze its dependencies based on Repository Manager
-        if recursive && repo_info[:tags] && repo_info[:tags].include?(chef_info[:version_used])
-          dependency.dependencies = @repomanager.project_dependencies(project, repo_info[:tags][chef_info[:version_used]])
-
-          [dependency, dependency.dependencies.collect do |dep|
-              dep.parents << dependency
-              analyze_dependency(dependency, recursive)
-            end]
+        if projects.empty?
+          repo_dependencies << [dependency, {}]
         else
-          [dependency]
+          projects.each do |project|
+            repo_info = info_from_repository(project)
+            repo_info[:not_unique] = projects.size > 1
+
+            # Inherit only shallow information from dependency
+            prj_dependency = Dependency.new(dependency.name, dependency.requirement)
+            prj_dependency.parents = dependency.parents
+
+            prj_dependency.parents.each do |parent|
+              parent.dependencies << prj_dependency
+            end
+
+            repo_dependencies << [prj_dependency, repo_info]
+
+            # Analyze its dependencies based on Repository Manager
+            if recursive && repo_info[:tags] && repo_info[:tags].include?(version_used)
+              children = @repomanager.project_dependencies(project, repo_info[:tags][version_used]).collect do |dep|
+                dep.parents << prj_dependency
+                analyze_from_repository(dep, version_used, recursive)
+              end.flatten!(1)
+
+              repo_dependencies.push(*children)
+            end
+          end
         end
+
+        repo_dependencies
       end
 
       # Return from versions the best match that satisfies the given constraint
@@ -110,7 +130,7 @@ module KitchenInspector
       end
 
       # Retrieve project info from Repository Manager
-      def analyze_from_repository(project)
+      def info_from_repository(project)
         tags = @repomanager.tags(project)
         latest_tag = get_latest_version(tags.keys)
 
@@ -146,9 +166,14 @@ module KitchenInspector
         repo_info[:status] = comparison[:repo]
         dependency.remarks.push(*comparison[:remarks]) if comparison[:remarks]
 
+        if repo_info[:not_unique]
+          repo_info[:status] = :'warning-notunique-repomanager'
+          dependency.remarks << "Not unique on #{@repomanager.type} (this is #{repo_info[:source_url]})"
+        end
+
         # Check whether latest tag and metadata version in Repository Manager are
         # consistent
-        unless repomanager_consistent?(repo_info)
+        unless repomanager_consistent_version?(repo_info)
           repo_info[:status] = :'warning-mismatch-repomanager'
           dependency.remarks << "#{@repomanager.type}'s last tag is #{repo_info[:latest_tag]} " \
                                   "but found #{repo_info[:latest_metadata]} in metadata.rb"
@@ -188,7 +213,7 @@ module KitchenInspector
         comparison
       end
 
-      def repomanager_consistent?(info)
+      def repomanager_consistent_version?(info)
         !(info[:latest_tag] &&
           info[:latest_metadata] &&
             info[:latest_tag] != info[:latest_metadata])

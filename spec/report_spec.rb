@@ -79,6 +79,22 @@ describe Report do
         expect(code).to eq(:'warning-outofdate-repomanager')
       end
 
+      it "warning-notunique-repomanager" do
+        dep1 = @dependencies.first
+        repomanager = {:tags => ["1.0.1"],
+                            :latest_metadata => Solve::Version.new("1.0.1"),
+                            :latest_tag => Solve::Version.new("1.0.1"),
+                            :not_unique => true}
+        dependency_inspector.update_dependency(dep1, dep1.chef, repomanager)
+
+        output, code = Report.generate(@dependencies, 'table', {})
+        expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
+        "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{QUESTION_MARK.light_red}      |\n" \
+        "#{'Status: warning-notunique-repomanager (?)'.light_red}"
+        )
+        expect(code).to eq(:'warning-notunique-repomanager')
+      end
+
       it "warning-chef" do
         dep1 = @dependencies.first
         chef = {:versions => ["1.0.0"],

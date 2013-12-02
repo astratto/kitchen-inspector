@@ -191,6 +191,17 @@ describe DependencyInspector do
         dependency_inspector.update_dependency(@dep, chef_info, repomanager)
         expect(@dep.repomanager[:status]).to eq(:'warning-mismatch-repomanager')
       end
+
+      it "warns when project is not unique on Repository Manager" do
+        repomanager = {:tags =>["1.0.0", "1.0.1"],
+                       :latest_metadata => Solve::Version.new("1.0.1"),
+                       :latest_tag => Solve::Version.new("1.0.1"),
+                       :not_unique => true
+                     }
+
+        dependency_inspector.update_dependency(@dep, chef_info, repomanager)
+        expect(@dep.repomanager[:status]).to eq(:'warning-notunique-repomanager')
+      end
     end
   end
 

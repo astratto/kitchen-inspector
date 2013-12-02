@@ -240,6 +240,23 @@ In this section are listed the checks applied.
     +------+-------------+------+--------+------------+-------------+-------------+------------+
     Status: error (✖)
 
+### Repository Manager contains two or more projects with the same name
+
+**Note:** In this situation is not possible to decide which version generated the one on the Chef Server.
+
+    +----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+
+    | Name     | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository | Remarks |
+    |          |             |       | Chef   | Repository | Status      | Status      | Status     |         |
+    +----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+
+    | database | >= 0.0.0    | 1.5.2 | 1.5.2  | 1.5.2      |      ✔      |      ✔      |     ?      | 1       |
+    | database | >= 0.0.0    | 1.5.2 | 1.5.2  | 1.1.0      |      ✔      |      ✔      |     ?      | 2       |
+    +----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+
+    Status: warning-notunique-repomanager (?)
+
+    Remarks:
+    [1]: Not unique on Github (this is github.com/opscode-cookbooks/database)
+    [2]: Not unique on Github (this is cookbooks/database)
+
 ## LICENSE
 
 Author:: Stefano Tortarolo <stefano.tortarolo@gmail.com>

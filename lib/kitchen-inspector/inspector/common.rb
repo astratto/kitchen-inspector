@@ -54,5 +54,6 @@ module KitchenInspector
     ESCLAMATION_MARK = "!"
     INFO_MARK = "i"
     INDENT_MARK = "\u203A"
+    QUESTION_MARK = "?"
   end
 end

@@ -11,6 +11,7 @@ FEATURES:
 * Add support for different Repository Managers (Gitlab and GitHub)
 * Verifies that a tag on the Repository Manager matches the corresponding metadata's version
 * Add exit codes to integrate Kitchen Inspector with a CI process
+* Handle not unique projects on Repository Manager
 
 FIXES:
 

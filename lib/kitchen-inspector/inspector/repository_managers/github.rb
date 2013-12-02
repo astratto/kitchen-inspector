@@ -61,7 +61,7 @@ module KitchenInspector
 
       # Return the full URL for a given project
       def source_url(project)
-        "http://github.com/#{project.full_name}"
+        "github.com/#{project.full_name}"
       end
 
       # Retrieve projects by name
