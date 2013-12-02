@@ -2,7 +2,7 @@ require_relative 'support/spec_helper'
 
 describe GithubManager do
   let(:manager) do
-    config = {:type => "Github", :users => ["astratto"]}
+    config = {:type => "Github", :allowed_users => ["astratto"]}
 
     manager = GithubManager.new config
     manager
@@ -22,7 +22,7 @@ describe GithubManager do
       it "creates a valid Manager" do
         config = {:type => "Github",
                   :token => ENV['GITHUB_TOKEN'],
-                  :users => ["astratto"]
+                  :allowed_users => ["astratto"]
                 }
 
         manager = GithubManager.new config
@@ -60,20 +60,20 @@ describe GithubManager do
   end
 
   describe "#project_metadata" do
-    let(:project) { manager.projects_by_name("mysql").first }
-    it "returns the correct metadata for github.com/astratto/mysql v.4.4.0", :type => :external do
+    let(:project) { manager.projects_by_name("cook-test").first }
+    it "returns the correct metadata for github.com/astratto/cook-test v.1.0.0", :type => :external do
 
-      metadata = manager.project_metadata(project, "aa1d3ac6c8266830005331518d77d1cf4a0987bd")
-      expect(metadata.name).to eq("mysql")
+      metadata = manager.project_metadata(project, "689dcf42e0cc0710fd337ebd1fee3d2ee8e7dca4")
+      expect(metadata.name).to eq("cook-test")
     end
 
-    it "returns the correct version for github.com/astratto/mysql v.4.4.0", :type => :external do
-      version = manager.project_metadata_version(project, "aa1d3ac6c8266830005331518d77d1cf4a0987bd")
-      expect(version).to eq("4.0.4")
+    it "returns the correct version for github.com/astratto/cook-test v.1.0.0", :type => :external do
+      version = manager.project_metadata_version(project, "689dcf42e0cc0710fd337ebd1fee3d2ee8e7dca4")
+      expect(version).to eq("1.0.0")
     end
 
-    it "returns the correct dependencies for github.com/astratto/mysql v.4.4.0", :type => :external do
-      dependencies = manager.project_dependencies(project, "aa1d3ac6c8266830005331518d77d1cf4a0987bd")
+    it "returns the correct dependencies for github.com/astratto/cook-test v.1.0.0", :type => :external do
+      dependencies = manager.project_dependencies(project, "689dcf42e0cc0710fd337ebd1fee3d2ee8e7dca4")
 
       expect(dependencies.collect(&:name)).to eq(["openssl", "build-essential"])
     end

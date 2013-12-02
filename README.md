@@ -141,7 +141,7 @@ repository_manager :type => "Gitlab",
 
 ### GitHub
 
-GitHub access can be configured specifying a *token* and a list of *users* that
+GitHub access can be configured specifying a *token* and a list of *allowed users* that
 host the cookbooks you're interested in.
 
 *PLEASE NOTE* that GitHub has a strict [rate limit](http://developer.github.com/v3/#rate-limiting) on the calls you can make.
@@ -154,7 +154,7 @@ Example:
 # Repository Manager configuration
 repository_manager :type => "Github",
                    :token => "gitlab_token",
-                   :users => ["opscode-cookbooks"]
+                   :allowed_users => ["opscode-cookbooks"]
 ```
 
 ## Checks

@@ -33,10 +33,11 @@ module KitchenInspector
 
       def initialize(config)
         super()
-        raise GithubUsersNotConfiguredError, config_msg("Github users", "users") unless config[:users]
+        raise GithubUsersNotConfiguredError, config_msg("Github allowed users", "allowed_users") unless config[:allowed_users]
 
         @type = "Github"
-        @users = config[:users]
+        @allowed_users = config[:allowed_users]
+        @projects_cache = {}
 
         Octokit.configure do |c|
           c.access_token = config[:token]
@@ -60,24 +61,19 @@ module KitchenInspector
 
       # Return the full URL for a given project
       def source_url(project)
-        # "#{@Github_base_url}/#{project.path_with_namespace}"
+        "http://github.com/#{project.full_name}"
       end
 
       # Retrieve projects by name
-      def projects_by_name(name)
-        projects.select{|prj| prj.name == name }
-      end
-
-      # Iterate over @users' profiles to search for projects
-      def projects
-        @projects ||= begin
-          @users.collect do |user|
-            begin
-              Octokit.repositories(user)
-            rescue Octokit::NotFound
-              # Skip repositories not found
-            end
-          end.flatten
+      # Filter by allowed users
+      def projects_by_name(name, opts={})
+        @projects_cache[name] ||= begin
+          user_query = @allowed_users.collect{|user| "user:#{user}"}.join(' ')
+          repos = Octokit.search_repos "#{name} in:name language:ruby #{user_query}"
+          repos = repos.items.select do |repo|
+            repo.name == name
+          end
+          repos
         end
       end
 
