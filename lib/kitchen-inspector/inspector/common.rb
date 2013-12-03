@@ -33,21 +33,6 @@ module KitchenInspector
     class DuplicateCookbookError < StandardError; end
     class UnsupportedReportFormatError < ArgumentError; end
 
-    STATUS_TO_RETURN_CODES = {
-        :'up-to-date' => 0,
-        :'error' => 100,
-        :'error-repomanager' => 101,
-        :'error-config' => 110,
-        :'error-notacookbook' => 111,
-        :'error-reportformat' => 112,
-        :'warning-req' => 200,
-        :'warning-mismatch-repomanager' => 201,
-        :'warning-outofdate-repomanager' => 202,
-        :'warning-chef' => 203,
-        :'warning-nodependencies' => 204
-    }
-    STATUS_TO_RETURN_CODES.default = 1
-
     # Graphical marks
     TICK_MARK = "\u2714"
     X_MARK = "\u2716"
@@ -55,5 +40,33 @@ module KitchenInspector
     INFO_MARK = "i"
     INDENT_MARK = "\u203A"
     QUESTION_MARK = "?"
+
+    STATUSES = {
+      :up_to_date => TICK_MARK,
+      :err => X_MARK,
+      :err_repo => X_MARK,
+      :err_chef => X_MARK,
+      :warn_req => ESCLAMATION_MARK,
+      :warn_chef => INFO_MARK,
+      :warn_mismatch_repo => ESCLAMATION_MARK,
+      :warn_outofdate_repo => (ESCLAMATION_MARK * 2),
+      :warn_notunique_repo => QUESTION_MARK
+    }
+    STATUSES.default = ' '
+
+    STATUS_TO_RETURN_CODES = {
+      :up_to_date => 0,
+      :err => 100,
+      :err_repo => 101,
+      :err_config => 110,
+      :err_notacookbook => 111,
+      :err_reportformat => 112,
+      :warn_req => 200,
+      :warn_mismatch_repo => 201,
+      :warn_outofdate_repo => 202,
+      :warn_chef => 203,
+      :warn_nodependencies => 204
+    }
+    STATUS_TO_RETURN_CODES.default = 1
   end
 end

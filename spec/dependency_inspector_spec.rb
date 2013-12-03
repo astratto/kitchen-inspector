@@ -127,9 +127,9 @@ describe DependencyInspector do
 
     it "returns a success for correct versions on both servers" do
       dependency_inspector.update_dependency(@dep, chef_info, repomanager_info)
-      expect(@dep.repomanager[:status]).to eq(:'up-to-date')
-      expect(@dep.chef[:status]).to eq(:'up-to-date')
-      expect(@dep.status).to eq(:'up-to-date')
+      expect(@dep.repomanager[:status]).to eq(:up_to_date)
+      expect(@dep.chef[:status]).to eq(:up_to_date)
+      expect(@dep.status).to eq(:up_to_date)
     end
 
     context "error statuses" do
@@ -137,7 +137,7 @@ describe DependencyInspector do
         chef = {:version_used => nil}
 
         dependency_inspector.update_dependency(@dep, chef, repomanager_info)
-        expect(@dep.status).to eq(:error)
+        expect(@dep.status).to eq(:err)
       end
 
       it "missing version on Chef Server" do
@@ -145,7 +145,7 @@ describe DependencyInspector do
                 :latest_version => nil}
 
         dependency_inspector.update_dependency(@dep, chef, repomanager_info)
-        expect(@dep.chef[:status]).to eq(:'error-chef')
+        expect(@dep.chef[:status]).to eq(:err_chef)
       end
 
       it "missing version on the Repository Manager" do
@@ -154,7 +154,7 @@ describe DependencyInspector do
 
 
         dependency_inspector.update_dependency(@dep, chef_info, repomanager)
-        expect(@dep.repomanager[:status]).to eq(:'error-repomanager')
+        expect(@dep.repomanager[:status]).to eq(:err_repo)
       end
     end
 
@@ -163,7 +163,7 @@ describe DependencyInspector do
         chef_info[:version_used] = "1.0.0"
 
         dependency_inspector.update_dependency(@dep, chef_info, repomanager_info)
-        expect(@dep.status).to eq(:'warning-req')
+        expect(@dep.status).to eq(:warn_req)
       end
 
       it "a newer version exists on the Repository Manager" do
@@ -171,7 +171,7 @@ describe DependencyInspector do
                      :latest_version => Solve::Version.new("1.0.0")}
 
         dependency_inspector.update_dependency(@dep, chef_info, repomanager_info)
-        expect(@dep.chef[:status]).to eq(:'warning-chef')
+        expect(@dep.chef[:status]).to eq(:warn_chef)
       end
 
       it "a newer version exists on Chef Server" do
@@ -180,7 +180,7 @@ describe DependencyInspector do
                             :latest_tag => Solve::Version.new("1.0.0")}
 
         dependency_inspector.update_dependency(@dep, chef_info, repomanager_info)
-        expect(@dep.repomanager[:status]).to eq(:'warning-outofdate-repomanager')
+        expect(@dep.repomanager[:status]).to eq(:warn_outofdate_repo)
       end
 
       it "last tag on Repository Manager doesn't match last metadata's version" do
@@ -189,7 +189,7 @@ describe DependencyInspector do
                        :latest_tag => Solve::Version.new("1.0.1")}
 
         dependency_inspector.update_dependency(@dep, chef_info, repomanager)
-        expect(@dep.repomanager[:status]).to eq(:'warning-mismatch-repomanager')
+        expect(@dep.repomanager[:status]).to eq(:warn_mismatch_repo)
       end
 
       it "warns when project is not unique on Repository Manager" do
@@ -200,7 +200,7 @@ describe DependencyInspector do
                      }
 
         dependency_inspector.update_dependency(@dep, chef_info, repomanager)
-        expect(@dep.repomanager[:status]).to eq(:'warning-notunique-repomanager')
+        expect(@dep.repomanager[:status]).to eq(:warn_notunique_repo)
       end
     end
   end

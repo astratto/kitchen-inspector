@@ -24,16 +24,16 @@ describe Report do
         @dependencies = [dep1]
       end
 
-      it "up-to-date" do
+      it "up_to_date" do
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |\n" \
-        "#{'Status: up-to-date (%s)'.green}" % TICK_MARK
+        "#{'Status: up_to_date (%s)'.green}" % TICK_MARK
         )
-        expect(code).to eq(:'up-to-date')
+        expect(code).to eq(:up_to_date)
       end
 
-      it "error-repomanager" do
+      it "err_repo" do
         dep1 = @dependencies.first
         repomanager = {:tags => [],
                             :latest_metadata => nil,
@@ -43,13 +43,13 @@ describe Report do
 
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
-        "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  |            |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{X_MARK.red}      |\n" \
-        "#{'Status: error-repomanager (%s)'.yellow}" % X_MARK
+        "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  |            |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{X_MARK.yellow}      |\n" \
+        "#{'Status: err_repo (%s)'.yellow}" % X_MARK
         )
-        expect(code).to eq(:'error-repomanager')
+        expect(code).to eq(:err_repo)
       end
 
-      it "warning-mismatch-repomanager" do
+      it "warn_mismatch_repo" do
         dep1 = @dependencies.first
         repomanager = {:tags => ["1.0.0"],
                             :latest_metadata => Solve::Version.new("1.0.0"),
@@ -59,12 +59,12 @@ describe Report do
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.0      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{ESCLAMATION_MARK.bold.light_red}      |\n" \
-        "#{'Status: warning-mismatch-repomanager (!)'.light_red}"
+        "#{'Status: warn_mismatch_repo (!)'.light_red}"
         )
-        expect(code).to eq(:'warning-mismatch-repomanager')
+        expect(code).to eq(:warn_mismatch_repo)
       end
 
-      it "warning-outofdate-repomanager" do
+      it "warn_outofdate_repo" do
         dep1 = @dependencies.first
         repomanager = {:tags => ["1.0.0"],
                             :latest_metadata => Solve::Version.new("1.0.0"),
@@ -74,12 +74,12 @@ describe Report do
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.0      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{(ESCLAMATION_MARK * 2).bold.light_red}     |\n" \
-        "#{'Status: warning-outofdate-repomanager (!!)'.light_red}"
+        "#{'Status: warn_outofdate_repo (!!)'.light_red}"
         )
-        expect(code).to eq(:'warning-outofdate-repomanager')
+        expect(code).to eq(:warn_outofdate_repo)
       end
 
-      it "warning-notunique-repomanager" do
+      it "warn_notunique_repo" do
         dep1 = @dependencies.first
         repomanager = {:tags => ["1.0.1"],
                             :latest_metadata => Solve::Version.new("1.0.1"),
@@ -90,12 +90,12 @@ describe Report do
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{QUESTION_MARK.light_red}      |\n" \
-        "#{'Status: warning-notunique-repomanager (?)'.light_red}"
+        "#{'Status: warn_notunique_repo (?)'.light_red}"
         )
-        expect(code).to eq(:'warning-notunique-repomanager')
+        expect(code).to eq(:warn_notunique_repo)
       end
 
-      it "warning-chef" do
+      it "warn_chef" do
         dep1 = @dependencies.first
         chef = {:versions => ["1.0.0"],
                      :latest_version => Solve::Version.new("1.0.0"),
@@ -105,12 +105,12 @@ describe Report do
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| Test | ~> 1.0.0    | 1.0.0 | 1.0.0  | 1.0.1      |      #{TICK_MARK.green}      |      #{INFO_MARK.bold.blue}      |     #{TICK_MARK.green}      |\n" \
-        "#{'Status: warning-chef (i)'.blue}"
+        "#{'Status: warn_chef (i)'.blue}"
         )
-        expect(code).to eq(:'warning-chef')
+        expect(code).to eq(:warn_chef)
       end
 
-      it "warning-req" do
+      it "warn_req" do
         dep1 = Dependency.new("Test", "= 1.0.0")
         chef = {:versions => ["1.0.0", "1.0.1"],
                      :latest_version => Solve::Version.new("1.0.1"),
@@ -123,12 +123,12 @@ describe Report do
         output, code = Report.generate([dep1], 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| Test | = 1.0.0     | 1.0.0 | 1.0.1  | 1.0.1      |      #{ESCLAMATION_MARK.bold.yellow}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |\n" \
-        "#{'Status: warning-req (!)'.yellow}"
+        "#{'Status: warn_req (!)'.yellow}"
         )
-        expect(code).to eq(:'warning-req')
+        expect(code).to eq(:warn_req)
       end
 
-      it "error due to wrong metadata" do
+      it "err due to wrong metadata" do
         dep1 = @dependencies.first
         chef = {:versions => ["1.1.0"],
                      :latest_version => Solve::Version.new("1.1.0"),
@@ -141,12 +141,12 @@ describe Report do
         output, code = Report.generate([dep1], 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| #{'Test'.red} | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      #{X_MARK.red}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |\n" \
-        "#{'Status: error (%s)'.red}" % X_MARK
+        "#{'Status: err (%s)'.red}" % X_MARK
         )
-        expect(code).to eq(:'error')
+        expect(code).to eq(:err)
       end
 
-      it "error due to Chef Server" do
+      it "err due to Chef Server" do
         dep1 = @dependencies.first
         chef = {:versions => [],
                      :latest_version => nil,
@@ -156,9 +156,9 @@ describe Report do
         output, code = Report.generate([dep1], 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| #{'Test'.red} | ~> 1.0.0    |      |        | 1.0.1      |      #{X_MARK.red}      |      #{X_MARK.red}      |     #{TICK_MARK.green}      |\n" \
-        "#{'Status: error (%s)'.red}" % X_MARK
+        "#{'Status: err (%s)'.red}" % X_MARK
         )
-        expect(code).to eq(:'error')
+        expect(code).to eq(:err)
       end
 
       it "shows remarks" do
@@ -180,11 +180,11 @@ describe Report do
         "| #{'Test'.red} | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      #{X_MARK.red}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      | 1       |\n" \
         "| #{'Test'.red} | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      #{X_MARK.red}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      | 2       |\n" \
         "+------+-------------+------+--------+------------+-------------+-------------+------------+---------+\n" \
-        "#{'Status: error (%s)'.red}\n\n" \
+        "#{'Status: err (%s)'.red}\n\n" \
         "Remarks:\n" \
         "[1]: No versions found\n" \
         "[2]: No versions found" % X_MARK)
-        expect(code).to eq(:error)
+        expect(code).to eq(:err)
       end
 
       it "shows nested dependencies" do
@@ -203,9 +203,9 @@ describe Report do
         "| Test      | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |         |\n" \
         "|  #{INDENT_MARK} Nested | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |         |\n" \
         "+-----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
-        "#{'Status: up-to-date (%s)'.green}\n\n" \
+        "#{'Status: up_to_date (%s)'.green}\n\n" \
         "Remarks:\n" % TICK_MARK)
-        expect(code).to eq(:'up-to-date')
+        expect(code).to eq(:up_to_date)
       end
     end
   end

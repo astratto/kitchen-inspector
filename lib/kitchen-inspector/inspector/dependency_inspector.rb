@@ -147,15 +147,15 @@ module KitchenInspector
       # Update the status of the dependency based on the version used and the
       # latest version available on the Repository Manager
       def update_dependency(dependency, chef_info, repo_info)
-        dependency.status = :'up-to-date'
+        dependency.status = :up_to_date
 
         if !chef_info[:version_used]
-          dependency.status = :error
+          dependency.status = :err
           dependency.remarks << 'No versions found'
         else
           relaxed_version = satisfy("~> #{chef_info[:version_used]}", chef_info[:versions])
           if relaxed_version != chef_info[:version_used]
-            dependency.status = :'warning-req'
+            dependency.status = :warn_req
             dependency.remarks << "#{relaxed_version} is available"
           end
         end
@@ -167,14 +167,14 @@ module KitchenInspector
         dependency.remarks.push(*comparison[:remarks]) if comparison[:remarks]
 
         if repo_info[:not_unique]
-          repo_info[:status] = :'warning-notunique-repomanager'
+          repo_info[:status] = :warn_notunique_repo
           dependency.remarks << "Not unique on #{@repomanager.type} (this is #{repo_info[:source_url]})"
         end
 
         # Check whether latest tag and metadata version in Repository Manager are
         # consistent
         unless repomanager_consistent_version?(repo_info)
-          repo_info[:status] = :'warning-mismatch-repomanager'
+          repo_info[:status] = :warn_mismatch_repo
           dependency.remarks << "#{@repomanager.type}'s last tag is #{repo_info[:latest_tag]} " \
                                   "but found #{repo_info[:latest_metadata]} in metadata.rb"
         end
@@ -185,28 +185,28 @@ module KitchenInspector
 
       # Compare Repository Manager and Chef Server
       def compare_repo_chef(chef_info, repo_info)
-        comparison = {:chef => :'up-to-date', :repo => :'up-to-date',
+        comparison = {:chef => :up_to_date, :repo => :up_to_date,
                   :remarks => []}
 
         if chef_info[:latest_version] && repo_info[:latest_metadata]
           if chef_info[:latest_version] > repo_info[:latest_metadata]
-            comparison[:repo] = :'warning-outofdate-repomanager'
+            comparison[:repo] = :warn_outofdate_repo
             comparison[:remarks] << "#{@repomanager.type} out-of-date!"
             return comparison
           elsif chef_info[:latest_version] < repo_info[:latest_metadata]
-            comparison[:chef] = :'warning-chef'
+            comparison[:chef] = :warn_chef
             comparison[:remarks] << "A new version might appear on Chef server"
             return comparison
           end
         end
 
         unless repo_info[:latest_metadata]
-          comparison[:repo] = :'error-repomanager'
+          comparison[:repo] = :err_repo
           comparison[:remarks] << "#{@repomanager.type} doesn't contain any versions."
         end
 
         unless chef_info[:latest_version]
-          comparison[:chef] = :'error-chef'
+          comparison[:chef] = :err_chef
           comparison[:remarks] << "Chef Server doesn't contain any versions."
         end
 
