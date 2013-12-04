@@ -84,7 +84,7 @@ Two display formats are supported: table and json
     | selinux    | = 0.5.6     | 0.5.6 | 0.5.6  | 0.5.6      |      ✔      |      ✔      |   ✔        |
     |  › keytool | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      ✔      |      ✔      |   ✔        |
     +------------+-------------+-------+--------+------------+-------------+-------------+------------+
-    Status: error (✖)
+    Status: err (✖)
 
 **Note:** The option *--remarks* provides more verbose descriptions for errors/warnings
 
@@ -99,7 +99,7 @@ Two display formats are supported: table and json
     | build-essential  | ~> 1.4.2    | 1.4.2  | 1.4.2  | 1.4.2      |      ✔      |      ✔      |     ✔      |         |
     | database         | >= 0.0.0    | 1.5.3  | 1.5.3  | 1.5.2      |      ✔      |      ✔      |     !!     | 4       |
     +------------------+-------------+--------+--------+------------+-------------+-------------+------------+---------+
-    Status: warning-outofdate-repomanager (!!)
+    Status: warn-outofdate-repo (!!)
 
     Remarks:
     [1]: Gitlab's last tag is 1.8.4 but found 1.8.2 in metadata.rb
@@ -179,7 +179,7 @@ In this section are listed the checks applied.
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    | 1.0.1 | 1.0.1  |            |      ✔      |      ✔      |     ✖      |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
-    Status: error-repomanager (✖)
+    Status: err-repo (✖)
 
 ### Repository Manager contains a mismatched tag/metadata's version
 
@@ -189,7 +189,7 @@ In this section are listed the checks applied.
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.0      |      ✔      |      ✔      |     !      |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
-    Status: warning-mismatch-repomanager (!)
+    Status: warn-mismatch-repo (!)
 
 ### Repository Manager doesn't contain the last version
 
@@ -199,7 +199,7 @@ In this section are listed the checks applied.
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.0      |      ✔      |      ✔      |     !!     |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
-    Status: warning-outofdate-repomanager (!!)
+    Status: warn-outofdate-repo (!!)
 
 ### Chef Server doesn't contain the last version
 
@@ -209,7 +209,7 @@ In this section are listed the checks applied.
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    | 1.0.0 | 1.0.0  | 1.0.1      |      ✔      |      i      |     ✔      |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
-    Status: warning-chef (i)
+    Status: warn-chef (i)
 
 ### Metadata doesn't use the last version
 
@@ -219,7 +219,7 @@ In this section are listed the checks applied.
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Test | = 1.0.0     | 1.0.0 | 1.0.1  | 1.0.1      |      !      |      ✔      |     ✔      |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
-    Status: warning-req (!)
+    Status: warn-req (!)
 
 ### Metadata refers to a version not existing on Chef Server
     +------+-------------+------+--------+------------+-------------+-------------+------------+
@@ -228,7 +228,7 @@ In this section are listed the checks applied.
     +------+-------------+------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      ✖      |      ✔      |     ✔      |
     +------+-------------+------+--------+------------+-------------+-------------+------------+
-    Status: error (✖)
+    Status: err (✖)
 
 ### Chef Server doesn't contain any versions
 
@@ -238,7 +238,7 @@ In this section are listed the checks applied.
     +------+-------------+------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    |      |        | 1.0.1      |      ✖      |      ✖      |     ✔      |
     +------+-------------+------+--------+------------+-------------+-------------+------------+
-    Status: error (✖)
+    Status: err (✖)
 
 ### Repository Manager contains two or more projects with the same name
 
@@ -251,7 +251,7 @@ In this section are listed the checks applied.
     | database | >= 0.0.0    | 1.5.2 | 1.5.2  | 1.5.2      |      ✔      |      ✔      |     ?      | 1       |
     | database | >= 0.0.0    | 1.5.2 | 1.5.2  | 1.1.0      |      ✔      |      ✔      |     ?      | 2       |
     +----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+
-    Status: warning-notunique-repomanager (?)
+    Status: warn-notunique-repo (?)
 
     Remarks:
     [1]: Not unique on Github (this is github.com/opscode-cookbooks/database)
