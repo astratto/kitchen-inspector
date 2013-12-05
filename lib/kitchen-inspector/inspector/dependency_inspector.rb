@@ -29,6 +29,7 @@ module KitchenInspector
       include Utils
 
       def initialize(config)
+        @chef_info_cache = {}
         configure(config)
       end
 
@@ -85,11 +86,14 @@ module KitchenInspector
       end
 
       def analyze_chef(dependency)
-        chef_info = {}
-        chef_info[:versions] = find_chef_server_versions(dependency.name)
-        chef_info[:latest_version] = get_latest_version(chef_info[:versions])
-        chef_info[:version_used] = satisfy(dependency.requirement, chef_info[:versions])
-        chef_info
+        cache_key = "#{dependency.name}, #{dependency.requirement}"
+        @chef_info_cache[cache_key] ||= begin
+          chef_info = {}
+          chef_info[:versions] = find_chef_server_versions(dependency.name)
+          chef_info[:latest_version] = get_latest_version(chef_info[:versions])
+          chef_info[:version_used] = satisfy(dependency.requirement, chef_info[:versions])
+          chef_info
+        end
       end
 
       def analyze_from_repository(dependency, version_used, recursive)
