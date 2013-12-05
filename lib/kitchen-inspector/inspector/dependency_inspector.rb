@@ -72,18 +72,24 @@ module KitchenInspector
       # Analyze Chef repo and Repository manager in order to find more information
       # about a given dependency
       def analyze_dependency(dependency, recursive)
-        chef_info = {}
-        chef_info[:versions] = find_chef_server_versions(dependency.name)
-        chef_info[:latest_version] = get_latest_version(chef_info[:versions])
-        chef_info[:version_used] = satisfy(dependency.requirement, chef_info[:versions])
+        chef_info = analyze_chef(dependency)
 
         # Grab information from the Repository Manager
         info_repo = analyze_from_repository(dependency, chef_info[:version_used], recursive)
         deps = info_repo.collect do |dep, repo_info|
-          update_dependency(dep, chef_info, repo_info)
+          dep_chef_info = analyze_chef(dep)
+          update_dependency(dep, dep_chef_info, repo_info)
           dep
         end
         deps
+      end
+
+      def analyze_chef(dependency)
+        chef_info = {}
+        chef_info[:versions] = find_chef_server_versions(dependency.name)
+        chef_info[:latest_version] = get_latest_version(chef_info[:versions])
+        chef_info[:version_used] = satisfy(dependency.requirement, chef_info[:versions])
+        chef_info
       end
 
       def analyze_from_repository(dependency, version_used, recursive)
