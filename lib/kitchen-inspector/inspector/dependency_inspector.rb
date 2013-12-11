@@ -254,7 +254,14 @@ module KitchenInspector
         end
 
         def get_latest_version(versions)
-          versions.collect{|v| Solve::Version.new(v)}.max
+          versions.collect do |v|
+            begin
+              Solve::Version.new(v)
+            rescue Solve::Errors::InvalidVersionFormat => e
+              # Skip invalid tags
+              Solve::Version.new("0.0.0")
+            end
+          end.max
         end
 
         def chef_server_url(url)
