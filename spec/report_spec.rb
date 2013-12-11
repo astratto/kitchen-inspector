@@ -182,8 +182,8 @@ describe Report do
         "+------+-------------+------+--------+------------+-------------+-------------+------------+---------+\n" \
         "#{'Status: err (%s)'.red}\n\n" \
         "Remarks:\n" \
-        "[1]: No versions found\n" \
-        "[2]: No versions found" % X_MARK)
+        "[1]: No versions found, using 1.1.0 for recursive analysis\n" \
+        "[2]: No versions found, using 1.1.0 for recursive analysis" % X_MARK)
         expect(code).to eq(:err)
       end
 
