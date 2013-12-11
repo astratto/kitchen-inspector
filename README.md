@@ -38,6 +38,8 @@ It's also possible to specify a target directory with `kitchen-inspector inspect
 Cookbook's `metadata.rb` is parsed to obtain the dependencies, then the configured Chef server and Repository Manager are queried to define which versions are available.  
 **Note:** The Chef server's version is the one that defines the used version.
 
+When a usable version is not found, Repository Manager's latest tag is used to analyze transitive dependencies.
+
 It will display a table that contains the following rows:
 
 * `Name` - The name of the cookbook
