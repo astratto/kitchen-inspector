@@ -118,8 +118,10 @@ module KitchenInspector
             repo_dependencies << [prj_dependency, repo_info]
 
             # Analyze its dependencies based on Repository Manager
-            if recursive && repo_info[:tags] && repo_info[:tags].include?(version_used)
-              children = @repomanager.project_dependencies(project, repo_info[:tags][version_used]).collect do |dep|
+            if recursive && repo_info[:tags]
+              reference_version = get_repo_reference_version(version_used, repo_info)
+
+              children = @repomanager.project_dependencies(project, repo_info[:tags][reference_version]).collect do |dep|
                 dep.parents << prj_dependency
                 analyze_from_repository(dep, version_used, recursive)
               end.flatten!(1)
@@ -130,6 +132,17 @@ module KitchenInspector
         end
 
         repo_dependencies
+      end
+
+      # Return the reference version to be used for recursive analysis
+      #
+      # It's the version used if present. The latest available tag on the Repository
+      # Manager otherwise.
+      def get_repo_reference_version(version_used, repo_info)
+        reference_version = nil
+        reference_version = version_used if version_used && repo_info[:tags].include?(version_used)
+        reference_version = repo_info[:latest_tag].to_s unless reference_version
+        reference_version
       end
 
       # Return from versions the best match that satisfies the given constraint
@@ -161,7 +174,11 @@ module KitchenInspector
 
         if !chef_info[:version_used]
           dependency.status = :err
-          dependency.remarks << 'No versions found'
+          msg = 'No versions found'
+          reference_version = get_repo_reference_version(nil, repo_info)
+          msg << ", using #{reference_version} for recursive analysis" if reference_version
+
+          dependency.remarks << msg
         else
           relaxed_version = satisfy("~> #{chef_info[:version_used]}", chef_info[:versions])
           if relaxed_version != chef_info[:version_used]
