@@ -30,7 +30,7 @@ module KitchenInspector
         # Return a global status
         #
         # Note that global :err_chef is not possible since there would
-        # be at least one :err that takes precedence
+        # be at least one :err_req that takes precedence
         def global_status(dependencies)
           result = nil
           dependencies.each do |dep|
@@ -51,7 +51,7 @@ module KitchenInspector
 
         # Return a dependency local status if different from up-to-date
         def single_status(dep)
-          return mark_structure(:err) if dep.status == :err
+          return mark_structure(:err_req) if dep.status == :err_req
 
           return mark_structure(:err_repo) if dep.repomanager[:status] == :err_repo
 
@@ -71,7 +71,7 @@ module KitchenInspector
         # Given a status return instructions on how to draw it
         def mark_structure(status)
           case status
-            when :err, :err_chef
+            when :err_req, :err_chef
               {:mark => STATUSES[status], :color => :red, :code => status }
             when :err_repo
               {:mark => STATUSES[status], :color => :yellow, :code => status }

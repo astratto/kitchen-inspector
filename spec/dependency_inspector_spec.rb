@@ -137,7 +137,7 @@ describe DependencyInspector do
         chef = {:version_used => nil}
 
         dependency_inspector.update_dependency(@dep, chef, repomanager_info)
-        expect(@dep.status).to eq(:err)
+        expect(@dep.status).to eq(:err_req)
       end
 
       it "missing version on Chef Server" do

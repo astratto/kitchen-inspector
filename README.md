@@ -159,6 +159,24 @@ repository_manager :type => "Github",
                    :allowed_users => ["opscode-cookbooks"]
 ```
 
+## CI/CD Integration
+
+Kitchen Inspector can be used in a Continuous Integration/Continuous Building/etc process, in order to validate cookbooks.
+
+These are the available exit codes (see *common.rb*):
+
+* 0 (:up_to_date): everything is OK!
+* Errors
+    * 100 (:err_req): a valid version could not be found
+    * 101 (:err_repo): an error related to the Repository Manager
+    * 102 (:err_config): configuration error
+    * 103 (:err_notacookbok): the specified directory is not a Cookbook
+* Warnings
+    * 200 (:warn_req): a newer version could be used
+    * 201 (:warn_mismatch_repo): metadata.rb's version and tag doesn't match
+    * 202 (:warn_outofdate_repo): a newer version exists on Chef Server
+    * 203 (:warn_chef): a newer version exists on Repository Manager
+
 ## Checks
 
 In this section are listed the checks applied.

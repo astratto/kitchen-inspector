@@ -173,7 +173,7 @@ module KitchenInspector
         dependency.status = :up_to_date
 
         if !chef_info[:version_used]
-          dependency.status = :err
+          dependency.status = :err_req
           msg = 'No versions found'
           reference_version = get_repo_reference_version(nil, repo_info)
           msg << ", using #{reference_version} for recursive analysis" if reference_version

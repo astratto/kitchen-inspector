@@ -118,7 +118,7 @@ module KitchenInspector
           repomanager_status = StatusAnalyzer.status_to_mark(dependency.repomanager[:status])
 
           name = indent_name(dependency.name.dup, level)
-          name = name.red if dependency.status == :err
+          name = name.red if dependency.status == :err_req
 
           row = [
             name,

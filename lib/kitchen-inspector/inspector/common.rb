@@ -43,7 +43,7 @@ module KitchenInspector
 
     STATUSES = {
       :up_to_date => TICK_MARK,
-      :err => X_MARK,
+      :err_req => X_MARK,
       :err_repo => X_MARK,
       :err_chef => X_MARK,
       :warn_req => ESCLAMATION_MARK,
@@ -56,16 +56,15 @@ module KitchenInspector
 
     STATUS_TO_RETURN_CODES = {
       :up_to_date => 0,
-      :err => 100,
+      :err_req => 100,
       :err_repo => 101,
-      :err_config => 110,
-      :err_notacookbook => 111,
-      :err_reportformat => 112,
+      :err_config => 102,
+      :err_notacookbook => 103,
+      :err_reportformat => 104,
       :warn_req => 200,
       :warn_mismatch_repo => 201,
       :warn_outofdate_repo => 202,
-      :warn_chef => 203,
-      :warn_nodependencies => 204
+      :warn_chef => 203
     }
     STATUS_TO_RETURN_CODES.default = 1
   end

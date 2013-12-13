@@ -141,9 +141,9 @@ describe Report do
         output, code = Report.generate([dep1], 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| #{'Test'.red} | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      #{X_MARK.red}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |\n" \
-        "#{'Status: err (%s)'.red}" % X_MARK
+        "#{'Status: err_req (%s)'.red}" % X_MARK
         )
-        expect(code).to eq(:err)
+        expect(code).to eq(:err_req)
       end
 
       it "err due to Chef Server" do
@@ -156,9 +156,9 @@ describe Report do
         output, code = Report.generate([dep1], 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
         "| #{'Test'.red} | ~> 1.0.0    |      |        | 1.0.1      |      #{X_MARK.red}      |      #{X_MARK.red}      |     #{TICK_MARK.green}      |\n" \
-        "#{'Status: err (%s)'.red}" % X_MARK
+        "#{'Status: err_req (%s)'.red}" % X_MARK
         )
-        expect(code).to eq(:err)
+        expect(code).to eq(:err_req)
       end
 
       it "shows remarks" do
@@ -180,11 +180,11 @@ describe Report do
         "| #{'Test'.red} | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      #{X_MARK.red}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      | 1       |\n" \
         "| #{'Test'.red} | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      #{X_MARK.red}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      | 2       |\n" \
         "+------+-------------+------+--------+------------+-------------+-------------+------------+---------+\n" \
-        "#{'Status: err (%s)'.red}\n\n" \
+        "#{'Status: err_req (%s)'.red}\n\n" \
         "Remarks:\n" \
         "[1]: No versions found, using 1.1.0 for recursive analysis\n" \
         "[2]: No versions found, using 1.1.0 for recursive analysis" % X_MARK)
-        expect(code).to eq(:err)
+        expect(code).to eq(:err_req)
       end
 
       it "shows remarks with changelog" do
