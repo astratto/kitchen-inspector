@@ -286,3 +286,5 @@ License:: MIT License
 
 ## CREDITS
 This code was heavily inspired by Kannan Manickam's [chef-taste](https://github.com/arangamani/chef-taste)
+
+Special thanks to [Marco Boschetti](https://github.com/mbizkit76) for the huge amount of suggestions given.
