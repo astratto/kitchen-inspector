@@ -111,11 +111,15 @@ Two display formats are supported: table and json
 
 ### Recursive dependencies
 
-There's also an option _--recursive boolean_ that turns off recursive analysis.
+In order to turn off recursive analysis, simply use _--recursive false_.
 
 ## Configuration
 
 By default *${HOME}/.chef/kitchen_inspector.rb* is picked, but _--config_ can be used to override that setting.
+
+```
+$ kitchen-inspector --config config_example.rb
+```
 
 ### Chef server
 
