@@ -10,7 +10,7 @@ describe Report do
   }
 
   let(:repomanager_info) {
-    repomanager = {:tags => ["1.0.0", "1.0.1"],
+    repomanager = {:tags => {"1.0.0" => "a", "1.0.1" => "b"},
                     :latest_metadata => Solve::Version.new("1.0.1"),
                     :latest_tag => Solve::Version.new("1.0.1")}
   }
@@ -51,7 +51,7 @@ describe Report do
 
       it "warn_mismatch_repo" do
         dep1 = @dependencies.first
-        repomanager = {:tags => ["1.0.0"],
+        repomanager = {:tags => {"1.0.0" => "a"},
                             :latest_metadata => Solve::Version.new("1.0.0"),
                             :latest_tag => Solve::Version.new("1.0.1")}
         dependency_inspector.update_dependency(dep1, dep1.chef, repomanager)
@@ -66,7 +66,7 @@ describe Report do
 
       it "warn_outofdate_repo" do
         dep1 = @dependencies.first
-        repomanager = {:tags => ["1.0.0"],
+        repomanager = {:tags => {"1.0.0" => "a"},
                             :latest_metadata => Solve::Version.new("1.0.0"),
                             :latest_tag => Solve::Version.new("1.0.0")}
         dependency_inspector.update_dependency(dep1, dep1.chef, repomanager)
@@ -81,7 +81,7 @@ describe Report do
 
       it "warn_notunique_repo" do
         dep1 = @dependencies.first
-        repomanager = {:tags => ["1.0.1"],
+        repomanager = {:tags => {"1.0.1" => "b"},
                             :latest_metadata => Solve::Version.new("1.0.1"),
                             :latest_tag => Solve::Version.new("1.0.1"),
                             :not_unique => true}
@@ -115,7 +115,7 @@ describe Report do
         chef = {:versions => ["1.0.0", "1.0.1"],
                      :latest_version => Solve::Version.new("1.0.1"),
                      :version_used => "1.0.0"}
-        repomanager = {:tags => ["1.0.0", "1.0.1"],
+        repomanager = {:tags => {"1.0.0" => "a", "1.0.1" => "b"},
                             :latest_metadata => Solve::Version.new("1.0.1"),
                             :latest_tag => Solve::Version.new("1.0.1")}
         dependency_inspector.update_dependency(dep1, chef, repomanager)
@@ -133,7 +133,7 @@ describe Report do
         chef = {:versions => ["1.1.0"],
                      :latest_version => Solve::Version.new("1.1.0"),
                      :version_used => nil}
-        repomanager = {:tags => ["1.1.0"],
+        repomanager = {:tags => {"1.1.0" => "c"},
                             :latest_metadata => Solve::Version.new("1.1.0"),
                             :latest_tag => Solve::Version.new("1.1.0")}
         dependency_inspector.update_dependency(dep1, chef, repomanager)
@@ -166,7 +166,7 @@ describe Report do
         chef = {:versions => ["1.1.0"],
                      :latest_version => Solve::Version.new("1.1.0"),
                      :version_used => nil}
-        repomanager = {:tags => ["1.1.0"],
+        repomanager = {:tags => {"1.1.0" => "c"},
                             :latest_metadata => Solve::Version.new("1.1.0"),
                             :latest_tag => Solve::Version.new("1.1.0")}
         dependency_inspector.update_dependency(dep1, chef, repomanager)
@@ -185,6 +185,31 @@ describe Report do
         "[1]: No versions found, using 1.1.0 for recursive analysis\n" \
         "[2]: No versions found, using 1.1.0 for recursive analysis" % X_MARK)
         expect(code).to eq(:err)
+      end
+
+      it "shows remarks with changelog" do
+        dependency_inspector.stub(:get_changelog).and_return(
+          "Changelog: test_url.short"
+        )
+
+        dep1 = @dependencies.first
+        chef = {:versions => ["1.0.0"],
+                     :latest_version => Solve::Version.new("1.0.0"),
+                     :version_used => "1.0.0"}
+        dependency_inspector.update_dependency(dep1, chef, dep1.repomanager)
+
+        output, code = Report.generate(@dependencies, 'table', {:remarks => true})
+        expect(output).to eq( \
+        "+------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
+        "| Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository | Remarks |\n" \
+        "|      |             |       | Chef   | Repository | Status      | Status      | Status     |         |\n" \
+        "+------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
+        "| Test | ~> 1.0.0    | 1.0.0 | 1.0.0  | 1.0.1      |      #{TICK_MARK.green}      |      #{INFO_MARK.bold.blue}      |     #{TICK_MARK.green}      | 1       |\n" \
+        "+------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
+        "#{'Status: warn_chef (i)'.blue}\n\n" \
+        "Remarks:\n" \
+        "[1]: A new version might appear on Chef server. Changelog: test_url.short")
+        expect(code).to eq(:warn_chef)
       end
 
       it "shows nested dependencies" do

@@ -183,7 +183,10 @@ module KitchenInspector
           relaxed_version = satisfy("~> #{chef_info[:version_used]}", chef_info[:versions])
           if relaxed_version != chef_info[:version_used]
             dependency.status = :warn_req
-            dependency.remarks << "#{relaxed_version} is available"
+            changelog_url = get_changelog(repo_info,
+                                          chef_info[:version_used],
+                                          relaxed_version)
+            dependency.remarks << "#{relaxed_version} is available. #{changelog_url}"
           end
         end
 
@@ -218,11 +221,17 @@ module KitchenInspector
         if chef_info[:latest_version] && repo_info[:latest_metadata]
           if chef_info[:latest_version] > repo_info[:latest_metadata]
             comparison[:repo] = :warn_outofdate_repo
-            comparison[:remarks] << "#{@repomanager.type} out-of-date!"
+            changelog_url = get_changelog(repo_info,
+                                          repo_info[:latest_metadata].to_s,
+                                          chef_info[:latest_version].to_s)
+            comparison[:remarks] << "#{@repomanager.type} out-of-date! #{changelog_url}"
             return comparison
           elsif chef_info[:latest_version] < repo_info[:latest_metadata]
             comparison[:chef] = :warn_chef
-            comparison[:remarks] << "A new version might appear on Chef server"
+            changelog_url = get_changelog(repo_info,
+                                          chef_info[:latest_version].to_s,
+                                          repo_info[:latest_metadata].to_s)
+            comparison[:remarks] << "A new version might appear on Chef server. #{changelog_url}"
             return comparison
           end
         end
@@ -244,6 +253,15 @@ module KitchenInspector
         !(info[:latest_tag] &&
           info[:latest_metadata] &&
             info[:latest_tag] != info[:latest_metadata])
+      end
+
+      def get_changelog(repo_info, startRev, endRev)
+        return unless repo_info[:tags]
+
+        url = @repomanager.changelog(repo_info[:source_url],
+                                               repo_info[:tags][startRev],
+                                               repo_info[:tags][endRev])
+        "Changelog: #{url}" if url
       end
 
       # Given a project return the versions on the Chef Server

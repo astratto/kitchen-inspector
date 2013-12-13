@@ -34,6 +34,7 @@ module KitchenInspector
         # Cache metadata and tags to reduce calls against the Repository Manager
         @metadata_cache = {}
         @tags_cache = {}
+        @changelogs_cache = {}
         @type = "BaseManager"
       end
 
@@ -92,6 +93,17 @@ module KitchenInspector
       def tags(project)
         cache_key = project.id
         @tags_cache[cache_key] ||= retrieve_tags(project)
+      end
+
+      # Return a shortened url to the commits between two revisions
+      def changelog(project_url, revId, otherRevId)
+        return unless project_url && revId && otherRevId
+        cache_key = "#{project_url}-#{revId}-otherRevId"
+
+        @changelogs_cache[cache_key] ||=
+          begin
+            Googl.shorten("#{project_url}/compare/#{revId}...#{otherRevId}").short_url.gsub(/^http:\/\//, '')
+          end
       end
     end
   end

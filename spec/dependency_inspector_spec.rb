@@ -4,7 +4,7 @@ describe DependencyInspector do
   let(:dependency_inspector) { generate_dependency_inspector }
 
   let(:repomanager_info) do
-    {:tags =>["1.0.0", "1.0.1"],
+    {:tags =>{"1.0.0" => "a", "1.0.1" => "b"},
      :latest_metadata => Solve::Version.new("1.0.1"),
      :latest_tag => Solve::Version.new("1.0.1")}
   end
@@ -175,7 +175,7 @@ describe DependencyInspector do
       end
 
       it "a newer version exists on Chef Server" do
-        repomanager_info = {:tags => ["1.0.0"],
+        repomanager_info = {:tags => {"1.0.0" => "a"},
                             :latest_metadata => Solve::Version.new("1.0.0"),
                             :latest_tag => Solve::Version.new("1.0.0")}
 
@@ -184,7 +184,7 @@ describe DependencyInspector do
       end
 
       it "last tag on Repository Manager doesn't match last metadata's version" do
-        repomanager = {:tags =>["1.0.0", "1.0.1"],
+        repomanager = {:tags =>{"1.0.0" => "a", "1.0.1" => "b"},
                        :latest_metadata => Solve::Version.new("1.0.0"),
                        :latest_tag => Solve::Version.new("1.0.1")}
 
@@ -193,7 +193,7 @@ describe DependencyInspector do
       end
 
       it "warns when project is not unique on Repository Manager" do
-        repomanager = {:tags =>["1.0.0", "1.0.1"],
+        repomanager = {:tags =>{"1.0.0" => "a", "1.0.1" => "b"},
                        :latest_metadata => Solve::Version.new("1.0.1"),
                        :latest_tag => Solve::Version.new("1.0.1"),
                        :not_unique => true
