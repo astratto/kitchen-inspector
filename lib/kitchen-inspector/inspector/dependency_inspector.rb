@@ -284,10 +284,6 @@ module KitchenInspector
       end
 
       private
-        def fix_version_name(version)
-          version.gsub(/[v][\.]*/i, "")
-        end
-
         def get_latest_version(versions)
           versions.collect do |v|
             begin
