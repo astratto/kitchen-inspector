@@ -45,8 +45,8 @@ It will display a table that contains the following rows:
 * `Name` - The name of the cookbook
 * `Requirement` - The version requirement specified in the metadata
 * `Used` - The final version used based on the requirement constraint
-* `Latest Chef` - The latest version available on the Chef server
-* `Latest Repository` - The latest version available on the Repository Manager
+* `Chef Latest` - The latest version available on the Chef server
+* `Repository Latest` - The latest version available on the Repository Manager
 * `Requirement Status` - The status of the cookbook:
     * up-to-date (a green tick mark): the right version is picked
     * warning-req (a yellow esclamation point): a newer version could be used
@@ -73,8 +73,8 @@ Two display formats are supported: table and json
 ### Examples
 
     +------------+-------------+-------+--------+------------+-------------+-------------+------------+
-    | Name       | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
-    |            |             |       | Chef   | Repository | Status      | Status      | Status     |
+    | Name       | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
+    |            |             |       | Latest | Latest     | Status      | Status      | Status     |
     +------------+-------------+-------+--------+------------+-------------+-------------+------------+
     | apache2    | = 1.8.2     | 1.8.2 | 1.8.2  | 1.8.4      |      ✔      |      i      |   ✔        |
     | mysql      | = 1.1.2     | 1.1.2 | 1.1.3  | 1.1.4      |      !      |      i      |   ✔        |
@@ -92,8 +92,8 @@ Two display formats are supported: table and json
 
     $ kitchen-inspector  --remarks
     +------------------+-------------+--------+--------+------------+-------------+-------------+------------+---------+
-    | Name             | Requirement | Used   | Latest | Latest     | Requirement | Chef Server | Repository | Remarks |
-    |                  |             |        | Chef   | Repository | Status      | Status      | Status     |         |
+    | Name             | Requirement | Used   | Chef   | Repository | Requirement | Chef Server | Repository | Remarks |
+    |                  |             |        | Latest | Latest     | Status      | Status      | Status     |         |
     +------------------+-------------+--------+--------+------------+-------------+-------------+------------+---------+
     | apache2          | = 1.8.2     | 1.8.2  | 1.8.2  | 1.8.2      |      ✔      |      ✔      |     !      | 1       |
     | mysql            | = 1.1.3     | 1.1.3  | 1.1.3  | 1.1.4      |      ✔      |      i      |     ✔      | 2       |
@@ -184,8 +184,8 @@ In this section are listed the checks applied.
 ### Everything is up to date
 
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
-    | Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
-    |      |             |       | Chef   | Repository | Status      | Status      | Status     |
+    | Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
+    |      |             |       | Latest | Latest     | Status      | Status      | Status     |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      ✔      |      ✔      |     ✔      |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
@@ -194,8 +194,8 @@ In this section are listed the checks applied.
 ### Repository Manager doesn't contain any versions
 
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
-    | Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
-    |      |             |       | Chef   | Repository | Status      | Status      | Status     |
+    | Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
+    |      |             |       | Latest | Latest     | Status      | Status      | Status     |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    | 1.0.1 | 1.0.1  |            |      ✔      |      ✔      |     ✖      |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
@@ -204,8 +204,8 @@ In this section are listed the checks applied.
 ### Repository Manager contains a mismatched tag/metadata's version
 
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
-    | Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
-    |      |             |       | Chef   | Repository | Status      | Status      | Status     |
+    | Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
+    |      |             |       | Latest | Latest     | Status      | Status      | Status     |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.0      |      ✔      |      ✔      |     !      |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
@@ -214,8 +214,8 @@ In this section are listed the checks applied.
 ### Repository Manager doesn't contain the last version
 
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
-    | Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
-    |      |             |       | Chef   | Repository | Status      | Status      | Status     |
+    | Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
+    |      |             |       | Latest | Latest     | Status      | Status      | Status     |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.0      |      ✔      |      ✔      |     !!     |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
@@ -224,8 +224,8 @@ In this section are listed the checks applied.
 ### Chef Server doesn't contain the last version
 
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
-    | Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
-    |      |             |       | Chef   | Repository | Status      | Status      | Status     |
+    | Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
+    |      |             |       | Latest | Latest     | Status      | Status      | Status     |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    | 1.0.0 | 1.0.0  | 1.0.1      |      ✔      |      i      |     ✔      |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
@@ -234,8 +234,8 @@ In this section are listed the checks applied.
 ### Metadata doesn't use the last version
 
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
-    | Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository |
-    |      |             |       | Chef   | Repository | Status      | Status      | Status     |
+    | Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
+    |      |             |       | Latest | Latest     | Status      | Status      | Status     |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Test | = 1.0.0     | 1.0.0 | 1.0.1  | 1.0.1      |      !      |      ✔      |     ✔      |
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
@@ -243,8 +243,8 @@ In this section are listed the checks applied.
 
 ### Metadata refers to a version not existing on Chef Server
     +------+-------------+------+--------+------------+-------------+-------------+------------+
-    | Name | Requirement | Used | Latest | Latest     | Requirement | Chef Server | Repository |
-    |      |             |      | Chef   | Repository | Status      | Status      | Status     |
+    | Name | Requirement | Used | Chef   | Repository | Requirement | Chef Server | Repository |
+    |      |             |      | Latest | Latest     | Status      | Status      | Status     |
     +------+-------------+------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      ✖      |      ✔      |     ✔      |
     +------+-------------+------+--------+------------+-------------+-------------+------------+
@@ -253,8 +253,8 @@ In this section are listed the checks applied.
 ### Chef Server doesn't contain any versions
 
     +------+-------------+------+--------+------------+-------------+-------------+------------+
-    | Name | Requirement | Used | Latest | Latest     | Requirement | Chef Server | Repository |
-    |      |             |      | Chef   | Repository | Status      | Status      | Status     |
+    | Name | Requirement | Used | Chef   | Repository | Requirement | Chef Server | Repository |
+    |      |             |      | Latest | Latest     | Status      | Status      | Status     |
     +------+-------------+------+--------+------------+-------------+-------------+------------+
     | Test | ~> 1.0.0    |      |        | 1.0.1      |      ✖      |      ✖      |     ✔      |
     +------+-------------+------+--------+------------+-------------+-------------+------------+
@@ -265,8 +265,8 @@ In this section are listed the checks applied.
 **Note:** In this situation is not possible to decide which version generated the one on the Chef Server.
 
     +----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+
-    | Name     | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository | Remarks |
-    |          |             |       | Chef   | Repository | Status      | Status      | Status     |         |
+    | Name     | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository | Remarks |
+    |          |             |       | Latest | Latest     | Status      | Status      | Status     |         |
     +----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+
     | database | >= 0.0.0    | 1.5.2 | 1.5.2  | 1.5.2      |      ✔      |      ✔      |     ?      | 1       |
     | database | >= 0.0.0    | 1.5.2 | 1.5.2  | 1.1.0      |      ✔      |      ✔      |     ?      | 2       |

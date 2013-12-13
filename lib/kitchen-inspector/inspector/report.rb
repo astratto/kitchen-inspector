@@ -47,7 +47,7 @@ module KitchenInspector
       class << self
         # Generate the status of dependent cookbooks as a table
         def generate(dependencies, opts)
-          headings = ["Name", "Requirement", "Used", "Latest\nChef", "Latest\nRepository", "Requirement\nStatus",
+          headings = ["Name", "Requirement", "Used", "Chef\nLatest", "Repository\nLatest", "Requirement\nStatus",
                       "Chef Server\nStatus", "Repository\nStatus"]
 
           if opts[:remarks]
