@@ -75,9 +75,11 @@ module KitchenInspector
           hash[:status] = status
           hash[:remarks] = remarks
           hash[:dependencies] = dependencies
-          hash[:parents] = parents
           hash[:chef] = chef
+          hash[:chef][:latest_version] = hash[:chef][:latest_version].to_s if hash[:chef][:latest_version]
           hash[:repomanager] = repomanager
+          hash[:repomanager][:latest_tag] = hash[:repomanager][:latest_tag].to_s if hash[:repomanager][:latest_tag]
+          hash[:repomanager][:latest_metadata] = hash[:repomanager][:latest_metadata].to_s if hash[:repomanager][:latest_metadata]
         end
       end
     end
