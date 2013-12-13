@@ -174,8 +174,8 @@ describe Report do
         output, code = Report.generate([dep1, dep1], 'table', {:remarks => true})
         expect(output).to eq( \
         "+------+-------------+------+--------+------------+-------------+-------------+------------+---------+\n" \
-        "| Name | Requirement | Used | Latest | Latest     | Requirement | Chef Server | Repository | Remarks |\n" \
-        "|      |             |      | Chef   | Repository | Status      | Status      | Status     |         |\n" \
+        "| Name | Requirement | Used | Chef   | Repository | Requirement | Chef Server | Repository | Remarks |\n" \
+        "|      |             |      | Latest | Latest     | Status      | Status      | Status     |         |\n" \
         "+------+-------------+------+--------+------------+-------------+-------------+------------+---------+\n" \
         "| #{'Test'.red} | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      #{X_MARK.red}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      | 1       |\n" \
         "| #{'Test'.red} | ~> 1.0.0    |      | 1.1.0  | 1.1.0      |      #{X_MARK.red}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      | 2       |\n" \
@@ -201,8 +201,8 @@ describe Report do
         output, code = Report.generate(@dependencies, 'table', {:remarks => true})
         expect(output).to eq( \
         "+------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
-        "| Name | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository | Remarks |\n" \
-        "|      |             |       | Chef   | Repository | Status      | Status      | Status     |         |\n" \
+        "| Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository | Remarks |\n" \
+        "|      |             |       | Latest | Latest     | Status      | Status      | Status     |         |\n" \
         "+------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
         "| Test | ~> 1.0.0    | 1.0.0 | 1.0.0  | 1.0.1      |      #{TICK_MARK.green}      |      #{INFO_MARK.bold.blue}      |     #{TICK_MARK.green}      | 1       |\n" \
         "+------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
@@ -222,8 +222,8 @@ describe Report do
         output, code = Report.generate([dep1, dep2], 'table', {:remarks => true})
         expect(output).to eq( \
         "+-----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
-        "| Name      | Requirement | Used  | Latest | Latest     | Requirement | Chef Server | Repository | Remarks |\n" \
-        "|           |             |       | Chef   | Repository | Status      | Status      | Status     |         |\n" \
+        "| Name      | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository | Remarks |\n" \
+        "|           |             |       | Latest | Latest     | Status      | Status      | Status     |         |\n" \
         "+-----------+-------------+-------+--------+------------+-------------+-------------+------------+---------+\n" \
         "| Test      | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |         |\n" \
         "|  #{INDENT_MARK} Nested | ~> 1.0.0    | 1.0.1 | 1.0.1  | 1.0.1      |      #{TICK_MARK.green}      |      #{TICK_MARK.green}      |     #{TICK_MARK.green}      |         |\n" \
