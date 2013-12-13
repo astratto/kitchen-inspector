@@ -13,6 +13,7 @@ FEATURES:
 * Add exit codes to integrate Kitchen Inspector with a CI process
 * Handle not unique projects on Repository Manager
 * Analyze transitive dependencies even when Chef's version is null
+* Shows url to Repository Manager's diff whenever possible
 
 FIXES:
 
