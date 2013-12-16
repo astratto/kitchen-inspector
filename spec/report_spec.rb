@@ -188,7 +188,7 @@ describe Report do
       end
 
       it "shows remarks with changelog" do
-        dependency_inspector.stub(:get_changelog).and_return(
+        dependency_inspector.repo_inspector.stub(:get_changelog).and_return(
           "Changelog: test_url.short"
         )
 

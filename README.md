@@ -127,9 +127,9 @@ Example:
 
 ```
 # Chef Server configuration
-chef_server_url "https://chefsrv.example.org"
-chef_username "chef_usename"
-chef_client_pem "/path/to/chef_client_pem"
+chef_server :url => "https://chefsrv.example.org",
+            :username => "chef_usename",
+            :client_pem => "/path/to/chef_client_pem"
 ```
 
 ### Gitlab

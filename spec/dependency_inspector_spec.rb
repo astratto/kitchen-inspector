@@ -20,9 +20,7 @@ describe DependencyInspector do
       it "raises an error if an unsupported Repository Manager is specified" do
           config = StringIO.new
           config.puts "repository_manager :type => 'Unknown', :base_url => 'http://localhost:8080', :token =>'test_token'"
-          config.puts "chef_server_url 'http://localhost:4000'"
-          config.puts "chef_client_pem 'testclient.pem'"
-          config.puts "chef_username 'test_user'"
+          config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
           expect do
             DependencyInspector.new config
@@ -32,9 +30,7 @@ describe DependencyInspector do
       it "raises an error if an unsupported field is specified" do
           config = StringIO.new
           config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-          config.puts "chef_server_url 'http://localhost:4000'"
-          config.puts "chef_client_pem 'testclient.pem'"
-          config.puts "chef_username 'test_user'"
+          config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
           config.puts "invalid_field 'test'"
 
           expect do
@@ -47,9 +43,7 @@ describe DependencyInspector do
           it "creates a valid Inspector" do
             config = StringIO.new
             config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-            config.puts "chef_server_url 'http://localhost:4000'"
-            config.puts "chef_client_pem 'testclient.pem'"
-            config.puts "chef_username 'test_user'"
+            config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
             inspector = DependencyInspector.new config
             inspector
@@ -60,9 +54,7 @@ describe DependencyInspector do
           it "raises an error when Gitlab Token is not configured" do
             config = StringIO.new
             config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080'"
-            config.puts "chef_server_url 'http://localhost:4000'"
-            config.puts "chef_client_pem 'testclient.pem'"
-            config.puts "chef_username 'test_user'"
+            config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
             expect do
               DependencyInspector.new config
@@ -72,9 +64,7 @@ describe DependencyInspector do
           it "raises an error when Gitlab Base Url is not configured" do
             config = StringIO.new
             config.puts "repository_manager :type => 'Gitlab', :token =>'test_token'"
-            config.puts "chef_server_url 'http://localhost:4000'"
-            config.puts "chef_client_pem 'testclient.pem'"
-            config.puts "chef_username 'test_user'"
+            config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
             expect do
               DependencyInspector.new config
@@ -88,8 +78,7 @@ describe DependencyInspector do
       it "raises an error when Server Url is not configured" do
         config = StringIO.new
         config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-        config.puts "chef_client_pem 'testclient.pem'"
-        config.puts "chef_username 'test_user'"
+        config.puts "chef_server :client_pem => 'testclient.pem', :username => 'test_user'"
 
         expect do
           DependencyInspector.new config
@@ -99,8 +88,7 @@ describe DependencyInspector do
       it "raises an error when Client PEM is not configured" do
         config = StringIO.new
         config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-        config.puts "chef_server_url 'http://localhost:4000'"
-        config.puts "chef_username 'test_user'"
+        config.puts "chef_server :server_url => 'http://localhost:4000', :username => 'test_user'"
 
         expect do
           DependencyInspector.new config
@@ -110,8 +98,7 @@ describe DependencyInspector do
       it "raises an error when Username is not configured" do
         config = StringIO.new
         config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-        config.puts "chef_server_url 'http://localhost:4000'"
-        config.puts "chef_client_pem 'testclient.pem'"
+        config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem'"
 
         expect do
           DependencyInspector.new config
@@ -226,12 +213,12 @@ describe DependencyInspector do
       }
       @chef_server.load_data data
 
-      versions = dependency_inspector.find_chef_server_versions('test')
+      versions = dependency_inspector.chef.find_chef_server_versions('test')
       expect(versions).to eq(["1.0.1"])
     end
 
     it "doesn't retrieve any versions using a missing project" do
-      versions = dependency_inspector.find_chef_server_versions('test')
+      versions = dependency_inspector.chef.find_chef_server_versions('test')
       expect(versions).to eq([])
     end
   end

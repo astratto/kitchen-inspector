@@ -45,6 +45,24 @@ module KitchenInspector
       def fix_version_name(version)
         version.gsub(/[v][\.]*/i, "")
       end
+
+      # Return from versions the best match that satisfies the given constraint
+      def satisfy(constraint, versions)
+        Solve::Solver.satisfy_best(constraint, versions).to_s
+      rescue Solve::Errors::NoSolutionError
+        nil
+      end
+
+      def get_latest_version(versions)
+        versions.collect do |v|
+          begin
+            Solve::Version.new(v)
+          rescue Solve::Errors::InvalidVersionFormat => e
+            # Skip invalid tags
+            Solve::Version.new("0.0.0")
+          end
+        end.max
+      end
     end
   end
 end

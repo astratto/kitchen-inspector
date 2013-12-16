@@ -28,12 +28,10 @@ module KitchenInspector
     class DependencyInspector
       include Utils
 
-      def initialize(config)
-        @chef_info_cache = {}
-        configure(config)
-      end
+      attr_reader :chef_inspector, :repo_inspector
+      alias :chef :chef_inspector
 
-      def configure(config)
+      def initialize(config)
         configuration = read_config(config)
 
         begin
@@ -41,10 +39,6 @@ module KitchenInspector
         rescue NoMethodError => e
           raise ConfigurationError, "Unsupported configuration: #{e.name}"
         end
-
-        raise ChefAccessNotConfiguredError, config_msg("Chef server url", "chef_server_url") unless @chef_server_url
-        raise ChefAccessNotConfiguredError, config_msg("Chef username", "chef_username") unless @chef_username
-        raise ChefAccessNotConfiguredError, config_msg("Chef client PEM", "chef_client_pem") unless @chef_client_pem
       end
 
       # Inspect your kitchen!
@@ -59,112 +53,19 @@ module KitchenInspector
         end.flatten
       end
 
-      # Initialize the Repository Manager
-      def repository_manager(config)
-        begin
-          manager_cls = "KitchenInspector::Inspector::#{config[:type]}Manager".constantize
-        rescue NameError => e
-          raise RepositoryManagerError, "Repository Manager '#{config[:type]}' not supported"
-        end
-
-        @repomanager = manager_cls.new config
-      end
-
       # Analyze Chef repo and Repository manager in order to find more information
       # about a given dependency
       def analyze_dependency(dependency, recursive)
-        chef_info = analyze_chef(dependency)
+        chef_info = @chef_inspector.analyze_chef(dependency)
 
         # Grab information from the Repository Manager
-        info_repo = analyze_from_repository(dependency, chef_info[:version_used], recursive)
+        info_repo = @repo_inspector.analyze_from_repository(dependency, chef_info[:version_used], recursive)
         deps = info_repo.collect do |dep, repo_info|
-          dep_chef_info = analyze_chef(dep)
+          dep_chef_info = @chef_inspector.analyze_chef(dep)
           update_dependency(dep, dep_chef_info, repo_info)
           dep
         end
         deps
-      end
-
-      def analyze_chef(dependency)
-        cache_key = "#{dependency.name}, #{dependency.requirement}"
-        @chef_info_cache[cache_key] ||= begin
-          chef_info = {}
-          chef_info[:versions] = find_chef_server_versions(dependency.name)
-          chef_info[:latest_version] = get_latest_version(chef_info[:versions])
-          chef_info[:version_used] = satisfy(dependency.requirement, chef_info[:versions])
-          chef_info
-        end
-      end
-
-      def analyze_from_repository(dependency, version_used, recursive)
-        repo_dependencies = []
-        projects = @repomanager.projects_by_name(dependency.name)
-
-        if projects.empty?
-          repo_dependencies << [dependency, {}]
-        else
-          projects.each do |project|
-            repo_info = info_from_repository(project)
-            repo_info[:not_unique] = projects.size > 1
-
-            # Inherit only shallow information from dependency
-            prj_dependency = Dependency.new(dependency.name, dependency.requirement)
-            prj_dependency.parents = dependency.parents
-
-            prj_dependency.parents.each do |parent|
-              parent.dependencies << prj_dependency
-            end
-
-            repo_dependencies << [prj_dependency, repo_info]
-
-            # Analyze its dependencies based on Repository Manager
-            if recursive && repo_info[:tags]
-              reference_version = get_repo_reference_version(version_used, repo_info)
-
-              children = @repomanager.project_dependencies(project, repo_info[:tags][reference_version]).collect do |dep|
-                dep.parents << prj_dependency
-                analyze_from_repository(dep, version_used, recursive)
-              end.flatten!(1)
-
-              repo_dependencies.push(*children)
-            end
-          end
-        end
-
-        repo_dependencies
-      end
-
-      # Return the reference version to be used for recursive analysis
-      #
-      # It's the version used if present. The latest available tag on the Repository
-      # Manager otherwise.
-      def get_repo_reference_version(version_used, repo_info)
-        reference_version = nil
-        reference_version = version_used if version_used && repo_info[:tags].include?(version_used)
-        reference_version = repo_info[:latest_tag].to_s unless reference_version
-        reference_version
-      end
-
-      # Return from versions the best match that satisfies the given constraint
-      def satisfy(constraint, versions)
-        Solve::Solver.satisfy_best(constraint, versions).to_s
-      rescue Solve::Errors::NoSolutionError
-        nil
-      end
-
-      # Retrieve project info from Repository Manager
-      def info_from_repository(project)
-        tags = @repomanager.tags(project)
-        latest_tag = get_latest_version(tags.keys)
-
-        latest_metadata = @repomanager.project_metadata_version(project, tags[latest_tag.to_s])
-        latest_metadata = Solve::Version.new(latest_metadata) if latest_metadata
-
-        {:tags => tags,
-         :latest_tag => latest_tag,
-         :latest_metadata => latest_metadata,
-         :source_url => @repomanager.source_url(project)
-        }
       end
 
       # Update the status of the dependency based on the version used and the
@@ -175,7 +76,7 @@ module KitchenInspector
         if !chef_info[:version_used]
           dependency.status = :err_req
           msg = 'No versions found'
-          reference_version = get_repo_reference_version(nil, repo_info)
+          reference_version = @repo_inspector.get_repo_reference_version(nil, repo_info)
           msg << ", using #{reference_version} for recursive analysis" if reference_version
 
           dependency.remarks << msg
@@ -183,7 +84,7 @@ module KitchenInspector
           relaxed_version = satisfy("~> #{chef_info[:version_used]}", chef_info[:versions])
           if relaxed_version != chef_info[:version_used]
             dependency.status = :warn_req
-            changelog_url = get_changelog(repo_info,
+            changelog_url = @repo_inspector.get_changelog(repo_info,
                                           chef_info[:version_used],
                                           relaxed_version)
             dependency.remarks << "#{relaxed_version} is available. #{changelog_url}"
@@ -198,14 +99,14 @@ module KitchenInspector
 
         if repo_info[:not_unique]
           repo_info[:status] = :warn_notunique_repo
-          dependency.remarks << "Not unique on #{@repomanager.type} (this is #{repo_info[:source_url]})"
+          dependency.remarks << "Not unique on #{@repo_inspector.manager.type} (this is #{repo_info[:source_url]})"
         end
 
         # Check whether latest tag and metadata version in Repository Manager are
         # consistent
-        unless repomanager_consistent_version?(repo_info)
+        unless @repo_inspector.consistent_version?(repo_info)
           repo_info[:status] = :warn_mismatch_repo
-          dependency.remarks << "#{@repomanager.type}'s last tag is #{repo_info[:latest_tag]} " \
+          dependency.remarks << "#{@repo_inspector.manager.type}'s last tag is #{repo_info[:latest_tag]} " \
                                   "but found #{repo_info[:latest_metadata]} in metadata.rb"
         end
 
@@ -221,14 +122,14 @@ module KitchenInspector
         if chef_info[:latest_version] && repo_info[:latest_metadata]
           if chef_info[:latest_version] > repo_info[:latest_metadata]
             comparison[:repo] = :warn_outofdate_repo
-            changelog_url = get_changelog(repo_info,
+            changelog_url = @repo_inspector.get_changelog(repo_info,
                                           repo_info[:latest_metadata].to_s,
                                           chef_info[:latest_version].to_s)
-            comparison[:remarks] << "#{@repomanager.type} out-of-date! #{changelog_url}"
+            comparison[:remarks] << "#{@repo_inspector.manager.type} out-of-date! #{changelog_url}"
             return comparison
           elsif chef_info[:latest_version] < repo_info[:latest_metadata]
             comparison[:chef] = :warn_chef
-            changelog_url = get_changelog(repo_info,
+            changelog_url = @repo_inspector.get_changelog(repo_info,
                                           chef_info[:latest_version].to_s,
                                           repo_info[:latest_metadata].to_s)
             comparison[:remarks] << "A new version might appear on Chef server. #{changelog_url}"
@@ -238,7 +139,7 @@ module KitchenInspector
 
         unless repo_info[:latest_metadata]
           comparison[:repo] = :err_repo
-          comparison[:remarks] << "#{@repomanager.type} doesn't contain any versions."
+          comparison[:remarks] << "#{@repo_inspector.manager.type} doesn't contain any versions."
         end
 
         unless chef_info[:latest_version]
@@ -249,63 +150,15 @@ module KitchenInspector
         comparison
       end
 
-      def repomanager_consistent_version?(info)
-        !(info[:latest_tag] &&
-          info[:latest_metadata] &&
-            info[:latest_tag] != info[:latest_metadata])
+      # Initialize the Chef Server configuration
+      def chef_server(config)
+        @chef_inspector = ChefInspector.new config
       end
 
-      def get_changelog(repo_info, startRev, endRev)
-        return unless repo_info[:tags]
-
-        url = @repomanager.changelog(repo_info[:source_url],
-                                               repo_info[:tags][startRev],
-                                               repo_info[:tags][endRev])
-        "Changelog: #{url}" if url
+      # Initialize the Repository Manager
+      def repository_manager(config)
+        @repo_inspector = RepositoryManagerInspector.new config
       end
-
-      # Given a project return the versions on the Chef Server
-      def find_chef_server_versions(project)
-        rest = Chef::REST.new(@chef_server_url, @chef_username, @chef_client_pem)
-        cookbook = rest.get("cookbooks/#{project}")
-        versions = []
-        versions = cookbook[project]["versions"].collect{|c| fix_version_name(c["version"])} if cookbook
-        versions
-      rescue Net::HTTPServerException
-        []
-      end
-
-      def inspect
-        "Repository Manager: #{@repomanager.type}\n" \
-        "\t#{@repomanager}\n" \
-        "Chef server url: #{@chef_server_url}\n" \
-        "Chef username: #{@chef_username}\n" \
-        "Chef client pem: #{@chef_client_pem}"
-      end
-
-      private
-        def get_latest_version(versions)
-          versions.collect do |v|
-            begin
-              Solve::Version.new(v)
-            rescue Solve::Errors::InvalidVersionFormat => e
-              # Skip invalid tags
-              Solve::Version.new("0.0.0")
-            end
-          end.max
-        end
-
-        def chef_server_url(url)
-          @chef_server_url = url
-        end
-
-        def chef_username(username)
-          @chef_username = username
-        end
-
-        def chef_client_pem(filename)
-          @chef_client_pem = filename
-        end
     end
   end
 end

@@ -28,9 +28,7 @@ end
 def generate_dependency_inspector
   config = StringIO.new
   config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-  config.puts "chef_server_url 'http://localhost:4000'"
-  config.puts "chef_client_pem '%s'" % "#{File.dirname(__FILE__)}/../data/test_client.pem"
-  config.puts "chef_username 'test_user'"
+  config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => '%s', :username => 'test_user'" % "#{File.dirname(__FILE__)}/../data/test_client.pem"
 
   inspector = DependencyInspector.new config
   inspector
