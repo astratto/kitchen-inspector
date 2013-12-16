@@ -63,6 +63,21 @@ module KitchenInspector
           end
         end.max
       end
+
+      # Evaluate only interesting lines
+      #
+      # Used also to ignore errors for missing
+      # files referenced in metadata.rb e.g., README.md
+      def eval_metadata(raw_response)
+        clean_response = raw_response.split("\n").select do |line|
+          line.strip!
+          line =~ /^depends|^name|^version/
+        end
+
+        metadata = Ridley::Chef::Cookbook::Metadata.new
+        metadata.instance_eval clean_response.join("\n")
+        metadata
+      end
     end
   end
 end

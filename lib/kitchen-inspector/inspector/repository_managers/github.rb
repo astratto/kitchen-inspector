@@ -51,9 +51,7 @@ module KitchenInspector
                             {:ref => revId, :path => "metadata.rb" })
 
         if response && response.respond_to?(:content)
-          metadata = Ridley::Chef::Cookbook::Metadata.new
-          metadata.instance_eval(Base64.decode64(response.content))
-          metadata
+          eval_metadata Base64.decode64(response.content)
         else
           nil
         end

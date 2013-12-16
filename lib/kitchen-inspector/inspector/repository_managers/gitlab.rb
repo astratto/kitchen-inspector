@@ -67,9 +67,7 @@ module KitchenInspector
                                 headers: {"PRIVATE-TOKEN" => Gitlab.private_token})
 
         if response.code == 200
-          metadata = Ridley::Chef::Cookbook::Metadata.new
-          metadata.instance_eval response.body
-          metadata
+          eval_metadata response.body
         else
           nil
         end
