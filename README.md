@@ -279,7 +279,7 @@ In this section are listed the checks applied.
 
     Remarks:
     [1]: Not unique on Github (this is github.com/opscode-cookbooks/database)
-    [2]: Not unique on Github (this is cookbooks/database)
+    [2]: Not unique on Github (this is github.com/cookbooks/database)
 
 ## LICENSE
 
