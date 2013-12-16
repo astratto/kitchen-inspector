@@ -42,8 +42,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "thor", "~> 0.18.0"
   spec.add_dependency "terminal-table", "~> 1.4.5"
   spec.add_dependency "colorize", "~> 0.6.0"
-  spec.add_dependency "gitlab"
-  spec.add_dependency "chef", ">= 11.0.0"
-  spec.add_dependency "octokit", "~> 2.0"
+  spec.add_dependency "httparty", "~> 0.10.0"
+  spec.add_dependency "gitlab", "~> 3.0"
+  spec.add_dependency "octokit", "~> 2.6"
   spec.add_dependency "googl", "~> 0.6.3"
+  spec.add_dependency "chef", ">= 11.0.0"
 end
