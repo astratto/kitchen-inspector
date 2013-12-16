@@ -53,9 +53,7 @@ describe GithubManager do
 
     it "returns the correct tags for astratto/kitchen-inspector", :type => :external do
 
-      expect(manager.tags(project)).to eq(
-            {"1.0.1" => "b935719a532c8042b51de560db09881803fbb511",
-             "1.0.0" => "0ab566a390b864e1ba844d06b4195d52a6f0975c"})
+      expect(manager.tags(project)["1.0.1"]).to eq("b935719a532c8042b51de560db09881803fbb511")
     end
   end
 
