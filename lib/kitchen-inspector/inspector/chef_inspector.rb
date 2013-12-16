@@ -29,13 +29,13 @@ module KitchenInspector
       include Utils
 
       def initialize(config)
-        @chef_server_url = config[:server_url]
+        @chef_server_url = config[:url]
         @chef_username = config[:username]
         @chef_client_pem = config[:client_pem]
 
-        raise ChefAccessNotConfiguredError, config_msg("Chef server url", "chef_server_url") unless @chef_server_url
-        raise ChefAccessNotConfiguredError, config_msg("Chef username", "chef_username") unless @chef_username
-        raise ChefAccessNotConfiguredError, config_msg("Chef client PEM", "chef_client_pem") unless @chef_client_pem
+        raise ChefAccessNotConfiguredError, config_msg("Chef Server url", ":url") unless @chef_server_url
+        raise ChefAccessNotConfiguredError, config_msg("Chef username", ":username") unless @chef_username
+        raise ChefAccessNotConfiguredError, config_msg("Chef client PEM", ":client_pem") unless @chef_client_pem
 
         @chef_info_cache = {}
       end

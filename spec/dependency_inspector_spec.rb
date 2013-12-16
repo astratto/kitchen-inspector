@@ -20,7 +20,7 @@ describe HealthBureau do
       it "raises an error if an unsupported Repository Manager is specified" do
           config = StringIO.new
           config.puts "repository_manager :type => 'Unknown', :base_url => 'http://localhost:8080', :token =>'test_token'"
-          config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
+          config.puts "chef_server :url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
           expect do
             HealthBureau.new config
@@ -30,7 +30,7 @@ describe HealthBureau do
       it "raises an error if an unsupported field is specified" do
           config = StringIO.new
           config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-          config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
+          config.puts "chef_server :url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
           config.puts "invalid_field 'test'"
 
           expect do
@@ -43,7 +43,7 @@ describe HealthBureau do
           it "creates a valid Inspector" do
             config = StringIO.new
             config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-            config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
+            config.puts "chef_server :url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
             inspector = HealthBureau.new config
             inspector
@@ -54,7 +54,7 @@ describe HealthBureau do
           it "raises an error when Gitlab Token is not configured" do
             config = StringIO.new
             config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080'"
-            config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
+            config.puts "chef_server :url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
             expect do
               HealthBureau.new config
@@ -64,7 +64,7 @@ describe HealthBureau do
           it "raises an error when Gitlab Base Url is not configured" do
             config = StringIO.new
             config.puts "repository_manager :type => 'Gitlab', :token =>'test_token'"
-            config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
+            config.puts "chef_server :url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
             expect do
               HealthBureau.new config
@@ -88,7 +88,7 @@ describe HealthBureau do
       it "raises an error when Client PEM is not configured" do
         config = StringIO.new
         config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-        config.puts "chef_server :server_url => 'http://localhost:4000', :username => 'test_user'"
+        config.puts "chef_server :url => 'http://localhost:4000', :username => 'test_user'"
 
         expect do
           HealthBureau.new config
@@ -98,7 +98,7 @@ describe HealthBureau do
       it "raises an error when Username is not configured" do
         config = StringIO.new
         config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
-        config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem'"
+        config.puts "chef_server :url => 'http://localhost:4000', :client_pem => 'testclient.pem'"
 
         expect do
           HealthBureau.new config
