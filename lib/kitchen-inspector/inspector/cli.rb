@@ -53,7 +53,7 @@ module KitchenInspector
 
       map 'inspect'   => :investigate
       def investigate(path=Dir.pwd)
-        inspector = DependencyInspector.new options[:config]
+        inspector = HealthBureau.new options[:config]
 
         dependencies = inspector.investigate(path, options[:recursive])
 

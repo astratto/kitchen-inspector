@@ -40,11 +40,11 @@ module KitchenInspector
         @chef_info_cache = {}
       end
 
-      def analyze_chef(dependency)
+      def investigate(dependency)
         cache_key = "#{dependency.name}, #{dependency.requirement}"
         @chef_info_cache[cache_key] ||= begin
           chef_info = {}
-          chef_info[:versions] = find_chef_server_versions(dependency.name)
+          chef_info[:versions] = find_versions(dependency.name)
           chef_info[:latest_version] = get_latest_version(chef_info[:versions])
           chef_info[:version_used] = satisfy(dependency.requirement, chef_info[:versions])
           chef_info
@@ -52,7 +52,7 @@ module KitchenInspector
       end
 
       # Given a project return the versions on the Chef Server
-      def find_chef_server_versions(project)
+      def find_versions(project)
         rest = Chef::REST.new(@chef_server_url, @chef_username, @chef_client_pem)
         cookbook = rest.get("cookbooks/#{project}")
         versions = []

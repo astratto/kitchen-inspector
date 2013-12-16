@@ -25,11 +25,10 @@
 
 module KitchenInspector
   module Inspector
-    class DependencyInspector
+    class HealthBureau
       include Utils
 
       attr_reader :chef_inspector, :repo_inspector
-      alias :chef :chef_inspector
 
       def initialize(config)
         configuration = read_config(config)
@@ -56,12 +55,12 @@ module KitchenInspector
       # Analyze Chef repo and Repository manager in order to find more information
       # about a given dependency
       def analyze_dependency(dependency, recursive)
-        chef_info = @chef_inspector.analyze_chef(dependency)
+        chef_info = @chef_inspector.investigate(dependency)
 
         # Grab information from the Repository Manager
-        info_repo = @repo_inspector.analyze_from_repository(dependency, chef_info[:version_used], recursive)
+        info_repo = @repo_inspector.investigate(dependency, chef_info[:version_used], recursive)
         deps = info_repo.collect do |dep, repo_info|
-          dep_chef_info = @chef_inspector.analyze_chef(dep)
+          dep_chef_info = @chef_inspector.investigate(dep)
           update_dependency(dep, dep_chef_info, repo_info)
           dep
         end
@@ -76,7 +75,7 @@ module KitchenInspector
         if !chef_info[:version_used]
           dependency.status = :err_req
           msg = 'No versions found'
-          reference_version = @repo_inspector.get_repo_reference_version(nil, repo_info)
+          reference_version = @repo_inspector.get_reference_version(nil, repo_info)
           msg << ", using #{reference_version} for recursive analysis" if reference_version
 
           dependency.remarks << msg

@@ -1,7 +1,7 @@
 require_relative 'support/spec_helper'
 
-describe DependencyInspector do
-  let(:dependency_inspector) { generate_dependency_inspector }
+describe HealthBureau do
+  let(:health_bureau) { generate_health_bureau }
 
   let(:repomanager_info) do
     {:tags =>{"1.0.0" => "a", "1.0.1" => "b"},
@@ -23,7 +23,7 @@ describe DependencyInspector do
           config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
           expect do
-            DependencyInspector.new config
+            HealthBureau.new config
           end.to raise_error(RepositoryManagerError)
       end
 
@@ -34,7 +34,7 @@ describe DependencyInspector do
           config.puts "invalid_field 'test'"
 
           expect do
-            DependencyInspector.new config
+            HealthBureau.new config
           end.to raise_error(ConfigurationError)
       end
 
@@ -45,7 +45,7 @@ describe DependencyInspector do
             config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
             config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
-            inspector = DependencyInspector.new config
+            inspector = HealthBureau.new config
             inspector
           end
         end
@@ -57,7 +57,7 @@ describe DependencyInspector do
             config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
             expect do
-              DependencyInspector.new config
+              HealthBureau.new config
             end.to raise_error(GitlabAccessNotConfiguredError)
           end
 
@@ -67,7 +67,7 @@ describe DependencyInspector do
             config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
             expect do
-              DependencyInspector.new config
+              HealthBureau.new config
             end.to raise_error(GitlabAccessNotConfiguredError)
           end
         end
@@ -81,7 +81,7 @@ describe DependencyInspector do
         config.puts "chef_server :client_pem => 'testclient.pem', :username => 'test_user'"
 
         expect do
-          DependencyInspector.new config
+          HealthBureau.new config
         end.to raise_error(ChefAccessNotConfiguredError)
       end
 
@@ -91,7 +91,7 @@ describe DependencyInspector do
         config.puts "chef_server :server_url => 'http://localhost:4000', :username => 'test_user'"
 
         expect do
-          DependencyInspector.new config
+          HealthBureau.new config
         end.to raise_error(ChefAccessNotConfiguredError)
       end
 
@@ -101,7 +101,7 @@ describe DependencyInspector do
         config.puts "chef_server :server_url => 'http://localhost:4000', :client_pem => 'testclient.pem'"
 
         expect do
-          DependencyInspector.new config
+          HealthBureau.new config
         end.to raise_error(ChefAccessNotConfiguredError)
       end
     end
@@ -113,7 +113,7 @@ describe DependencyInspector do
     end
 
     it "returns a success for correct versions on both servers" do
-      dependency_inspector.update_dependency(@dep, chef_info, repomanager_info)
+      health_bureau.update_dependency(@dep, chef_info, repomanager_info)
       expect(@dep.repomanager[:status]).to eq(:up_to_date)
       expect(@dep.chef[:status]).to eq(:up_to_date)
       expect(@dep.status).to eq(:up_to_date)
@@ -123,7 +123,7 @@ describe DependencyInspector do
       it "when a valid version cannot be found" do
         chef = {:version_used => nil}
 
-        dependency_inspector.update_dependency(@dep, chef, repomanager_info)
+        health_bureau.update_dependency(@dep, chef, repomanager_info)
         expect(@dep.status).to eq(:err_req)
       end
 
@@ -131,7 +131,7 @@ describe DependencyInspector do
         chef = {:versions => [],
                 :latest_version => nil}
 
-        dependency_inspector.update_dependency(@dep, chef, repomanager_info)
+        health_bureau.update_dependency(@dep, chef, repomanager_info)
         expect(@dep.chef[:status]).to eq(:err_chef)
       end
 
@@ -140,7 +140,7 @@ describe DependencyInspector do
                        :latest_metadata => nil}
 
 
-        dependency_inspector.update_dependency(@dep, chef_info, repomanager)
+        health_bureau.update_dependency(@dep, chef_info, repomanager)
         expect(@dep.repomanager[:status]).to eq(:err_repo)
       end
     end
@@ -149,7 +149,7 @@ describe DependencyInspector do
       it "a newer version could be used" do
         chef_info[:version_used] = "1.0.0"
 
-        dependency_inspector.update_dependency(@dep, chef_info, repomanager_info)
+        health_bureau.update_dependency(@dep, chef_info, repomanager_info)
         expect(@dep.status).to eq(:warn_req)
       end
 
@@ -157,7 +157,7 @@ describe DependencyInspector do
         chef_info = {:versions => ["1.0.0"],
                      :latest_version => Solve::Version.new("1.0.0")}
 
-        dependency_inspector.update_dependency(@dep, chef_info, repomanager_info)
+        health_bureau.update_dependency(@dep, chef_info, repomanager_info)
         expect(@dep.chef[:status]).to eq(:warn_chef)
       end
 
@@ -166,7 +166,7 @@ describe DependencyInspector do
                             :latest_metadata => Solve::Version.new("1.0.0"),
                             :latest_tag => Solve::Version.new("1.0.0")}
 
-        dependency_inspector.update_dependency(@dep, chef_info, repomanager_info)
+        health_bureau.update_dependency(@dep, chef_info, repomanager_info)
         expect(@dep.repomanager[:status]).to eq(:warn_outofdate_repo)
       end
 
@@ -175,7 +175,7 @@ describe DependencyInspector do
                        :latest_metadata => Solve::Version.new("1.0.0"),
                        :latest_tag => Solve::Version.new("1.0.1")}
 
-        dependency_inspector.update_dependency(@dep, chef_info, repomanager)
+        health_bureau.update_dependency(@dep, chef_info, repomanager)
         expect(@dep.repomanager[:status]).to eq(:warn_mismatch_repo)
       end
 
@@ -186,7 +186,7 @@ describe DependencyInspector do
                        :not_unique => true
                      }
 
-        dependency_inspector.update_dependency(@dep, chef_info, repomanager)
+        health_bureau.update_dependency(@dep, chef_info, repomanager)
         expect(@dep.repomanager[:status]).to eq(:warn_notunique_repo)
       end
     end
@@ -194,17 +194,17 @@ describe DependencyInspector do
 
   describe "#satisfy" do
     it "returns the correct version when existing" do
-      version = dependency_inspector.satisfy("~> 1.0.1", ["1.0.0", "1.0.1"])
+      version = health_bureau.satisfy("~> 1.0.1", ["1.0.0", "1.0.1"])
       expect(version).to eq("1.0.1")
     end
 
     it "returns nil when a satisfying version doesn't exist" do
-      version = dependency_inspector.satisfy("~> 1.0.1", ["1.0.0"])
+      version = health_bureau.satisfy("~> 1.0.1", ["1.0.0"])
       expect(version).to eq(nil)
     end
   end
 
-  describe "#find_chef_server_versions" do
+  describe "#find_versions" do
     it "retrieves versions using a valid project" do
       data = {"cookbooks" =>
         {
@@ -213,12 +213,12 @@ describe DependencyInspector do
       }
       @chef_server.load_data data
 
-      versions = dependency_inspector.chef.find_chef_server_versions('test')
+      versions = health_bureau.chef_inspector.find_versions('test')
       expect(versions).to eq(["1.0.1"])
     end
 
     it "doesn't retrieve any versions using a missing project" do
-      versions = dependency_inspector.chef.find_chef_server_versions('test')
+      versions = health_bureau.chef_inspector.find_versions('test')
       expect(versions).to eq([])
     end
   end
@@ -239,18 +239,18 @@ describe DependencyInspector do
 
     context "dependencies on Chef Server but not on Repository Manager" do
       it "doesn't fail" do
-        dependencies = dependency_inspector.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps")
+        dependencies = health_bureau.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps")
         expect(dependencies.count).to eq(2)
         expect(dependencies.first.repomanager).not_to be_nil
       end
 
       it "sets correct remarks" do
-        dependencies = dependency_inspector.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps")
+        dependencies = health_bureau.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps")
         expect(dependencies.first.remarks).to eq(["Gitlab doesn't contain any versions."])
       end
 
       it "sets correct chef info" do
-        dependencies = dependency_inspector.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps")
+        dependencies = health_bureau.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps")
         dep1 = dependencies.first
 
         expect(dep1.chef).not_to be_empty
@@ -281,7 +281,7 @@ describe DependencyInspector do
       end
 
       it "sets correct repomanager info without recursing" do
-        dependencies = dependency_inspector.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps", recursive=false)
+        dependencies = health_bureau.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps", recursive=false)
         dep1 = dependencies.first
 
         expect(dependencies.count).to eq(2)

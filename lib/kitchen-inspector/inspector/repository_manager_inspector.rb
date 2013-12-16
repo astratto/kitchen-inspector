@@ -37,18 +37,18 @@ module KitchenInspector
           raise RepositoryManagerError, "Repository Manager '#{config[:type]}' not supported"
         end
 
-        @repo_inspector.manager = manager_cls.new config
+        @manager = manager_cls.new config
       end
 
-      def analyze_from_repository(dependency, version_used, recursive)
+      def investigate(dependency, version_used, recursive)
         repo_dependencies = []
-        projects = manager.projects_by_name(dependency.name)
+        projects = @manager.projects_by_name(dependency.name)
 
         if projects.empty?
           repo_dependencies << [dependency, {}]
         else
           projects.each do |project|
-            repo_info = info_from_repository(project)
+            repo_info = analyze_repository(project)
             repo_info[:not_unique] = projects.size > 1
 
             # Inherit only shallow information from dependency
@@ -63,11 +63,11 @@ module KitchenInspector
 
             # Analyze its dependencies based on Repository Manager
             if recursive && repo_info[:tags]
-              reference_version = get_repo_reference_version(version_used, repo_info)
+              reference_version = get_reference_version(version_used, repo_info)
 
-              children = manager.project_dependencies(project, repo_info[:tags][reference_version]).collect do |dep|
+              children = @manager.project_dependencies(project, repo_info[:tags][reference_version]).collect do |dep|
                 dep.parents << prj_dependency
-                analyze_from_repository(dep, version_used, recursive)
+                investigate(dep, version_used, recursive)
               end.flatten!(1)
 
               repo_dependencies.push(*children)
@@ -82,26 +82,11 @@ module KitchenInspector
       #
       # It's the version used if present. The latest available tag on the Repository
       # Manager otherwise.
-      def get_repo_reference_version(version_used, repo_info)
+      def get_reference_version(version_used, repo_info)
         reference_version = nil
         reference_version = version_used if version_used && repo_info[:tags].include?(version_used)
         reference_version = repo_info[:latest_tag].to_s unless reference_version
         reference_version
-      end
-
-      # Retrieve project info from Repository Manager
-      def info_from_repository(project)
-        tags = manager.tags(project)
-        latest_tag = get_latest_version(tags.keys)
-
-        latest_metadata = manager.project_metadata_version(project, tags[latest_tag.to_s])
-        latest_metadata = Solve::Version.new(latest_metadata) if latest_metadata
-
-        {:tags => tags,
-         :latest_tag => latest_tag,
-         :latest_metadata => latest_metadata,
-         :source_url => manager.source_url(project)
-        }
       end
 
       def consistent_version?(info)
@@ -113,10 +98,26 @@ module KitchenInspector
       def get_changelog(repo_info, startRev, endRev)
         return unless repo_info[:tags]
 
-        url = manager.changelog(repo_info[:source_url],
+        url = @manager.changelog(repo_info[:source_url],
                                                repo_info[:tags][startRev],
                                                repo_info[:tags][endRev])
         "Changelog: #{url}" if url
+      end
+
+
+      # Retrieve project info from Repository Manager
+      def analyze_repository(project)
+        tags = @manager.tags(project)
+        latest_tag = get_latest_version(tags.keys)
+
+        latest_metadata = @manager.project_metadata_version(project, tags[latest_tag.to_s])
+        latest_metadata = Solve::Version.new(latest_metadata) if latest_metadata
+
+        {:tags => tags,
+         :latest_tag => latest_tag,
+         :latest_metadata => latest_metadata,
+         :source_url => @manager.source_url(project)
+        }
       end
     end
   end

@@ -1,7 +1,7 @@
 require_relative 'support/spec_helper'
 
 describe Report do
-  let(:dependency_inspector) { generate_dependency_inspector }
+  let(:health_bureau) { generate_health_bureau }
 
   let(:chef_info) {
     chef = {:versions => ["1.0.0", "1.0.1"],
@@ -19,7 +19,7 @@ describe Report do
     context "global status" do
       before(:each) do
         dep1 = Dependency.new("Test", "~> 1.0.0")
-        dependency_inspector.update_dependency(dep1, chef_info, repomanager_info)
+        health_bureau.update_dependency(dep1, chef_info, repomanager_info)
 
         @dependencies = [dep1]
       end
@@ -39,7 +39,7 @@ describe Report do
                             :latest_metadata => nil,
                             :latest_tag => nil}
 
-        dependency_inspector.update_dependency(dep1, dep1.chef, repomanager)
+        health_bureau.update_dependency(dep1, dep1.chef, repomanager)
 
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -54,7 +54,7 @@ describe Report do
         repomanager = {:tags => {"1.0.0" => "a"},
                             :latest_metadata => Solve::Version.new("1.0.0"),
                             :latest_tag => Solve::Version.new("1.0.1")}
-        dependency_inspector.update_dependency(dep1, dep1.chef, repomanager)
+        health_bureau.update_dependency(dep1, dep1.chef, repomanager)
 
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -69,7 +69,7 @@ describe Report do
         repomanager = {:tags => {"1.0.0" => "a"},
                             :latest_metadata => Solve::Version.new("1.0.0"),
                             :latest_tag => Solve::Version.new("1.0.0")}
-        dependency_inspector.update_dependency(dep1, dep1.chef, repomanager)
+        health_bureau.update_dependency(dep1, dep1.chef, repomanager)
 
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -85,7 +85,7 @@ describe Report do
                             :latest_metadata => Solve::Version.new("1.0.1"),
                             :latest_tag => Solve::Version.new("1.0.1"),
                             :not_unique => true}
-        dependency_inspector.update_dependency(dep1, dep1.chef, repomanager)
+        health_bureau.update_dependency(dep1, dep1.chef, repomanager)
 
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -100,7 +100,7 @@ describe Report do
         chef = {:versions => ["1.0.0"],
                      :latest_version => Solve::Version.new("1.0.0"),
                      :version_used => "1.0.0"}
-        dependency_inspector.update_dependency(dep1, chef, dep1.repomanager)
+        health_bureau.update_dependency(dep1, chef, dep1.repomanager)
 
         output, code = Report.generate(@dependencies, 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -118,7 +118,7 @@ describe Report do
         repomanager = {:tags => {"1.0.0" => "a", "1.0.1" => "b"},
                             :latest_metadata => Solve::Version.new("1.0.1"),
                             :latest_tag => Solve::Version.new("1.0.1")}
-        dependency_inspector.update_dependency(dep1, chef, repomanager)
+        health_bureau.update_dependency(dep1, chef, repomanager)
 
         output, code = Report.generate([dep1], 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -136,7 +136,7 @@ describe Report do
         repomanager = {:tags => {"1.1.0" => "c"},
                             :latest_metadata => Solve::Version.new("1.1.0"),
                             :latest_tag => Solve::Version.new("1.1.0")}
-        dependency_inspector.update_dependency(dep1, chef, repomanager)
+        health_bureau.update_dependency(dep1, chef, repomanager)
 
         output, code = Report.generate([dep1], 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -151,7 +151,7 @@ describe Report do
         chef = {:versions => [],
                      :latest_version => nil,
                      :version_used => nil}
-        dependency_inspector.update_dependency(dep1, chef, dep1.repomanager)
+        health_bureau.update_dependency(dep1, chef, dep1.repomanager)
 
         output, code = Report.generate([dep1], 'table', {})
         expect(output.split("\n").grep(/Test|Status:/).join("\n")).to eq( \
@@ -169,7 +169,7 @@ describe Report do
         repomanager = {:tags => {"1.1.0" => "c"},
                             :latest_metadata => Solve::Version.new("1.1.0"),
                             :latest_tag => Solve::Version.new("1.1.0")}
-        dependency_inspector.update_dependency(dep1, chef, repomanager)
+        health_bureau.update_dependency(dep1, chef, repomanager)
 
         output, code = Report.generate([dep1, dep1], 'table', {:remarks => true})
         expect(output).to eq( \
@@ -188,7 +188,7 @@ describe Report do
       end
 
       it "shows remarks with changelog" do
-        dependency_inspector.repo_inspector.stub(:get_changelog).and_return(
+        health_bureau.repo_inspector.stub(:get_changelog).and_return(
           "Changelog: test_url.short"
         )
 
@@ -196,7 +196,7 @@ describe Report do
         chef = {:versions => ["1.0.0"],
                      :latest_version => Solve::Version.new("1.0.0"),
                      :version_used => "1.0.0"}
-        dependency_inspector.update_dependency(dep1, chef, dep1.repomanager)
+        health_bureau.update_dependency(dep1, chef, dep1.repomanager)
 
         output, code = Report.generate(@dependencies, 'table', {:remarks => true})
         expect(output).to eq( \
@@ -217,7 +217,7 @@ describe Report do
         dep2 = Dependency.new("Nested", "~> 1.0.0")
         dep2.parents << dep1
         dep1.dependencies << dep2
-        dependency_inspector.update_dependency(dep2, chef_info, repomanager_info)
+        health_bureau.update_dependency(dep2, chef_info, repomanager_info)
 
         output, code = Report.generate([dep1, dep2], 'table', {:remarks => true})
         expect(output).to eq( \
