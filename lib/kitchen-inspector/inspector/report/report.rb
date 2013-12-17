@@ -45,7 +45,11 @@ module KitchenInspector
     #
     class TableReport
       class << self
-        # Generate the status of dependent cookbooks as a table
+        # Generate a report in tabular format
+        #
+        # @param dependencies [Array<Dependency>] list of cookbook dependency objects
+        # @params opts [Hash] options (only flag to show remarks at this stage)
+        # @return [Array] printable report and global status code
         def generate(dependencies, opts)
           headings = ["Name", "Requirement", "Used", "Chef\nLatest", "Repository\nLatest", "Requirement\nStatus",
                       "Chef Server\nStatus", "Repository\nStatus"]
@@ -153,14 +157,18 @@ module KitchenInspector
     # Return Kitchen's status in JSON format
     class JSONReport
       class << self
+        # @param dependencies [Array<Dependency>] list of dependencies
+        # @return [Array] JSON report and global status code
         def generate(dependencies)
-          JSON.pretty_generate(dependencies_hash(dependencies))
+          # Show Status
+          g_status, g_status_code = StatusReporter.global_status(dependencies)
+
+          [JSON.pretty_generate(dependencies_hash(dependencies)), g_status_code]
         end
 
         # Converts the dependency objects to JSON object
         #
-        # @param dependencies [Array<Dependency>] list of cookbook dependency objects
-        #
+        # @param dependencies [Array<Dependency>] list of dependencies
         def dependencies_hash(dependencies)
           {}.tap do |hash|
             dependencies.each do |dependency|
