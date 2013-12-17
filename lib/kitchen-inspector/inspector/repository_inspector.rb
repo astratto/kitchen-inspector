@@ -25,7 +25,7 @@
 
 module KitchenInspector
   module Inspector
-    class RepositoryManagerInspector
+    class RepositoryInspector
       include Utils
 
       attr_accessor :manager

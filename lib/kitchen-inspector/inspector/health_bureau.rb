@@ -174,7 +174,7 @@ module KitchenInspector
 
       # Initialize the Repository Manager
       def repository_manager(config)
-        @repo_inspector = RepositoryManagerInspector.new config
+        @repo_inspector = RepositoryInspector.new config
       end
     end
   end

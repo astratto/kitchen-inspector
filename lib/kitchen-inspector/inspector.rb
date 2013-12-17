@@ -38,7 +38,7 @@ require 'kitchen-inspector/inspector/common'
 require 'kitchen-inspector/inspector/dependency'
 
 require 'kitchen-inspector/inspector/chef_inspector'
-require 'kitchen-inspector/inspector/repository_manager_inspector'
+require 'kitchen-inspector/inspector/repository_inspector'
 require 'kitchen-inspector/inspector/health_bureau'
 
 require 'kitchen-inspector/inspector/repository_managers/base'
