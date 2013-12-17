@@ -40,6 +40,13 @@ module KitchenInspector
         @manager = manager_cls.new config
       end
 
+      # Given a dependency and a version provided by Chef Server,
+      # analyze that dependency and its transitive dependencies (if recursive)
+      #
+      # It also detects whether multiple projects exist with the same name
+      # e.g., different users or forks
+      #
+      # @return [Array] containing pairs [dependency, repository_information]
       def investigate(dependency, version_used, recursive)
         repo_dependencies = []
         projects = @manager.projects_by_name(dependency.name)
@@ -65,7 +72,8 @@ module KitchenInspector
             if recursive && repo_info[:tags]
               reference_version = get_reference_version(version_used, repo_info)
 
-              children = @manager.project_dependencies(project, repo_info[:tags][reference_version]).collect do |dep|
+              children = @manager.project_dependencies(project,
+                                    repo_info[:tags][reference_version]).collect do |dep|
                 dep.parents << prj_dependency
                 investigate(dep, version_used, recursive)
               end.flatten!(1)
@@ -80,7 +88,7 @@ module KitchenInspector
 
       # Return the reference version to be used for recursive analysis
       #
-      # It's the version used if present. The latest available tag on the Repository
+      # It's the version used, if present. The latest available tag on the Repository
       # Manager otherwise.
       def get_reference_version(version_used, repo_info)
         reference_version = nil
@@ -89,12 +97,14 @@ module KitchenInspector
         reference_version
       end
 
+      # Check whether tag and metadata's version match
       def consistent_version?(info)
         !(info[:latest_tag] &&
           info[:latest_metadata] &&
             info[:latest_tag] != info[:latest_metadata])
       end
 
+      # Return an url pointing to the diff between startRev and endRev
       def get_changelog(repo_info, startRev, endRev)
         return unless repo_info[:tags]
 
@@ -103,7 +113,6 @@ module KitchenInspector
                                                repo_info[:tags][endRev])
         "Changelog: #{url}" if url
       end
-
 
       # Retrieve project info from Repository Manager
       def analyze_repository(project)

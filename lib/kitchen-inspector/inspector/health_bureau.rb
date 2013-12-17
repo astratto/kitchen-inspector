@@ -25,6 +25,8 @@
 
 module KitchenInspector
   module Inspector
+    # Main class that, starting from a cookbook, analyzes its dependencies
+    # using its "inspectors" and returns a collection of analyzed dependencies
     class HealthBureau
       include Utils
 
@@ -43,6 +45,10 @@ module KitchenInspector
       # Inspect your kitchen!
       #
       # If recursive is specified, dependencies' metadata are downloaded and recursively analyzed
+      #
+      # @param path [String] path to the cookbook to be analyzed
+      # @param recursive [Boolean] whether transitive dependencies should be analyzed
+      # @return [Array<Dependency>] analyzed dependency and its transitive dependencies
       def investigate(path, recursive=true)
         raise NotACookbookError, 'Path is not a cookbook' unless File.exists?(File.join(path, 'metadata.rb'))
 
@@ -54,6 +60,10 @@ module KitchenInspector
 
       # Analyze Chef repo and Repository manager in order to find more information
       # about a given dependency
+      #
+      # @param dependency [Dependency] dependency to be analyzed
+      # @param recursive [Boolean] whether transitive dependencies should be analyzed
+      # @return [Array<Dependency>] analyzed dependency and its transitive dependencies
       def analyze_dependency(dependency, recursive)
         chef_info = @chef_inspector.investigate(dependency)
 
@@ -67,8 +77,12 @@ module KitchenInspector
         deps
       end
 
-      # Update the status of the dependency based on the version used and the
-      # latest version available on the Repository Manager
+      # Update in-place a dependency based on information retrieved from
+      # Chef Server and Repository Manager
+      #
+      # @param dependency [Dependency] dependency to be updated
+      # @param chef_info [Hash] information from Chef Server
+      # @param repo_info [Hash] information from Repository Manager
       def update_dependency(dependency, chef_info, repo_info)
         dependency.status = :up_to_date
 
@@ -114,6 +128,10 @@ module KitchenInspector
       end
 
       # Compare Repository Manager and Chef Server
+      #
+      # @param chef_info [Hash] information from Chef Server
+      # @param repo_info [Hash] information from Repository Manager
+      # @return [Hash] containing servers statuses and remarks
       def compare_repo_chef(chef_info, repo_info)
         comparison = {:chef => :up_to_date, :repo => :up_to_date,
                   :remarks => []}

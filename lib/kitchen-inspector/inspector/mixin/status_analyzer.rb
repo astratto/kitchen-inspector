@@ -28,9 +28,6 @@ module KitchenInspector
     class StatusAnalyzer
       class << self
         # Return a global status
-        #
-        # Note that global :err_chef is not possible since there would
-        # be at least one :err_req that takes precedence
         def global_status(dependencies)
           result = nil
           dependencies.each do |dep|

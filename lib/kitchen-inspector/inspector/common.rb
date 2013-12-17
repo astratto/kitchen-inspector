@@ -41,6 +41,7 @@ module KitchenInspector
     INDENT_MARK = "\u203A"
     QUESTION_MARK = "?"
 
+    # Dependency statuses
     STATUSES = {
       :up_to_date => TICK_MARK,
       :err_req => X_MARK,
@@ -54,6 +55,10 @@ module KitchenInspector
     }
     STATUSES.default = ' '
 
+    # Possible return codes
+    #
+    # Note that global :err_chef is not possible since there would
+    # be at least one :err_req that takes precedence
     STATUS_TO_RETURN_CODES = {
       :up_to_date => 0,
       :err_req => 100,
