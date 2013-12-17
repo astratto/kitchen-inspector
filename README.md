@@ -21,10 +21,16 @@ It assumes that your kitchen is composed by:
 
 ## Installation
 
-Install it with:
+Install it from RubyGems.org with:
 
 ```bash
 $ gem install kitchen-inspector
+```
+
+Or with Rake:
+
+```bash
+[kitchen-inspector_clone_dir]$ rake install
 ```
 
 Repository Managers are loaded dynamically, so you should also install specific gems.
@@ -192,7 +198,7 @@ These are the available exit codes (see *common.rb*):
 
 In this section are listed the checks applied.
 
-### Everything is up to date
+#### Everything is up to date
 
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
@@ -202,7 +208,7 @@ In this section are listed the checks applied.
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     Status: up-to-date (✔)
 
-### Repository Manager doesn't contain any versions
+#### Repository Manager doesn't contain any versions
 
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
@@ -212,7 +218,7 @@ In this section are listed the checks applied.
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     Status: err-repo (✖)
 
-### Repository Manager contains a mismatched tag/metadata's version
+#### Repository Manager contains a mismatched tag/metadata's version
 
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
@@ -222,7 +228,7 @@ In this section are listed the checks applied.
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     Status: warn-mismatch-repo (!)
 
-### Repository Manager doesn't contain the last version
+#### Repository Manager doesn't contain the last version
 
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
@@ -232,7 +238,7 @@ In this section are listed the checks applied.
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     Status: warn-outofdate-repo (!!)
 
-### Chef Server doesn't contain the last version
+#### Chef Server doesn't contain the last version
 
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
@@ -242,7 +248,7 @@ In this section are listed the checks applied.
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     Status: warn-chef (i)
 
-### Metadata doesn't use the last version
+#### Metadata doesn't use the last version
 
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     | Name | Requirement | Used  | Chef   | Repository | Requirement | Chef Server | Repository |
@@ -252,7 +258,7 @@ In this section are listed the checks applied.
     +------+-------------+-------+--------+------------+-------------+-------------+------------+
     Status: warn-req (!)
 
-### Metadata refers to a version not existing on Chef Server
+#### Metadata refers to a version not existing on Chef Server
     +------+-------------+------+--------+------------+-------------+-------------+------------+
     | Name | Requirement | Used | Chef   | Repository | Requirement | Chef Server | Repository |
     |      |             |      | Latest | Latest     | Status      | Status      | Status     |
@@ -261,7 +267,7 @@ In this section are listed the checks applied.
     +------+-------------+------+--------+------------+-------------+-------------+------------+
     Status: err (✖)
 
-### Chef Server doesn't contain any versions
+#### Chef Server doesn't contain any versions
 
     +------+-------------+------+--------+------------+-------------+-------------+------------+
     | Name | Requirement | Used | Chef   | Repository | Requirement | Chef Server | Repository |
@@ -271,7 +277,7 @@ In this section are listed the checks applied.
     +------+-------------+------+--------+------------+-------------+-------------+------------+
     Status: err (✖)
 
-### Repository Manager contains two or more projects with the same name
+#### Repository Manager contains two or more projects with the same name
 
 **Note:** In this situation is not possible to decide which version generated the one on the Chef Server.
 
@@ -288,9 +294,18 @@ In this section are listed the checks applied.
     [1]: Not unique on Github (this is github.com/opscode-cookbooks/database)
     [2]: Not unique on Github (this is github.com/cookbooks/database)
 
+## Testing
+
+Kitchen Inspector is tested using RSpec.
+You can run tests using:
+
+```bash
+$ rake test
+```
+
 ## LICENSE
 
-Author:: Stefano Tortarolo <stefano.tortarolo@gmail.com>
+Author:: Stefano Tortarolo <stefano.tortarolo@gmail.com\>
 
 Copyright:: Copyright (c) 2013
 License:: MIT License

@@ -48,7 +48,7 @@ module KitchenInspector
         # Generate a report in tabular format
         #
         # @param dependencies [Array<Dependency>] list of cookbook dependency objects
-        # @params opts [Hash] options (only flag to show remarks at this stage)
+        # @param opts [Hash] options (only flag to show remarks at this stage)
         # @return [Array] printable report and global status code
         def generate(dependencies, opts)
           headings = ["Name", "Requirement", "Used", "Chef\nLatest", "Repository\nLatest", "Requirement\nStatus",
