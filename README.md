@@ -305,7 +305,7 @@ $ rake test
 
 ## LICENSE
 
-Author:: Stefano Tortarolo <stefano.tortarolo@gmail.com\>
+Author:: Stefano Tortarolo (stefano.tortarolo@gmail.com)
 
 Copyright:: Copyright (c) 2013
 License:: MIT License
