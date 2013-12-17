@@ -42,9 +42,5 @@ describe Cli do
         cli.investigate
       end.to exit_with_code(STATUS_TO_RETURN_CODES[:'error-notacookbook'])
     end
-
-    it "generates a correct table report"
-
-    it "generates a correct json report"
   end
 end
