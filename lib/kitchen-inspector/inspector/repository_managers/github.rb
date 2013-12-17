@@ -31,16 +31,16 @@ end
 
 module KitchenInspector
   module Inspector
-    class GithubManager
+    class GitHubManager
       include BaseManager
 
-      class GithubUsersNotConfiguredError < StandardError; end
+      class GitHubUsersNotConfiguredError < StandardError; end
 
       def initialize(config)
         super()
-        raise GithubUsersNotConfiguredError, config_msg("Github allowed users", "allowed_users") unless config[:allowed_users]
+        raise GitHubUsersNotConfiguredError, config_msg("GitHub allowed users", "allowed_users") unless config[:allowed_users]
 
-        @type = "Github"
+        @type = "GitHub"
         @allowed_users = config[:allowed_users]
         @projects_cache = {}
 
@@ -80,7 +80,7 @@ module KitchenInspector
         end
       end
 
-      # Given a project return the tags on Github
+      # Given a project return the tags on GitHub
       def retrieve_tags(project)
         tags = {}
         Octokit.tags(project.full_name).collect do |tag|

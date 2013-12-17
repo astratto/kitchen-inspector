@@ -29,7 +29,7 @@ describe HealthBureau do
 
       it "raises an error if an unsupported field is specified" do
           config = StringIO.new
-          config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
+          config.puts "repository_manager :type => 'GitLab', :base_url => 'http://localhost:8080', :token =>'test_token'"
           config.puts "chef_server :url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
           config.puts "invalid_field 'test'"
 
@@ -38,11 +38,11 @@ describe HealthBureau do
           end.to raise_error(ConfigurationError)
       end
 
-      context "Gitlab" do
+      context "GitLab" do
         context "with a full configuration" do
           it "creates a valid Inspector" do
             config = StringIO.new
-            config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
+            config.puts "repository_manager :type => 'GitLab', :base_url => 'http://localhost:8080', :token =>'test_token'"
             config.puts "chef_server :url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
             inspector = HealthBureau.new config
@@ -51,24 +51,24 @@ describe HealthBureau do
         end
 
         context "with invalid configuration" do
-          it "raises an error when Gitlab Token is not configured" do
+          it "raises an error when GitLab Token is not configured" do
             config = StringIO.new
-            config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080'"
+            config.puts "repository_manager :type => 'GitLab', :base_url => 'http://localhost:8080'"
             config.puts "chef_server :url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
             expect do
               HealthBureau.new config
-            end.to raise_error(GitlabAccessNotConfiguredError)
+            end.to raise_error(GitLabAccessNotConfiguredError)
           end
 
-          it "raises an error when Gitlab Base Url is not configured" do
+          it "raises an error when GitLab Base Url is not configured" do
             config = StringIO.new
-            config.puts "repository_manager :type => 'Gitlab', :token =>'test_token'"
+            config.puts "repository_manager :type => 'GitLab', :token =>'test_token'"
             config.puts "chef_server :url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
 
             expect do
               HealthBureau.new config
-            end.to raise_error(GitlabAccessNotConfiguredError)
+            end.to raise_error(GitLabAccessNotConfiguredError)
           end
         end
       end
@@ -77,7 +77,7 @@ describe HealthBureau do
     context "Chef Server" do
       it "raises an error when Server Url is not configured" do
         config = StringIO.new
-        config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
+        config.puts "repository_manager :type => 'GitLab', :base_url => 'http://localhost:8080', :token =>'test_token'"
         config.puts "chef_server :client_pem => 'testclient.pem', :username => 'test_user'"
 
         expect do
@@ -87,7 +87,7 @@ describe HealthBureau do
 
       it "raises an error when Client PEM is not configured" do
         config = StringIO.new
-        config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
+        config.puts "repository_manager :type => 'GitLab', :base_url => 'http://localhost:8080', :token =>'test_token'"
         config.puts "chef_server :url => 'http://localhost:4000', :username => 'test_user'"
 
         expect do
@@ -97,7 +97,7 @@ describe HealthBureau do
 
       it "raises an error when Username is not configured" do
         config = StringIO.new
-        config.puts "repository_manager :type => 'Gitlab', :base_url => 'http://localhost:8080', :token =>'test_token'"
+        config.puts "repository_manager :type => 'GitLab', :base_url => 'http://localhost:8080', :token =>'test_token'"
         config.puts "chef_server :url => 'http://localhost:4000', :client_pem => 'testclient.pem'"
 
         expect do
@@ -225,7 +225,7 @@ describe HealthBureau do
 
   describe "#investigate" do
     before(:each) do
-      GitlabManager.any_instance.stub(:projects_by_name).and_return([])
+      GitLabManager.any_instance.stub(:projects_by_name).and_return([])
 
       data = {"cookbooks" =>
         {
@@ -246,7 +246,7 @@ describe HealthBureau do
 
       it "sets correct remarks" do
         dependencies = health_bureau.investigate("#{File.dirname(__FILE__)}/data/cookbook_deps")
-        expect(dependencies.first.remarks).to eq(["Gitlab doesn't contain any versions."])
+        expect(dependencies.first.remarks).to eq(["GitLab doesn't contain any versions."])
       end
 
       it "sets correct chef info" do
@@ -267,15 +267,15 @@ describe HealthBureau do
         allow(project).to receive(:id).and_return(1)
         allow(project).to receive(:path_with_namespace).and_return("group/project")
 
-        GitlabManager.any_instance.stub(:projects_by_name).and_return([
+        GitLabManager.any_instance.stub(:projects_by_name).and_return([
           project
         ])
 
-        GitlabManager.any_instance.stub(:tags).with(project).and_return(
+        GitLabManager.any_instance.stub(:tags).with(project).and_return(
           { "1.0.1" => "fake_sha1" }
         )
 
-        GitlabManager.any_instance.stub(:project_metadata_version).with(project, "fake_sha1").and_return(
+        GitLabManager.any_instance.stub(:project_metadata_version).with(project, "fake_sha1").and_return(
           "1.0.1"
         )
       end

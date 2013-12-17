@@ -17,7 +17,7 @@ It assumes that your kitchen is composed by:
 * a Chef server containing the cookbooks to be used
 * a Repository Manager hosting cookbook's development
 
-**Note:** at this stage Gitlab and GitHub are supported.
+**Note:** at this stage GitLab and GitHub are supported.
 
 ## Installation
 
@@ -117,10 +117,10 @@ Two display formats are supported: table and json
     Status: warn-outofdate-repo (!!)
 
     Remarks:
-    [1]: Gitlab's last tag is 1.8.4 but found 1.8.2 in metadata.rb
+    [1]: GitLab's last tag is 1.8.4 but found 1.8.2 in metadata.rb
     [2]: A new version might appear on Chef server
-    [3]: Gitlab's last tag is 3.1.0 but found 3.0.5 in metadata.rb
-    [4]: Gitlab out-of-date!
+    [3]: GitLab's last tag is 3.1.0 but found 3.0.5 in metadata.rb
+    [4]: GitLab out-of-date!
 
 ### Recursive dependencies
 
@@ -145,17 +145,17 @@ chef_server :url => "https://chefsrv.example.org",
             :client_pem => "/path/to/chef_client_pem"
 ```
 
-### Gitlab
+### GitLab
 
-Gitlab access can be configured specifying a *token* and a *base_url*.
+GitLab access can be configured specifying a *token* and a *base_url*.
 
 Example:
 
 ```ruby
 # Repository Manager configuration
-repository_manager :type => "Gitlab",
+repository_manager :type => "GitLab",
                    :base_url => "http://gitlab.example.org",
-                   :token => "gitlab_token" # (Gitlab > Profile > Account)
+                   :token => "gitlab_token" # (GitLab > Profile > Account)
 ```
 
 ### GitHub
@@ -171,8 +171,8 @@ Example:
 
 ```ruby
 # Repository Manager configuration
-repository_manager :type => "Github",
-                   :token => "gitlab_token",
+repository_manager :type => "GitHub",
+                   :token => "github_token",
                    :allowed_users => ["opscode-cookbooks"]
 ```
 
@@ -291,8 +291,8 @@ In this section are listed the checks applied.
     Status: warn-notunique-repo (?)
 
     Remarks:
-    [1]: Not unique on Github (this is github.com/opscode-cookbooks/database)
-    [2]: Not unique on Github (this is github.com/cookbooks/database)
+    [1]: Not unique on GitHub (this is github.com/opscode-cookbooks/database)
+    [2]: Not unique on GitHub (this is github.com/cookbooks/database)
 
 ## Testing
 

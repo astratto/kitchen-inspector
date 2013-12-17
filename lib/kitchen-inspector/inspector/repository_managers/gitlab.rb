@@ -31,9 +31,9 @@ end
 
 module KitchenInspector
   module Inspector
-    class GitlabAccessNotConfiguredError < StandardError; end
+    class GitLabAccessNotConfiguredError < StandardError; end
 
-    class GitlabManager
+    class GitLabManager
       include BaseManager
 
       REPO_PER_PAGE = 1000
@@ -41,10 +41,10 @@ module KitchenInspector
       def initialize(config)
         super()
 
-        raise GitlabAccessNotConfiguredError, config_msg("Gitlab base url", "base_url") unless config[:base_url]
-        raise GitlabAccessNotConfiguredError, config_msg("Gitlab Private Token", "token") unless config[:token]
+        raise GitLabAccessNotConfiguredError, config_msg("GitLab base url", "base_url") unless config[:base_url]
+        raise GitLabAccessNotConfiguredError, config_msg("GitLab Private Token", "token") unless config[:token]
 
-        @type = "Gitlab"
+        @type = "GitLab"
         @gitlab_token = config[:token]
         @gitlab_base_url = config[:base_url]
         @gitlab_api_url = "#{@gitlab_base_url}/api/v3"
@@ -78,7 +78,7 @@ module KitchenInspector
         end
       end
 
-      # Given a project return the tags on Gitlab
+      # Given a project return the tags on GitLab
       def retrieve_tags(project)
         tags = {}
         Gitlab.tags(project.id).collect do |tag|

@@ -89,7 +89,7 @@ module KitchenInspector
           end
       end
 
-      # Given a project return the tags on Gitlab
+      # Given a project return the tags on the Repository Manager
       def tags(project)
         cache_key = project.id
         @tags_cache[cache_key] ||= retrieve_tags(project)

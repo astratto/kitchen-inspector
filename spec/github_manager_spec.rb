@@ -1,10 +1,10 @@
 require_relative 'support/spec_helper'
 
-describe GithubManager do
+describe GitHubManager do
   let(:manager) do
-    config = {:type => "Github", :allowed_users => ["astratto"]}
+    config = {:type => "GitHub", :allowed_users => ["astratto"]}
 
-    manager = GithubManager.new config
+    manager = GitHubManager.new config
     manager
   end
 
@@ -20,23 +20,23 @@ describe GithubManager do
   describe "#initialize" do
     context "full configuration" do
       it "creates a valid Manager" do
-        config = {:type => "Github",
+        config = {:type => "GitHub",
                   :token => ENV['GITHUB_TOKEN'],
                   :allowed_users => ["astratto"]
                 }
 
-        manager = GithubManager.new config
+        manager = GitHubManager.new config
         manager
       end
     end
 
     context "invalid configuration" do
       it "raise an error when users are not configured" do
-        config = {:type => "Github",
+        config = {:type => "GitHub",
                   :token => ENV['GITHUB_TOKEN']
                 }
 
-        expect{GithubManager.new(config)}.to raise_error(GithubManager::GithubUsersNotConfiguredError)
+        expect{GitHubManager.new(config)}.to raise_error(GitHubManager::GitHubUsersNotConfiguredError)
       end
     end
   end

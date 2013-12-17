@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.version       = git_version
   spec.authors       = ["Stefano Tortarolo"]
   spec.email         = ["stefano.tortarolo@gmail.com"]
-  spec.description   = %q{Given a Chef cookbook, verifies its dependencies against a Chef Server and a Repository Manager instance (i.e., Gitlab)}
+  spec.description   = %q{Given a Chef cookbook, verifies its dependencies against a Chef Server and a Repository Manager instance (i.e., GitHub/GitLab)}
   spec.summary       = %q{Kitchen integrity checker}
   spec.homepage      = "https://github.com/astratto/kitchen-inspector"
   spec.license       = "MIT"
