@@ -36,6 +36,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'chef-zero'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'coveralls'
+  spec.add_development_dependency "gitlab", "~> 3.0"
+  spec.add_development_dependency "octokit", "~> 2.6"
 
   spec.add_dependency "solve", "~> 0.8.0"
   spec.add_dependency "berkshelf", "~> 2.0.10"
@@ -43,8 +45,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "terminal-table", "~> 1.4.5"
   spec.add_dependency "colorize", "~> 0.6.0"
   spec.add_dependency "httparty", "~> 0.10.0"
-  spec.add_dependency "gitlab", "~> 3.0"
-  spec.add_dependency "octokit", "~> 2.6"
   spec.add_dependency "googl", "~> 0.6.3"
   spec.add_dependency "chef", ">= 11.0.0"
 end

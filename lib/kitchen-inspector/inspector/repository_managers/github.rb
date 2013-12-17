@@ -22,7 +22,12 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-require 'octokit'
+begin
+  require 'octokit'
+rescue LoadError
+  raise KitchenInspector::Inspector::RepositoryManagerError,
+    "GitHub support requires 'octokit'. Please install it with 'gem install octokit'."
+end
 
 module KitchenInspector
   module Inspector

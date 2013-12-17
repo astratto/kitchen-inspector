@@ -22,7 +22,12 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-require 'gitlab'
+begin
+  require 'gitlab'
+rescue LoadError
+  raise KitchenInspector::Inspector::RepositoryManagerError,
+    "GitLab support requires 'gitlab'. Please install it with 'gem install gitlab'."
+end
 
 module KitchenInspector
   module Inspector

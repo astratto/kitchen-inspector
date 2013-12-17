@@ -27,6 +27,13 @@ Install it with:
 $ gem install kitchen-inspector
 ```
 
+Repository Managers are loaded dynamically, so you should also install specific gems.
+
+If you plan to use Kitchen Inspector with:
+
+* GitHub: ```gem install octokit```
+* GitLab: ```gem install gitlab```
+
 ## Usage
 
 A valid configuration must be provided in order to configure the Chef Server and the Repository Manager.  

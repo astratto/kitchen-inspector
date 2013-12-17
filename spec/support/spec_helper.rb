@@ -2,6 +2,9 @@ require 'coveralls'
 Coveralls.wear!
 
 require 'kitchen-inspector/inspector'
+require 'kitchen-inspector/inspector/repository_managers/github'
+require 'kitchen-inspector/inspector/repository_managers/gitlab'
+
 require 'chef_zero/server'
 
 include KitchenInspector::Inspector
