@@ -138,7 +138,7 @@ $ kitchen-inspector --config config_example.rb
 
 Example:
 
-```
+```ruby
 # Chef Server configuration
 chef_server :url => "https://chefsrv.example.org",
             :username => "chef_usename",
