@@ -62,7 +62,7 @@ module KitchenInspector
           table = Terminal::Table.new headings: headings, rows: rows
 
           # Show Status
-          g_status, g_status_code = StatusAnalyzer.global_status(dependencies)
+          g_status, g_status_code = StatusReporter.global_status(dependencies)
 
           if opts[:remarks]
             remarks_result = remarks.each_with_index.collect{|remark, idx| "[#{idx + 1}]: #{remark}"}.join("\n")
@@ -113,9 +113,9 @@ module KitchenInspector
         def generate_row(dependency, remarks_counter, level, opts)
           row_remarks = []
 
-          status = StatusAnalyzer.status_to_mark(dependency.status)
-          chef_status = StatusAnalyzer.status_to_mark(dependency.chef[:status])
-          repomanager_status = StatusAnalyzer.status_to_mark(dependency.repomanager[:status])
+          status = StatusReporter.status_to_mark(dependency.status)
+          chef_status = StatusReporter.status_to_mark(dependency.chef[:status])
+          repomanager_status = StatusReporter.status_to_mark(dependency.repomanager[:status])
 
           name = indent_name(dependency.name.dup, level)
           name = name.red if dependency.status == :err_req

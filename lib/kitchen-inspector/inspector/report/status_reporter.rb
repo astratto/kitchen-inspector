@@ -25,7 +25,8 @@
 
 module KitchenInspector
   module Inspector
-    class StatusAnalyzer
+    # Provides functions to report single or global status
+    class StatusReporter
       class << self
         # Return a global status
         def global_status(dependencies)
