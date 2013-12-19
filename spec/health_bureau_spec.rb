@@ -1,6 +1,13 @@
 require_relative 'support/spec_helper'
 
 describe HealthBureau do
+  before(:each) do
+    # Ignore existing knife.rb configuration
+    orig_file = File.method(:exists?)
+    File.stub(:exists?).with(anything()) { |*args| orig_file.call(*args) }
+    File.stub(:exists?).with("#{Dir.home}/.chef/knife.rb").and_return(false)
+  end
+
   let(:health_bureau) { generate_health_bureau }
 
   let(:repomanager_info) do

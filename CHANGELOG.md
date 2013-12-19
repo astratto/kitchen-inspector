@@ -3,6 +3,10 @@ Changes
 Next Version
 --
 
+FEATURES:
+
+* Fallback to *knife.rb* for Chef Server configuration
+
 FIXES:
 
 * Detect when inspectors are not configured at all

@@ -42,7 +42,7 @@ module KitchenInspector
         end
 
         raise ConfigurationError, "Chef Server is not configured properly, " \
-                                  "please check your 'chef_server' configuration." unless @chef_inspector
+                                  "please check your 'chef_server' configuration." unless validate_chef_inspector
 
         raise ConfigurationError, "Repository Manager is not configured properly, " \
                                   "please check your 'repository_manager' configuration." unless @repo_inspector
@@ -181,6 +181,24 @@ module KitchenInspector
       # Initialize the Repository Manager
       def repository_manager(config)
         @repo_inspector = RepositoryInspector.new config
+      end
+
+      # Initialize a Chef Inspector using knife.rb settings if not already
+      # initialized
+      #
+      # @return [ChefInspector]
+      def validate_chef_inspector
+        @chef_inspector ||= begin
+          # Fallback to knife.rb if possible
+          knife_cfg = "#{Dir.home}/.chef/knife.rb"
+          if File.exists?(knife_cfg)
+            Chef::Config.from_file knife_cfg
+            chef_server({ :username => Chef::Config.node_name,
+                          :url => Chef::Config.chef_server_url,
+                          :client_pem => Chef::Config.client_key
+                        })
+          end
+        end
       end
     end
   end
