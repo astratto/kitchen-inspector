@@ -24,7 +24,7 @@ describe HealthBureau do
 
           expect do
             HealthBureau.new config
-          end.to raise_error(RepositoryManagerError)
+          end.to raise_error(RepositoryManagerError, "Repository Manager 'Unknown' not supported.")
       end
 
       it "raises an error if an unsupported field is specified" do
@@ -35,7 +35,7 @@ describe HealthBureau do
 
           expect do
             HealthBureau.new config
-          end.to raise_error(ConfigurationError)
+          end.to raise_error(ConfigurationError, "Unsupported configuration: invalid_field.")
       end
 
       context "GitLab" do
@@ -58,7 +58,8 @@ describe HealthBureau do
 
             expect do
               HealthBureau.new config
-            end.to raise_error(GitLabAccessNotConfiguredError)
+            end.to raise_error(GitLabAccessNotConfiguredError, "GitLab Private Token not configured. " \
+                                                               "Please set token in your config file.")
           end
 
           it "raises an error when GitLab Base Url is not configured" do
@@ -68,7 +69,8 @@ describe HealthBureau do
 
             expect do
               HealthBureau.new config
-            end.to raise_error(GitLabAccessNotConfiguredError)
+            end.to raise_error(GitLabAccessNotConfiguredError, "GitLab base url not configured. " \
+                                                               "Please set base_url in your config file.")
           end
         end
       end
@@ -82,7 +84,8 @@ describe HealthBureau do
 
         expect do
           HealthBureau.new config
-        end.to raise_error(ChefAccessNotConfiguredError)
+        end.to raise_error(ChefAccessNotConfiguredError, "Chef Server url not configured. " \
+                                                         "Please set :url in your config file.")
       end
 
       it "raises an error when Client PEM is not configured" do
@@ -92,7 +95,8 @@ describe HealthBureau do
 
         expect do
           HealthBureau.new config
-        end.to raise_error(ChefAccessNotConfiguredError)
+        end.to raise_error(ChefAccessNotConfiguredError, "Chef client PEM not configured. " \
+                                                         "Please set :client_pem in your config file.")
       end
 
       it "raises an error when Username is not configured" do
@@ -102,7 +106,8 @@ describe HealthBureau do
 
         expect do
           HealthBureau.new config
-        end.to raise_error(ChefAccessNotConfiguredError)
+        end.to raise_error(ChefAccessNotConfiguredError, "Chef username not configured. " \
+                                                         "Please set :username in your config file.")
       end
     end
   end

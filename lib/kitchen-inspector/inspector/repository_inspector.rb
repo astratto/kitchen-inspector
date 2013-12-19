@@ -35,7 +35,7 @@ module KitchenInspector
           require "kitchen-inspector/inspector/repository_managers/#{config[:type].downcase}"
           manager_cls = "KitchenInspector::Inspector::#{config[:type]}Manager".constantize
         rescue LoadError, NameError => e
-          raise RepositoryManagerError, "Repository Manager '#{config[:type]}' not supported"
+          raise RepositoryManagerError, "Repository Manager '#{config[:type]}' not supported."
         end
 
         @manager = manager_cls.new config

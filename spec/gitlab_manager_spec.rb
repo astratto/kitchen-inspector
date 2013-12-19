@@ -41,7 +41,8 @@ describe GitLabManager do
 
         expect do
           GitLabManager.new config
-        end.to raise_error(GitLabAccessNotConfiguredError)
+        end.to raise_error(GitLabAccessNotConfiguredError, "GitLab Private Token not configured. " \
+                                                           "Please set token in your config file.")
       end
 
       it "raises an error when GitLab Base Url is not configured" do
@@ -51,7 +52,8 @@ describe GitLabManager do
 
         expect do
           GitLabManager.new config
-        end.to raise_error(GitLabAccessNotConfiguredError)
+        end.to raise_error(GitLabAccessNotConfiguredError, "GitLab base url not configured. " \
+                                                           "Please set base_url in your config file.")
       end
     end
   end

@@ -58,7 +58,7 @@ module KitchenInspector
         dependencies = inspector.investigate(path, options[:recursive])
 
         if dependencies.empty?
-          puts 'No dependent cookbooks'.yellow
+          puts 'No dependent cookbooks.'.yellow
           status_code = :'warning-nodependencies'
         else
           output, status_code = Report.generate(dependencies, options[:format], options)
@@ -69,10 +69,10 @@ module KitchenInspector
         puts e.message.red
         exit STATUS_TO_RETURN_CODES[:'error-config']
       rescue NotACookbookError
-        puts 'The path is not a cookbook path'.red
+        puts 'The path is not a cookbook path.'.red
         exit STATUS_TO_RETURN_CODES[:'error-notacookbook']
       rescue UnsupportedReportFormatError
-        puts "The report format #{options[:format]} is not supported".red
+        puts "The report format #{options[:format]} is not supported.".red
         exit STATUS_TO_RETURN_CODES[:'error-reportformat']
       end
     end

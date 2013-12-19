@@ -38,7 +38,7 @@ module KitchenInspector
         begin
           self.instance_eval configuration
         rescue NoMethodError => e
-          raise ConfigurationError, "Unsupported configuration: #{e.name}"
+          raise ConfigurationError, "Unsupported configuration: #{e.name}."
         end
       end
 
