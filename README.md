@@ -130,13 +130,14 @@ In order to turn off recursive analysis, simply use _--recursive false_.
 
 By default *${HOME}/.chef/kitchen_inspector.rb* is picked, but _--config_ can be used to override that setting.
 
+Valid Repository Manager and Chef Server configurations must be provided.  
+When a Chef Server configuration is not specified in *kitchen_inspector.rb* it fallbacks to *${HOME}/.chef/knife.rb*, if present.
+
 ```
 $ kitchen-inspector --config config_example.rb
 ```
 
 ### Chef server
-
-When a valid Chef Server configuration is not specified it fallbacks to *${HOME}/.chef/knife.rb*, if present.
 
 Example:
 
