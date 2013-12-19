@@ -16,6 +16,28 @@ describe HealthBureau do
   end
 
   describe "#initialize" do
+    context "Incomplete configuration" do
+      it "raises an error if a Repository Manager is not configured" do
+          config = StringIO.new
+          config.puts "chef_server :url => 'http://localhost:4000', :client_pem => 'testclient.pem', :username => 'test_user'"
+
+          expect do
+            HealthBureau.new config
+          end.to raise_error(ConfigurationError, "Repository Manager is not configured properly, "\
+                                                 "please check your 'repository_manager' configuration.")
+      end
+
+      it "raises an error if a Chef Server is not configured" do
+          config = StringIO.new
+          config.puts "repository_manager :type => 'GitLab', :base_url => 'http://localhost:8080', :token =>'test_token'"
+
+          expect do
+            HealthBureau.new config
+          end.to raise_error(ConfigurationError, "Chef Server is not configured properly, "\
+                                                 "please check your 'chef_server' configuration.")
+      end
+    end
+
     context "Repository Manager" do
       it "raises an error if an unsupported Repository Manager is specified" do
           config = StringIO.new

@@ -40,6 +40,12 @@ module KitchenInspector
         rescue NoMethodError => e
           raise ConfigurationError, "Unsupported configuration: #{e.name}."
         end
+
+        raise ConfigurationError, "Chef Server is not configured properly, " \
+                                  "please check your 'chef_server' configuration." unless @chef_inspector
+
+        raise ConfigurationError, "Repository Manager is not configured properly, " \
+                                  "please check your 'repository_manager' configuration." unless @repo_inspector
       end
 
       # Inspect your kitchen!
