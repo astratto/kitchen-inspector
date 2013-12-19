@@ -170,6 +170,8 @@ host the cookbooks you're interested in.
 So, even though a *token* is not strictly required, it's better to configure it as well.  
 From [GitHub's Applications page](https://github.com/settings/applications) go to "Personal Access Tokens" and generate a new token.
 
+Due to the huge search space, searches against GitHub are restricted to profiles owned by *allowed_users*.
+
 Example:
 
 ```ruby
