@@ -136,6 +136,8 @@ $ kitchen-inspector --config config_example.rb
 
 ### Chef server
 
+When a valid Chef Server configuration is not specified it fallbacks to *${HOME}/.chef/knife.rb*, if present.
+
 Example:
 
 ```ruby
