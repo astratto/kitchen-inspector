@@ -11,6 +11,10 @@ FIXES:
 
 * Detect when inspectors are not configured at all
 
+CHANGES:
+
+* Show 'inspect' in help instead of 'investigate'
+
 17 Dec 2013 (1.1.0)
 --
 

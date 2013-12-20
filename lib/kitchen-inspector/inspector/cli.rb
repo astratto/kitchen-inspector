@@ -49,9 +49,8 @@ module KitchenInspector
                              default: false,
                              aliases: '--remarks'
 
-      desc 'investigate (COOKBOOK_PATH)', 'Check Repository Manager/Chef Server status of dependent cookbooks'
-
-      map 'inspect'   => :investigate
+      desc 'inspect (COOKBOOK_PATH)', 'Check Repository Manager/Chef Server status of dependent cookbooks'
+      map 'inspect' => :investigate
       def investigate(path=Dir.pwd)
         inspector = HealthBureau.new options[:config]
 
