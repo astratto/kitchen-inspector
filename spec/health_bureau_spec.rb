@@ -143,7 +143,7 @@ describe HealthBureau do
 
   describe "#update_dependency" do
     before(:each) do
-      @dep = Dependency.new("test", ">= 0")
+      @dep = Models::Dependency.new("test", ">= 0")
     end
 
     it "returns a success for correct versions on both servers" do

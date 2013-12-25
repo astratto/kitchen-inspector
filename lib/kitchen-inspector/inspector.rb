@@ -34,7 +34,8 @@ require 'googl'
 require 'kitchen-inspector/inspector/common'
 require 'kitchen-inspector/inspector/mixin/utils'
 require 'kitchen-inspector/inspector/cli'
-require 'kitchen-inspector/inspector/dependency'
+
+require 'kitchen-inspector/inspector/models/dependency'
 
 require 'kitchen-inspector/inspector/chef_inspector'
 require 'kitchen-inspector/inspector/repository_inspector'

@@ -18,7 +18,7 @@ describe Report do
   describe ".generate" do
     context "global status" do
       before(:each) do
-        dep1 = Dependency.new("Test", "~> 1.0.0")
+        dep1 = Models::Dependency.new("Test", "~> 1.0.0")
         health_bureau.update_dependency(dep1, chef_info, repomanager_info)
 
         @dependencies = [dep1]
@@ -111,7 +111,7 @@ describe Report do
       end
 
       it "warn_req" do
-        dep1 = Dependency.new("Test", "= 1.0.0")
+        dep1 = Models::Dependency.new("Test", "= 1.0.0")
         chef = {:versions => ["1.0.0", "1.0.1"],
                      :latest_version => Solve::Version.new("1.0.1"),
                      :version_used => "1.0.0"}
@@ -214,7 +214,7 @@ describe Report do
 
       it "shows nested dependencies" do
         dep1 = @dependencies.first
-        dep2 = Dependency.new("Nested", "~> 1.0.0")
+        dep2 = Models::Dependency.new("Nested", "~> 1.0.0")
         dep2.parents << dep1
         dep1.dependencies << dep2
         health_bureau.update_dependency(dep2, chef_info, repomanager_info)

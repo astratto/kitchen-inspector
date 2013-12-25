@@ -65,7 +65,7 @@ module KitchenInspector
         metadata = project_metadata(project, revId)
 
         if metadata
-          metadata.dependencies.collect{|dep, constraint| Dependency.new(dep, constraint)}
+          metadata.dependencies.collect{|dep, constraint| Models::Dependency.new(dep, constraint)}
         end
       end
 

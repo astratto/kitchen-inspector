@@ -60,7 +60,7 @@ module KitchenInspector
             repo_info[:not_unique] = projects.size > 1
 
             # Inherit only shallow information from dependency
-            prj_dependency = Dependency.new(dependency.name, dependency.requirement)
+            prj_dependency = Models::Dependency.new(dependency.name, dependency.requirement)
             prj_dependency.parents = dependency.parents
 
             prj_dependency.parents.each do |parent|

@@ -60,7 +60,7 @@ module KitchenInspector
 
         metadata = Ridley::Chef::Cookbook::Metadata.from_file(File.join(path, 'metadata.rb'))
         metadata.dependencies.collect do |name, version|
-          analyze_dependency(Dependency.new(name, version), recursive)
+          analyze_dependency(Models::Dependency.new(name, version), recursive)
         end.flatten
       end
 
