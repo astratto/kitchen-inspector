@@ -299,7 +299,7 @@ describe HealthBureau do
         project = double()
 
         allow(project).to receive(:id).and_return(1)
-        allow(project).to receive(:path_with_namespace).and_return("group/project")
+        allow(project).to receive(:name).and_return("group/project")
 
         GitLabManager.any_instance.stub(:projects_by_name).and_return([
           project

@@ -23,26 +23,32 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-require 'chef/rest'
-require 'berkshelf'
-require 'colorize'
-require 'ridley'
-require 'terminal-table'
-require 'thor'
-require 'googl'
+module KitchenInspector
+  module Inspector
+    module Models
+      # The class that contains information about a cookbook on Repository Manager
+      class RepoCookbook
+        include Comparable
 
-require 'kitchen-inspector/inspector/common'
-require 'kitchen-inspector/inspector/mixin/utils'
-require 'kitchen-inspector/inspector/cli'
+        # The ID of the cookbook on Repository Manager
+        attr_reader :id
 
-require 'kitchen-inspector/inspector/models/dependency'
-require 'kitchen-inspector/inspector/models/repo_cookbook'
+        # The name of the cookbook
+        attr_reader :name
 
-require 'kitchen-inspector/inspector/chef_inspector'
-require 'kitchen-inspector/inspector/repository_inspector'
-require 'kitchen-inspector/inspector/health_bureau'
+        # Path to metadata.rb
+        attr_accessor :metadata_path
 
-require 'kitchen-inspector/inspector/repository_managers/base'
-require 'kitchen-inspector/inspector/report/report'
-require 'kitchen-inspector/inspector/report/status_reporter'
-require 'kitchen-inspector/inspector/version'
+        def initialize(id, name, metadata_path)
+          @id = id
+          @name = name
+          @metadata_path = metadata_path
+        end
+
+        def ==(anOther)
+          name == anOther.name && metadata_path == anOther.metadata_path
+        end
+      end
+    end
+  end
+end

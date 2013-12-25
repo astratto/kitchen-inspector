@@ -52,8 +52,8 @@ module KitchenInspector
 
       # Given a project and a revision retrieve its metadata
       def retrieve_metadata(project, revId)
-        response = Octokit.contents(project.full_name,
-                            {:ref => revId, :path => "metadata.rb" })
+        response = Octokit.contents(project.name,
+                            {:ref => revId, :path => project.metadata_path })
 
         if response && response.respond_to?(:content)
           eval_metadata Base64.decode64(response.content)
@@ -64,7 +64,7 @@ module KitchenInspector
 
       # Return the full URL for a given project
       def source_url(project)
-        "github.com/#{project.full_name}"
+        "github.com/#{project.name}"
       end
 
       # Retrieve projects by name
@@ -76,14 +76,15 @@ module KitchenInspector
           repos = repos.items.select do |repo|
             repo.name == name
           end
-          repos
+
+          repos.collect{|repo| Models::RepoCookbook.new(repo.id, repo.full_name, "metadata.rb")}
         end
       end
 
       # Given a project return the tags on GitHub
       def retrieve_tags(project)
         tags = {}
-        Octokit.tags(project.full_name).collect do |tag|
+        Octokit.tags(project.name).collect do |tag|
           tags[fix_version_name(tag.name)] = tag.commit.sha
         end
         tags

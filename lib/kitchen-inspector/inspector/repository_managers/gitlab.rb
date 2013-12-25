@@ -58,17 +58,18 @@ module KitchenInspector
 
       # Return the full URL for a given project
       def source_url(project)
-        "#{@gitlab_base_url}/#{project.path_with_namespace}"
+        "#{@gitlab_base_url}/#{project.name}"
       end
 
       # Retrieve projects by name
       def projects_by_name(name)
-        projects.select{|prj| prj.path == name }
+        repos = projects.select{|prj| prj.path == name }
+        repos.collect{|repo| Models::RepoCookbook.new(repo.id, repo.path_with_namespace, "metadata.rb")}
       end
 
       # Given a project and a revision retrieve its metadata
       def retrieve_metadata(project, revId)
-        response = HTTParty.get("#{Gitlab.endpoint}/projects/#{project.id}/repository/blobs/#{revId}?filepath=metadata.rb",
+        response = HTTParty.get("#{Gitlab.endpoint}/projects/#{project.id}/repository/blobs/#{revId}?filepath=#{project.metadata_path}",
                                 headers: {"PRIVATE-TOKEN" => Gitlab.private_token})
 
         if response.code == 200
