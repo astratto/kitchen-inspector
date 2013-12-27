@@ -71,7 +71,7 @@ module KitchenInspector
       def eval_metadata(raw_response)
         clean_response = raw_response.split("\n").select do |line|
           line.strip!
-          line =~ /^depends|^name|^version/
+          line !~ /^(long_)*description|^recipe|^maintainer.*|^license/
         end
 
         metadata = Ridley::Chef::Cookbook::Metadata.new

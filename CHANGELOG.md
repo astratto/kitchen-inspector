@@ -10,6 +10,7 @@ FEATURES:
 FIXES:
 
 * Detect when inspectors are not configured at all
+* Blacklist metadata.rb's fields instead of using a whitelist
 
 CHANGES:
 
