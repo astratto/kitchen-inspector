@@ -68,16 +68,32 @@ module KitchenInspector
       end
 
       # Retrieve projects by name
-      # Filter by allowed users
-      def projects_by_name(name, opts={})
+      #
+      # Scan allowed_users' repositories in order to detect cookbooks matching 'name'
+      # in their metadata.rb
+      #
+      # @param name [String] name of the cookbook to search for
+      # @return [Array<RepoCookbook>] cookbooks matching search criteria
+      def projects_by_name(name)
         @projects_cache[name] ||= begin
-          user_query = @allowed_users.collect{|user| "user:#{user}"}.join(' ')
-          repos = Octokit.search_repos "#{name} in:name language:ruby #{user_query}"
-          repos = repos.items.select do |repo|
-            repo.name == name
+          projects = []
+
+          @allowed_users.each do |user|
+            repos = Octokit.repos user
+            repos.each do |repo|
+              project = Models::RepoCookbook.new(repo.id, repo.full_name, "metadata.rb")
+
+              # Match against metadata.rb's name
+              content = Octokit.contents repo.full_name
+              if is_a_cookbook?(content)
+                # Metadata.rb in repo's root
+                metadata = project_metadata(project, "master")
+                projects << project if metadata && metadata.name == name
+              end
+            end
           end
 
-          repos.collect{|repo| Models::RepoCookbook.new(repo.id, repo.full_name, "metadata.rb")}
+          projects
         end
       end
 
@@ -93,6 +109,11 @@ module KitchenInspector
       def to_s
         "#{@type} instance"
       end
+
+      private
+        def is_a_cookbook?(content)
+          content.any?{|f| f.type == "file" && f.name == "metadata.rb"}
+        end
     end
   end
 end

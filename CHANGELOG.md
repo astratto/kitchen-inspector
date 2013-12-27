@@ -6,6 +6,7 @@ Next Version
 FEATURES:
 
 * Fallback to *knife.rb* for Chef Server configuration
+* GitHub: analyze repositories' metadata to find matches
 
 FIXES:
 
