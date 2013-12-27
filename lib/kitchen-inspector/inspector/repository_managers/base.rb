@@ -98,7 +98,7 @@ module KitchenInspector
       # Return a shortened url to the commits between two revisions
       def changelog(project_url, revId, otherRevId)
         return unless project_url && revId && otherRevId
-        cache_key = "#{project_url}-#{revId}-otherRevId"
+        cache_key = "#{project_url}-#{revId}-#{otherRevId}"
 
         @changelogs_cache[cache_key] ||=
           begin
