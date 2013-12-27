@@ -2,7 +2,9 @@ require_relative 'support/spec_helper'
 
 describe GitHubManager do
   let(:manager) do
-    config = {:type => "GitHub", :allowed_users => ["astratto"]}
+    config = {:type => "GitHub",
+              :allowed_users => ["kitchen-inspector"],
+              :token => ENV['GITHUB_TOKEN']}
 
     manager = GitHubManager.new config
     manager
@@ -22,7 +24,7 @@ describe GitHubManager do
       it "creates a valid Manager" do
         config = {:type => "GitHub",
                   :token => ENV['GITHUB_TOKEN'],
-                  :allowed_users => ["astratto"]
+                  :allowed_users => ["kitchen-inspector"]
                 }
 
         manager = GitHubManager.new config
@@ -42,36 +44,35 @@ describe GitHubManager do
   end
 
   describe "#projects_by_name" do
-    it "returns the correct project for astratto/kitchen-inspector", :type => :external do
-      projects = manager.projects_by_name "kitchen-inspector"
+    it "returns the correct project for kitchen-inspector/cook-test", :type => :external do
+      projects = manager.projects_by_name "cook-test"
       expect(projects).not_to eq(nil)
     end
   end
 
   describe "#tags" do
-    let(:project) { manager.projects_by_name("kitchen-inspector").first }
+    let(:project) { manager.projects_by_name("cook-test").first }
 
-    it "returns the correct tags for astratto/kitchen-inspector", :type => :external do
-
-      expect(manager.tags(project)["1.0.1"]).to eq("b935719a532c8042b51de560db09881803fbb511")
+    it "returns the correct tags for kitchen-inspector/cook-test", :type => :external do
+      expect(manager.tags(project)["1.1.0"]).to eq("5c430684e34415df07f3178dff96f2cf23a59452")
     end
   end
 
   describe "#project_metadata" do
     let(:project) { manager.projects_by_name("cook-test").first }
-    it "returns the correct metadata for github.com/astratto/cook-test v.1.0.0", :type => :external do
+    it "returns the correct metadata for github.com/kitchen-inspector/cook-test v.1.1.0", :type => :external do
 
-      metadata = manager.project_metadata(project, "689dcf42e0cc0710fd337ebd1fee3d2ee8e7dca4")
+      metadata = manager.project_metadata(project, "5c430684e34415df07f3178dff96f2cf23a59452")
       expect(metadata.name).to eq("cook-test")
     end
 
-    it "returns the correct version for github.com/astratto/cook-test v.1.0.0", :type => :external do
-      version = manager.project_metadata_version(project, "689dcf42e0cc0710fd337ebd1fee3d2ee8e7dca4")
-      expect(version).to eq("1.0.0")
+    it "returns the correct version for github.com/kitchen-inspector/cook-test v.1.1.0", :type => :external do
+      version = manager.project_metadata_version(project, "5c430684e34415df07f3178dff96f2cf23a59452")
+      expect(version).to eq("1.1.0")
     end
 
-    it "returns the correct dependencies for github.com/astratto/cook-test v.1.0.0", :type => :external do
-      dependencies = manager.project_dependencies(project, "689dcf42e0cc0710fd337ebd1fee3d2ee8e7dca4")
+    it "returns the correct dependencies for github.com/kitchen-inspector/cook-test v.1.1.0", :type => :external do
+      dependencies = manager.project_dependencies(project, "5c430684e34415df07f3178dff96f2cf23a59452")
 
       expect(dependencies.collect(&:name)).to eq(["openssl", "build-essential"])
     end
