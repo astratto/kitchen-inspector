@@ -64,7 +64,8 @@ module KitchenInspector
       # Retrieve projects by name
       def projects_by_name(name)
         repos = projects.select{|prj| prj.path == name }
-        repos.collect{|repo| Models::RepoCookbook.new(repo.id, repo.path_with_namespace, "metadata.rb")}
+        repos.collect{|repo| Models::RepoCookbook.new(repo.id, repo.path_with_namespace,
+                                            "metadata.rb", nil)}
       end
 
       # Given a project and a revision retrieve its metadata

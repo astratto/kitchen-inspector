@@ -48,6 +48,8 @@ module KitchenInspector
           c.access_token = config[:token]
           c.auto_paginate = true
         end
+
+        load_cache
       end
 
       # Given a project and a revision retrieve its metadata
@@ -81,14 +83,15 @@ module KitchenInspector
           @allowed_users.each do |user|
             repos = Octokit.repos user
             repos.each do |repo|
-              project = Models::RepoCookbook.new(repo.id, repo.full_name, "metadata.rb")
+              project = Models::RepoCookbook.new(repo.id, repo.full_name,
+                                      "metadata.rb", repo.updated_at)
 
               # Match against metadata.rb's name
               content = Octokit.contents repo.full_name
               if is_a_cookbook?(content)
                 # Metadata.rb in repo's root
                 metadata = project_metadata(project, "master")
-                projects << project if metadata && metadata.name == name
+                projects << project if metadata
               end
             end
           end
@@ -113,6 +116,46 @@ module KitchenInspector
       private
         def is_a_cookbook?(content)
           content.any?{|f| f.type == "file" && f.name == "metadata.rb"}
+        end
+
+        def store_cache
+          require 'byebug'
+          byebug
+
+          File.open("#{Dir.home}/.chef/.kitchen-inspector.cache", "w") do |cache|
+            cache.write @projects_cache.to_json
+          end
+        end
+
+        def load_cache
+          cache_file = "#{Dir.home}/.chef/.kitchen-inspector.cache"
+
+          require 'byebug'
+          byebug
+          if File.exists? cache_file
+            @projects_cache = JSON.parse File.read(cache_file)
+          else
+            init_cache
+          end
+          @projects_cache
+        end
+
+        def init_cache
+          @allowed_users.each do |user|
+            repos = Octokit.repos user
+            repos.each do |repo|
+              puts "Init cache for #{repo.full_name}"
+              project = Models::RepoCookbook.new(repo.id, repo.full_name, "metadata.rb", repo.updated_at)
+
+              # Match against metadata.rb's name
+              content = Octokit.contents repo.full_name
+              if is_a_cookbook?(content)
+                # Metadata.rb in repo's root
+                project_metadata(project, "master")
+              end
+            end
+          end
+          store_cache
         end
     end
   end

@@ -54,6 +54,10 @@ module KitchenInspector
       def investigate(path=Dir.pwd)
         inspector = HealthBureau.new options[:config]
 
+#        inspector.repo_inspector.manager.send(:init_cache)
+#        inspector.repo_inspector.manager.send(:store_cache)
+        inspector.repo_inspector.manager.send(:load_cache)
+
         dependencies = inspector.investigate(path, options[:recursive])
 
         if dependencies.empty?

@@ -39,10 +39,14 @@ module KitchenInspector
         # Path to metadata.rb
         attr_accessor :metadata_path
 
-        def initialize(id, name, metadata_path)
+        # Path to metadata.rb
+        attr_accessor :updated_at
+
+        def initialize(id, name, metadata_path, updated_at)
           @id = id
           @name = name
           @metadata_path = metadata_path
+          @updated_at = updated_at
         end
 
         def ==(anOther)

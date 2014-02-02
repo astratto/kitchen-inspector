@@ -82,7 +82,7 @@ module KitchenInspector
 
       # Given a project and a revision retrieve its metadata
       def project_metadata(project, revId)
-        cache_key = "#{project.id}-#{revId}"
+        cache_key = "#{project.id}-#{project.updated_at}-#{revId}"
         @metadata_cache[cache_key] ||=
           begin
             retrieve_metadata(project, revId)

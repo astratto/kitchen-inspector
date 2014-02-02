@@ -59,9 +59,13 @@ module KitchenInspector
         raise NotACookbookError, 'Path is not a cookbook' unless File.exists?(File.join(path, 'metadata.rb'))
 
         metadata = Ridley::Chef::Cookbook::Metadata.from_file(File.join(path, 'metadata.rb'))
-        metadata.dependencies.collect do |name, version|
+        dependencies = metadata.dependencies.collect do |name, version|
           analyze_dependency(Models::Dependency.new(name, version), recursive)
         end.flatten
+
+        @repo_inspector.manager.store_cache
+
+        dependencies
       end
 
       # Analyze Chef repo and Repository manager in order to find more information
