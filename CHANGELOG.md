@@ -1,6 +1,7 @@
 Changes
 ==
-Next Version
+
+12 Feb 2014 (1.2.0)
 --
 
 FEATURES:
