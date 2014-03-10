@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Stefano Tortarolo <stefano.tortarolo@gmail.com>
+# Copyright (c) 2014 Stefano Tortarolo <stefano.tortarolo@gmail.com>
 #
 # MIT License
 #
@@ -23,26 +23,24 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-require 'chef/rest'
-require 'berkshelf'
-require 'colorize'
-require 'ridley'
-require 'terminal-table'
-require 'thor'
+module KitchenInspector
+  module Inspector
+    module NetUtils
+      SHORTENER_API_URL = "https://www.googleapis.com/urlshortener/v1/url"
 
-require 'kitchen-inspector/inspector/common'
-require 'kitchen-inspector/inspector/mixin/utils'
-require 'kitchen-inspector/inspector/mixin/net_utils'
-require 'kitchen-inspector/inspector/cli'
+      def shorten_url(url)
+        response = HTTParty.post(SHORTENER_API_URL,
+                           :body => {'longUrl' => url}.to_json,
+                           :headers => {'Content-Type' => 'application/json'})
 
-require 'kitchen-inspector/inspector/models/dependency'
-require 'kitchen-inspector/inspector/models/repo_cookbook'
+        if response.code == 200
+          response['id']
+        else
+          "Short url N/A"
+        end
+      end
 
-require 'kitchen-inspector/inspector/chef_inspector'
-require 'kitchen-inspector/inspector/repository_inspector'
-require 'kitchen-inspector/inspector/health_bureau'
-
-require 'kitchen-inspector/inspector/repository_managers/base'
-require 'kitchen-inspector/inspector/report/report'
-require 'kitchen-inspector/inspector/report/status_reporter'
-require 'kitchen-inspector/inspector/version'
+      module_function :shorten_url
+    end
+  end
+end

@@ -102,7 +102,7 @@ module KitchenInspector
 
         @changelogs_cache[cache_key] ||=
           begin
-            Googl.shorten("#{project_url}/compare/#{revId}...#{otherRevId}").short_url.gsub(/^http:\/\//, '')
+            NetUtils.shorten_url("#{project_url}/compare/#{revId}...#{otherRevId}").gsub(/^http:\/\//, '')
           end
       end
     end
