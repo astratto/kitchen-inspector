@@ -44,6 +44,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "thor", "~> 0.18.0"
   spec.add_dependency "terminal-table", "~> 1.4.5"
   spec.add_dependency "colorize", "~> 0.6.0"
-  spec.add_dependency "httparty", "~> 0.10.0"
+  spec.add_dependency "httparty", "~> 0.13"
   spec.add_dependency "chef", ">= 11.0.0"
 end
