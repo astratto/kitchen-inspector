@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Stefano Tortarolo <stefano.tortarolo@gmail.com>
+# Copyright (c) 2013-2014 Stefano Tortarolo <stefano.tortarolo@gmail.com>
 #
 # MIT License
 #
@@ -24,6 +24,6 @@
 #
 module KitchenInspector
   module Inspector
-    VERSION = '1.2.0'
+    VERSION = '1.3.0'
   end
 end

@@ -313,7 +313,7 @@ $ rake test
 
 Author:: Stefano Tortarolo (stefano.tortarolo@gmail.com)
 
-Copyright:: Copyright (c) 2013
+Copyright:: Copyright (c) 2013-2014
 License:: MIT License
 
 ## CREDITS

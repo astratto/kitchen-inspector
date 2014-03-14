@@ -1,6 +1,20 @@
 Changes
 ==
 
+14 Mar 2014 (1.3.0)
+--
+
+Maintenance release that updates dependencies and **drops support for Ruby 1.9.2**.
+
+As a result, less dependencies are now required.
+
+CHANGES:
+
+* Drop support for 1.9.2
+* Add official support for 2.1.1
+* Update dependencies (i.e., httparty)
+* Remove some dependencies (i.e., Berkshelf & googl)
+
 12 Feb 2014 (1.2.0)
 --
 
