@@ -31,13 +31,13 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.3"
-  spec.add_development_dependency "rubocop", "~> 0.14"
+  spec.add_development_dependency "rubocop", ">= 0.49.0"
   spec.add_development_dependency "rake"
   spec.add_development_dependency 'chef-zero'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency "gitlab", "~> 3.0"
-  spec.add_development_dependency "octokit", "~> 2.6"
+  spec.add_development_dependency "octokit", "~> 2.6"  
 
   spec.add_dependency "solve", "~> 0.8.0"
   spec.add_dependency "ridley", "~> 2.5.1"
